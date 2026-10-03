@@ -609,6 +609,147 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  return '<div class="tp-chain"><div class="tp-header"><div class="titles"><div class="eyebrow">Bac Pro Maintenance des véhicules · TP</div><h1>'+fmt(p,'publicTitle')+'</h1><div>Bac Pro MV · Durée : '+E(p.duration||'__________')+'</div></div><span class="code">'+E(p.publicId||p.id||'TP')+'</span></div>'+(opt.student?'<div class="student"><span>Nom et prénom : '+E(opt.student.name||'')+'</span><span>Classe : '+E(opt.student.classe||'')+'</span><span>Date : '+E(opt.student.date||'')+'</span></div>':'')+extras+covers+'<div class="brief"><section><h2>Situation professionnelle</h2><div>'+fmt(p,'intro')+'</div></section><section><h2>Objectifs</h2><div>'+fmt(p,'objectives')+'</div></section><section><h2>Support</h2><div>'+fmt(p,'support')+'</div></section><section><h2>Ressources et matériels</h2><div>'+fmt(p,'resources')+'</div></section></div>'+body+'<div class="footer"><span>'+E(p.publicId||p.id||'TP')+'</span><span>Chaîne graphique V198</span></div></div>'}
  return {render};} window.TPChainRenderer=TPChainRenderer;
 (function(){const R=TPChainRenderer();function pof(){let m=window.model||model,p=m?.tpProject||m?.sourceProject||m?.project||m?.projet;return p?.schema==='evaluation.tp.v1'&&p.data?p.data:p}function answers(){let m=window.model||model;m.reponses=m.reponses||{};m.reponses.v117=m.reponses.v117||{};return m.reponses.v117}function apply(){let p=pof(),m=window.model||model;if(!p)return;let host=document.getElementById('v117ProjectHost')||document.getElementById('v115ProjectHost');if(!host)return;host.innerHTML=R.render(p,{answers:answers(),student:{name:[m.eleve?.nom,m.eleve?.prenom].filter(Boolean).join(' '),classe:m.classe||'',date:m.eleve?.date||''}});host.querySelectorAll('[data-chain-answer]').forEach(t=>t.oninput=()=>{answers()[t.dataset.chainAnswer]=t.value});host.querySelectorAll('[data-chain-table]').forEach(t=>t.oninput=()=>{let a=answers(),id=t.dataset.chainTable,r=+t.dataset.r,c=+t.dataset.c;a[id]=a[id]||[];a[id][r]=a[id][r]||[];a[id][r][c]=t.value})}const old=window.render;window.render=function(){let z=old?.apply(this,arguments);setTimeout(apply,0);return z};document.addEventListener('DOMContentLoaded',()=>setTimeout(apply,50));window.addEventListener('load',()=>setTimeout(apply,100));})();</script>
+
+<!-- V200 : base V198 CHAINE_GRAPHIQUE_FIDELE + alignement Editeur V65 -->
+<style id="reader-v200-editor-exact-style">
+body.v200-editor-exact #v117ProjectHost{display:none!important}
+body.v200-editor-exact #v200ProjectHost{display:block!important}
+#v200ProjectHost{background:white;box-shadow:0 3px 18px #15304b24;max-width:1040px;margin:18px auto;padding:25px 30px;min-height:690px;color:#1a2c3c;font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+#v200ProjectHost *{box-sizing:border-box}
+#v200ProjectHost .tp-header{display:flex;gap:18px;align-items:center;border-bottom:5px solid #1c75b8;padding-bottom:12px}
+#v200ProjectHost .tp-header img.tp-logo{width:115px;height:50px;object-fit:contain}
+#v200ProjectHost .tp-header .titles{flex:1}
+#v200ProjectHost .eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800;color:#1c75b8}
+#v200ProjectHost .tp-header h1{font-size:27px;line-height:1.15;margin:2px 0 3px;color:#173e60}
+#v200ProjectHost .sub{color:#60788d;font-size:12px}
+#v200ProjectHost .code{background:#173e60;color:white;border-radius:5px;padding:7px 10px;font-weight:800}
+#v200ProjectHost .student{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0}
+#v200ProjectHost .student span{border-bottom:1px solid #7d91a4;min-height:27px;color:#60788d;font-size:11px}
+#v200ProjectHost .brief{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+#v200ProjectHost .brief section{background:#edf6fc;border-left:4px solid #1c75b8;padding:10px 12px;min-height:70px}
+#v200ProjectHost .brief h2{font-size:12px;text-transform:uppercase;margin:0 0 4px;color:#1c75b8}
+#v200ProjectHost .brief p{margin:0;white-space:pre-wrap;font-size:12px}
+#v200ProjectHost h2.section-title{font-size:17px;color:#173e60;border-bottom:2px solid #d5e1ec;padding-bottom:5px;margin:23px 0 10px}
+#v200ProjectHost .question-card{border:1px solid #c8d7e5;border-radius:7px;margin:11px 0;padding:12px 13px;break-inside:avoid;page-break-inside:avoid}
+#v200ProjectHost .qhead{display:flex;align-items:flex-start;gap:9px}
+#v200ProjectHost .qno{background:#1c75b8;color:white;border-radius:4px;padding:3px 6px;min-width:30px;text-align:center;font-weight:800;font-size:12px}
+#v200ProjectHost .qbody{flex:1;min-width:0;display:flow-root}
+#v200ProjectHost .qtext{white-space:pre-wrap;font-weight:650;font-size:13px}
+#v200ProjectHost .qmeta{font-size:10px;color:#46617c;margin-top:6px}
+#v200ProjectHost .qmeta em{font-style:normal;background:#eaf3fa;border-radius:3px;padding:2px 4px;margin-right:4px}
+#v200ProjectHost .answer{display:block;width:100%;border:1px solid #aabccb;margin-top:10px;border-radius:3px;min-height:42px;padding:7px 9px;background:white;color:#1a2c3c;font:inherit;line-height:1.5;resize:vertical}
+#v200ProjectHost .answer:focus{outline:2px solid #377caa;outline-offset:1px}
+#v200ProjectHost .footer{border-top:1px solid #d5e1ec;padding-top:8px;margin-top:22px;color:#60788d;font-size:10px;display:flex;justify-content:space-between}
+#v200ProjectHost .image-block{border:2px solid #9dc9e7;background:#f5faff;border-radius:7px;margin:11px 0;padding:12px;break-inside:avoid;display:flow-root}
+#v200ProjectHost .image-block h3,#v200ProjectHost .text-block h3,#v200ProjectHost .table-block h3,#v200ProjectHost .match-block h3,#v200ProjectHost .placement-block h3{font-size:13px;color:#1c75b8;margin:0 0 7px}
+#v200ProjectHost .image-grid{display:flex;flex-wrap:wrap;gap:10px}
+#v200ProjectHost .image-grid figure{margin:0;flex:1 1 220px;text-align:center}
+#v200ProjectHost .image-grid img{max-width:100%;max-height:300px;object-fit:contain}
+#v200ProjectHost figure figcaption{font-size:10px;color:#60788d}
+#v200ProjectHost .question-contents{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:10px;margin-top:12px}
+#v200ProjectHost .question-contents>*{min-width:0;margin:0!important}
+#v200ProjectHost .placement-block,#v200ProjectHost .table-block,#v200ProjectHost .text-block,#v200ProjectHost .match-block{border:2px solid #adc9df;border-radius:7px;padding:12px;margin:13px 0;break-inside:avoid;display:flow-root;background:#fff}
+#v200ProjectHost .text-block{border-color:var(--text-frame-color,#175b97)}
+#v200ProjectHost .placement-stage{position:relative;width:min(100%,600px);margin:10px auto;touch-action:none;user-select:none}
+#v200ProjectHost .placement-stage img{width:100%;height:auto;display:block;border:1px solid #9eb5c9;border-radius:5px;box-sizing:border-box}
+#v200ProjectHost .placement-bank,#v200ProjectHost .match-bank{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px;min-height:38px;padding:8px;background:#edf5fa;border-radius:5px}
+#v200ProjectHost .placement-token,#v200ProjectHost .placement-pin{background:#176a9e;color:white;border:2px solid white;box-shadow:0 1px 5px #2348;border-radius:50%;min-width:34px;height:34px;padding:2px 7px;font-weight:800;text-align:center;white-space:nowrap;cursor:grab}
+#v200ProjectHost .placement-pin{position:absolute;transform:translate(-50%,-50%);touch-action:none}
+#v200ProjectHost .match-token{background:#fff;border:1px solid #5a9bcc;border-radius:20px;padding:6px 11px;font-size:12px;font-weight:700;color:#173e60;cursor:grab}
+#v200ProjectHost .match-token.used{opacity:.42}
+#v200ProjectHost .match-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}
+#v200ProjectHost .match-card{border:1px solid #cbd9e7;background:white;padding:8px;text-align:center;border-radius:7px}
+#v200ProjectHost .match-card img{width:100%;height:120px;object-fit:contain}
+#v200ProjectHost .match-drop{width:100%;margin-top:7px;border:2px dashed #90b4d0;border-radius:5px;background:#f8fcff;min-height:40px;padding:7px;font-size:12px;color:#41678a}
+#v200ProjectHost .match-drop.filled{background:#e7f5e9;border-color:#39a36b;color:#164d30}
+#v200ProjectHost .tp-grid{width:100%;border-collapse:collapse;background:#fff}
+#v200ProjectHost .tp-grid td,#v200ProjectHost .tp-grid th{border:1px solid #9fc4d6;padding:8px;vertical-align:middle}
+#v200ProjectHost .tp-grid th{background:#edf6fc}
+#v200ProjectHost .tp-grid textarea{width:100%;min-height:42px;border:1px solid #b8ccda;border-radius:4px;padding:6px;font:inherit}
+#v200ProjectHost .builtin-picto-group{float:right;display:flex;gap:4px;margin:0 0 8px 12px}
+#v200ProjectHost .block-picto{width:44px;height:44px;object-fit:contain}
+#v200ProjectHost .tp-photo-row{width:100%;clear:both}
+#v200ProjectHost .tp-photo{max-width:100%;text-align:center;margin-top:9px;margin-bottom:4px}
+#v200ProjectHost .tp-photo img{display:block;max-width:100%;max-height:300px;object-fit:contain;margin:auto}
+#v200ProjectHost .photo-question img{max-height:270px}
+#v200ProjectHost .builtin-cover-grid{display:grid;gap:10px;margin:12px 0}
+#v200ProjectHost .builtin-cover-grid figure{margin:0;text-align:center}
+#v200ProjectHost .builtin-cover-grid img{display:block;max-width:100%;max-height:300px;object-fit:contain}
+#v200ProjectHost .cover-text-block{background:#fff;border:2px solid var(--text-frame-color,#175b97);border-radius:7px;padding:12px;margin:12px 0;display:flow-root}
+#v200ProjectHost .cover-text-block h2{font-size:13px;color:#1c75b8;margin:0 0 7px}
+#v200ProjectHost .cover-text-block p,#v200ProjectHost .text-block p,#v200ProjectHost .image-block p,#v200ProjectHost .table-block p,#v200ProjectHost .match-block p,#v200ProjectHost .placement-block p{white-space:pre-wrap}
+#v200ProjectHost .tp-spacer{width:100%;clear:both}
+#v200ProjectHost .call-prof{display:flex;width:max-content;max-width:100%;clear:both;align-items:center;gap:7px;border:2px solid #223243;border-radius:6px;background:white;padding:4px 8px;margin:12px 0 0 auto;font-size:12px;font-weight:800}
+@media(max-width:700px){#v200ProjectHost{padding:15px;min-height:0}#v200ProjectHost .brief,#v200ProjectHost .student{grid-template-columns:1fr}#v200ProjectHost .tp-header h1{font-size:20px}}
+@media print{#v200ProjectHost{box-shadow:none;margin:0;max-width:none}.tp-photo,.question-card,.image-block,.text-block,.table-block,.match-block,.placement-block{break-inside:avoid}}
+</style>
+<script id="reader-v200-editor-exact-runtime">
+(function(){
+'use strict';
+const E=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const validColour=v=>/^#[0-9a-f]{6}$/i.test(String(v||''));
+const image=o=>o?.data||o?.image||o?.src||'';
+function project(){let p=model?.tpProject||model?.sourceProject||model?.project||null;return p?.schema==='evaluation.tp.v1'&&p.data?p.data:p}
+function pictos(){return model?.tpPictograms||model?.projectPictograms||model?.tpProjectPictograms||[]}
+function getObj(p,f){const map={question:'questions',image:'imageBlocks',match:'matchBlocks',text:'textBlocks',table:'tableBlocks',placement:'placementBlocks'};return (p?.[map[f.type]]||[]).find(x=>String(x.id)===String(f.id))}
+function bag(){model.reponses=model.reponses||{};model.reponses.v117=model.reponses.v117||{};return model.reponses.v117}
+function textStyleAt(obj,field,index){let out={...(obj?._textDefaults?.[field]||{})};for(const r of (obj?._textFormats?.[field]||[]))if(index>=Number(r.start)&&index<Number(r.end))for(const k of ['bold','italic','strike','size','color'])if(r[k]!==undefined)out[k]=r[k];return out}
+function formattedText(obj,field){const value=String(obj?.[field]??'');if(!value)return'';if(!obj?._textFormats?.[field]?.length&&!obj?._textDefaults?.[field])return E(value);let pieces=[],start=0,prev=textStyleAt(obj,field,0),key=x=>JSON.stringify(x);function flush(end){let text=E(value.slice(start,end));if(prev.bold)text=`<strong>${text}</strong>`;if(prev.italic)text=`<em>${text}</em>`;if(prev.strike)text=`<del>${text}</del>`;if(prev.size)text=`<span style="font-size:${Math.max(8,Math.min(48,Number(prev.size)||12))}pt">${text}</span>`;if(validColour(prev.color))text=`<span style="color:${prev.color}">${text}</span>`;pieces.push(text)}for(let i=1;i<value.length;i++){const next=textStyleAt(obj,field,i);if(key(next)!==key(prev)){flush(i);start=i;prev=next}}flush(value.length);return pieces.join('')}
+function frameWidth(v,def=2){let n=Number(v);return Number.isFinite(n)?Math.max(0,Math.min(10,n)):def}
+function blockFrameStyle(b){const c=validColour(b?.frameColor)?`border-color:${b.frameColor};`:'';return c+(b?.frameWidthPx!==undefined?`border-width:${frameWidth(b.frameWidthPx)}px;`:'')}
+function coverFrameWidth(m,k){return frameWidth(m?.coverFrameWidths?.[k],k==='header'?5:k==='photos'?2:4)}
+function coverFrameStyle(m,k){let c=m?.coverFrameColors?.[k];return(validColour(c)?`border-color:${c};`:'')+(m?.coverFrameWidths?.[k]!==undefined?`border-width:${coverFrameWidth(m,k)}px;`:'')}
+function photoWidth(im){let n=Number(im?.widthPct);return Number.isFinite(n)?Math.max(10,Math.min(100,n)):0}
+function photoAlign(im){return ['left','center','right'].includes(im?.align)?im.align:'center'}
+function photoStyle(im){const w=photoWidth(im),a=photoAlign(im);return`width:${w||100}%;margin-left:${a==='left'?'0':'auto'};margin-right:${a==='right'?'0':'auto'};`}
+function photoMarkup(im,mode){const width=photoWidth(im),align=photoAlign(im),url=E(image(im)),caption=E(im?.caption||im?.name||'');if(mode==='zone'&&!width&&!im?.align)return`<figure><img src="${url}" alt="${caption||'Illustration'}">${caption?`<figcaption>${caption}</figcaption>`:''}</figure>`;const margins=align==='left'?'margin-left:0;margin-right:auto':align==='right'?'margin-left:auto;margin-right:0':'margin-left:auto;margin-right:auto';return`<div class="tp-photo-row"><figure class="tp-photo ${width?'photo-sized':'photo-auto'} ${mode==='question'?'photo-question':''}" style="${width?'width:'+width+'%;':''}${margins}"><img src="${url}" alt="${caption||'Illustration'}">${caption?`<figcaption>${caption}</figcaption>`:''}</figure></div>`}
+function pictogram(obj){let ids=Array.isArray(obj?.pictogramIds)&&obj.pictogramIds.length?obj.pictogramIds:[obj?.pictogramId];let imgs=[...new Set(ids.filter(Boolean))].map(id=>pictos().find(p=>String(p.id)===String(id))).filter(p=>p?.image?.startsWith('data:image/'));if(!imgs.length&&obj?.pictogram?.data)imgs=[{image:obj.pictogram.data,name:''}];return imgs.length?`<span class="builtin-picto-group">${imgs.map(p=>`<img class="block-picto" src="${E(p.image)}" alt="${E(p.name||'')}" title="${E(p.name||'')}">`).join('')}</span>`:''}
+function callProf(o){return o?.callProfessor?`<div class="call-prof"><strong>👨‍🏫 Appeler le professeur</strong></div>`:''}
+function publicMeta(q){if(q.hideEvaluationCriteria)return'';let c=String(q.competence||'').trim(),id=String(q.criterionId||'').trim(),label=String(q.criterion||'').trim(),ok=s=>s&&!/à\s+(préciser|définir|déterminer)/i.test(s),bits=[];if(ok(c))bits.push(`<em>${E(c)}</em>`);if(ok(id))bits.push(`<em>${E(id)}</em>`);if(ok(label))bits.push(E(label));return bits.length?`<div class="qmeta">${bits.join(' ')}</div>`:''}
+function fontFieldStyle(o,f){let s=o?._textDefaults?.[f]||{};let z='';if(s.bold)z+='font-weight:700;';if(s.italic)z+='font-style:italic;';if(s.strike)z+='text-decoration:line-through;';if(s.size)z+=`font-size:${Math.max(8,Math.min(48,Number(s.size)||12))}pt;`;if(validColour(s.color))z+=`color:${s.color};`;return z}
+function textFrameColor(b){return validColour(b?.frameColor)?b.frameColor:'#175b97'}
+function spacerMarkup(b){let n=Number(b?.heightMm);n=Number.isFinite(n)?Math.max(0,Math.min(150,n)):10;return`<div class="tp-spacer" style="height:${n}mm" aria-label="Espacement"></div>`}
+function coverBlocks(m,pos){return(m.coverBlocks||[]).filter(b=>(b.position||'afterBrief')===pos).map(b=>b.type==='spacer'?spacerMarkup(b):`<section class="cover-text-block" style="--text-frame-color:${textFrameColor(b)};${blockFrameStyle(b)}">${b.title?`<h2>${formattedText(b,'title')}</h2>`:''}<p>${formattedText(b,'text')}</p></section>`).join('')}
+function coverPhotos(m){let photos=(m.coverImages||[]).filter(im=>image(im));if(!photos.length)return'';let cols=Math.max(1,Math.min(4,Number(m.coverColumns)||2));return`<div class="builtin-cover-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr));${coverFrameStyle(m,'photos')}${m.coverFrameColors?.photos||m.coverFrameWidths?.photos!==undefined?'border-style:solid;border-width:'+coverFrameWidth(m,'photos')+'px;padding:8px;':''}">${photos.map(im=>`<figure><img src="${E(image(im))}" alt="Illustration" style="width:${Math.max(10,Math.min(100,Number(im.widthPct)||100))}%;margin-left:${im.align==='left'?'0':'auto'};margin-right:${im.align==='right'?'0':'auto'}">${im.caption?`<figcaption>${E(im.caption)}</figcaption>`:''}</figure>`).join('')}</div>`}
+function block(p,f){
+ const x=getObj(p,f);if(!x)return'';const answers=bag(),a=answers[x.id];
+ if(f.type==='text')return x.isSpacer?spacerMarkup(x):`<section class="text-block" style="--text-frame-color:${textFrameColor(x)};${blockFrameStyle(x)}">${pictogram(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}<p>${formattedText(x,'text')}</p>${callProf(x)}</section>`;
+ if(f.type==='image')return`<div class="image-block ${x.images?.length?'':'empty-print'}" style="${blockFrameStyle(x)}">${pictogram(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="image-grid">${(x.images||[]).map(im=>photoMarkup(im,'zone')).join('')}</div>${callProf(x)}</div>`;
+ if(f.type==='table'){let weights=(x.columnWeights||[]).map(v=>Math.max(1,+v||1)),total=weights.reduce((u,v)=>u+v,0)||1;return`<section class="table-block" style="${blockFrameStyle(x)}">${pictogram(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<table class="tp-grid"><colgroup>${Array.from({length:x.cols||0},(_,c)=>`<col style="width:${(weights[c]||1)/total*100}%">`).join('')}</colgroup><tbody>${Array.from({length:x.rows||0},(_,r)=>`<tr style="height:${Math.max(25,Math.min(250,+x.rowHeights?.[r]||48))}px">${Array.from({length:x.cols||0},(_,c)=>{let cell=x.cells?.[r]?.[c]||{},tag=x.headerRow&&r===0?'th':'td';return`<${tag} style="${fontFieldStyle(cell,'text')}">${cell.student?`<textarea data-v117-table="${E(x.id)}" data-r="${r}" data-c="${c}" aria-label="Réponse ligne ${r+1}, colonne ${c+1}">${E(a?.[r]?.[c]||'')}</textarea>`:formattedText(cell,'text')}</${tag}>`}).join('')}</tr>`).join('')}</tbody></table>${callProf(x)}</section>`}
+ if(f.type==='match'){let toks=[];(x.labels||[]).forEach(l=>{for(let i=0;i<Math.min(30,Math.max(1,+l.count||1));i++)toks.push({id:l.id+'@'+i,obj:{...l,name:l.name}})});let slots=a&&typeof a==='object'?a:{};return`<section class="match-block" style="${blockFrameStyle(x)}" data-v117-match-block="${E(x.id)}">${pictogram(x)}<h3>${formattedText(x,'title')}</h3><p>${formattedText(x,'text')}</p><div class="match-bank">${toks.map(t=>`<button type="button" class="match-token ${Object.values(slots).includes(t.id)?'used':''}" draggable="true" data-v117-token="${E(t.id)}" data-label="${E(t.obj.name||'')}">${formattedText(t.obj,'name')}</button>`).join('')}</div><div class="match-grid">${(x.targets||[]).map((t,i)=>{let tid=String(t.id||i),tok=slots[tid],label=toks.find(z=>z.id===tok)?.obj?.name||'Déposer un nom ici';return`<div class="match-card"><img src="${E(image(t))}" alt="Outil ${i+1}" style="${photoStyle(t)}"><button type="button" class="match-drop ${tok?'filled':''}" data-v117-target="${E(tid)}"><span>${E(label)}</span></button></div>`}).join('')}</div>${callProf(x)}</section>`}
+ if(f.type==='placement'){let pos=a&&typeof a==='object'?a:{};return`<section class="placement-block" style="${blockFrameStyle(x)}" data-v117-placement-block="${E(x.id)}">${pictogram(x)}<h3>${formattedText(x,'title')}</h3><p>${formattedText(x,'text')}</p>${image(x.image)?`<div class="placement-bank">${(x.tokens||[]).map(t=>`<button type="button" class="placement-token" draggable="true" data-v117-placement-token="${E(t.id)}">${formattedText(t,'label')}</button>`).join('')}</div><div class="placement-stage" style="${photoStyle(x.image)}max-width:600px" data-v117-stage="${E(x.id)}"><img src="${E(image(x.image))}" alt="Support de placement">${(x.tokens||[]).filter(t=>pos[t.id]).map(t=>`<button type="button" class="placement-pin" data-v117-pin="${E(t.id)}" style="left:${Number(pos[t.id].x)||0}%;top:${Number(pos[t.id].y)||0}%">${formattedText(t,'label')}</button>`).join('')}</div>`:'<p>Image à ajouter par le professeur.</p>'}${callProf(x)}</section>`}
+ return'';
+}
+function renderExact(){
+ const p=project();if(!p)return false;
+ document.body.classList.add('v200-editor-exact','tp-active-file');document.body.classList.remove('tp-awaiting-file','reader-locked');
+ let host=document.getElementById('v200ProjectHost');if(!host){host=document.createElement('main');host.id='v200ProjectHost';document.querySelector('.wrap')?.appendChild(host)}
+ let flow=Array.isArray(p.flow)?p.flow:(p.questions||[]).map(q=>({type:'question',id:q.id})),n=0,oldSection='',pieces='';
+ for(const f of flow){
+  if(f.type!=='question'){let x=getObj(p,f);if(x?.parentQuestionId)continue;pieces+=block(p,f);continue}
+  let q=getObj(p,f);if(!q||q.excluded)continue;
+  let sec=q.section||'Activité',head=sec!==oldSection?`<h2 class="section-title">${formattedText(q,'section')}</h2>`:'';oldSection=sec;
+  let ans=bag()[q.id]||'';
+  let children=flow.filter(z=>z.type!=='question'&&getObj(p,z)?.parentQuestionId===q.id);
+  pieces+=`${head?'<div class="section-start">':''}${head}<div class="question-card" style="${blockFrameStyle(q)}"><div class="qhead"><span class="qno">${++n}</span><div class="qbody">${pictogram(q)}<div class="qtext">${formattedText(q,'text')}</div>${publicMeta(q)}${(q.images||[]).map(im=>photoMarkup(im,'question')).join('')}${q.answerType==='none'?'':`<textarea class="answer" rows="${Math.max(1,Math.min(20,Number(q.answerRows)||((q.answerType==='long')?5:2)))}" data-v117-answer="${E(q.id)}" aria-label="Réponse à la question ${n}">${E(ans)}</textarea>`}${children.length?`<div class="question-contents">${children.map(z=>block(p,z)).join('')}</div>`:''}${callProf(q)}</div></div></div>${head?'</div>':''}`;
+ }
+ let logo=model?.tpLogo||model?.projectLogo||'';
+ host.innerHTML=`<div class="tp-cover"><div class="tp-cover-inner"><div class="tp-header" style="${coverFrameStyle(p,'header')}">${logo?`<img class="tp-logo" src="${E(logo)}" alt="">`:''}<div class="titles"><div class="eyebrow">Bac Pro Maintenance des véhicules · TP élève</div><h1>${formattedText(p,'publicTitle')||E(p.publicTitle||p.title||model.titre||'TP')}</h1><div class="sub">Bac Pro MV · Durée : ${E(String(p.duration??'').trim()||'__________')}</div></div><span class="code">${E(p.publicId||p.id||model.code||'TP')}</span></div><div class="student"><span>Nom et prénom : ${E([model.eleve?.nom,model.eleve?.prenom].filter(Boolean).join(' '))}</span><span>Classe : ${E(model.classe||'')}</span><span>Date : ${E(model.eleve?.date||'')}</span></div>${coverBlocks(p,'afterHeader')}<div class="brief"><section style="${coverFrameStyle(p,'intro')}"><h2>Situation professionnelle</h2><p>${formattedText(p,'intro')}</p></section><section style="${coverFrameStyle(p,'objectives')}"><h2>Objectifs</h2><p>${formattedText(p,'objectives')}</p></section><section style="${coverFrameStyle(p,'support')}"><h2>Support</h2><p>${formattedText(p,'support')}</p></section><section style="${coverFrameStyle(p,'resources')}"><h2>Ressources et matériels</h2><p>${formattedText(p,'resources')}</p></section></div>${coverBlocks(p,'afterBrief')}${coverPhotos(p)}${coverBlocks(p,'afterPhotos')}</div></div>${pieces}<div class="footer"><span>${E(p.publicId||p.id||model.code||'TP')} · Document pédagogique personnalisable</span><span>Nom : ${E([model.eleve?.nom,model.eleve?.prenom].filter(Boolean).join(' '))}</span></div>`;
+ return true;
+}
+function install(){
+ if(!project())return;
+ renderExact();
+}
+const oldRender=window.render;
+if(typeof oldRender==='function')window.render=function(){let r=oldRender.apply(this,arguments);setTimeout(install,0);return r};
+document.addEventListener('change',e=>{if(e.target?.id==='fileInput')setTimeout(install,120)},true);
+document.addEventListener('input',e=>{if(e.target?.matches?.('#v200ProjectHost [data-v117-answer],#v200ProjectHost [data-v117-table]')){try{e.target.dispatchEvent(new Event('change',{bubbles:true}))}catch(_){}}},false);
+setTimeout(install,250);setTimeout(install,900);
+window.renderTPExactlyLikeEditorV200=renderExact;
+console.info('Lecteur V200 : rendu graphique aligné sur l’aperçu Editeur TP V65.');
+})();
+</script>
 </body></html><style id="v8-symbols-always-visible">
 @media (min-width:1100px){
  #tpSymbolPalette.tp-symbol-palette{display:block!important;top:90px;bottom:auto;right:12px;width:210px;max-height:calc(100vh - 110px);overflow:auto;padding:10px}
