@@ -1376,3 +1376,331 @@ const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
 })();
 </script>
+
+
+<!-- V206 — verrou strict d'un TP déjà rendu, y compris si le fichier DIFFUSION d'origine est rouvert -->
+<style id="reader-v206-strict-lock-style">
+body.v205-readonly #v205ReadOnlyBanner{
+  display:block!important;
+  position:sticky;
+  top:8px;
+  z-index:9998;
+  max-width:1040px;
+  margin:12px auto 16px;
+  padding:15px 18px;
+  border:2px solid #f0a22e!important;
+  border-left-width:7px!important;
+  border-radius:12px;
+  background:#fff8df!important;
+  color:#743d00!important;
+  box-shadow:0 5px 18px rgba(99,62,8,.14);
+  font-size:15px;
+  line-height:1.45;
+}
+body.v205-readonly #v205ReadOnlyBanner .v206-lock-title{
+  display:block;
+  margin-bottom:4px;
+  font-size:18px;
+  font-weight:900;
+  color:#7c3f00;
+}
+body.v205-readonly #v205ReadOnlyBanner .v206-lock-help{
+  display:block;
+  font-size:13px;
+  font-weight:650;
+  color:#765425;
+}
+body.v205-readonly #v117ProjectHost,
+body.v205-readonly .page{
+  filter:grayscale(.22)!important;
+  opacity:.82!important;
+}
+body.v205-readonly #teacherUnlockBtn{
+  display:inline-flex!important;
+  background:#7c3aed!important;
+  color:#fff!important;
+  border-color:#6d28d9!important;
+  font-weight:900!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+body.v205-readonly #pauseBtn,
+body.v205-readonly #saveBtn,
+body.v205-readonly #quitBtn{
+  display:none!important;
+}
+</style>
+
+<script id="reader-v206-strict-lock-runtime">
+(function(){
+'use strict';
+
+const LOCK_PREFIX='tp_reader_strict_lock_v206|';
+const UNLOCK_PREFIX='tp_reader_strict_unlock_v206|';
+
+function norm(v){
+  return String(v||'')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+function projectOfV206(d){
+  let p=d?.tpProject||d?.sourceProject||d?.project||d?.projet||null;
+  if(p?.schema==='evaluation.tp.v1'&&p.data)return p.data;
+  if(p?.publicId||p?.questions)return p;
+  if(d?.schema==='evaluation.tp.v1'&&d.data)return d.data;
+  return null;
+}
+function studentKeyV206(d){
+  const id=String(d?.studentId||d?.eleve?.id||d?.identite?.id||d?.meta?.studentId||'').trim();
+  if(id)return 'id:'+norm(id);
+  const nom=d?.eleve?.nom||d?.identite?.nom||'';
+  const prenom=d?.eleve?.prenom||d?.identite?.prenom||'';
+  return 'nom:'+norm(nom+' '+prenom);
+}
+function tpKeyV206(d){
+  const p=projectOfV206(d);
+  return norm(
+    d?.tp?.id||d?.tpId||d?.code||d?.tpCode||
+    p?.publicId||p?.id||p?.publicTitle||p?.title||d?.titre||''
+  );
+}
+function classKeyV206(d){
+  return norm(d?.classe||d?.identite?.classe||d?.meta?.className||d?.className||'');
+}
+function identityV206(d){
+  return [studentKeyV206(d),classKeyV206(d),tpKeyV206(d)].join('|');
+}
+function lockKeyV206(d){return LOCK_PREFIX+identityV206(d)}
+function unlockKeyV206(d){return UNLOCK_PREFIX+identityV206(d)}
+
+function legacyWorkKeyV206(d){
+  const p=projectOfV206(d);
+  const studentId=d?.studentId||d?.eleve?.id||d?.identite?.id||d?.meta?.studentId||'';
+  const code=d?.code||d?.tp?.id||d?.tpId||p?.publicId||p?.id||'';
+  const classe=d?.classe||d?.identite?.classe||d?.className||'';
+  const nom=d?.eleve?.nom||d?.identite?.nom||'';
+  const prenom=d?.eleve?.prenom||d?.identite?.prenom||'';
+  return ['tp_work_v17',studentId,code,classe,nom,prenom].join('|');
+}
+function parseJson(text){
+  try{return JSON.parse(text)}catch(_){return null}
+}
+function readLock(d){
+  try{
+    const raw=localStorage.getItem(lockKeyV206(d));
+    const obj=raw?parseJson(raw):null;
+    if(obj?.locked)return obj;
+
+    // Migration automatique des rendus déjà faits avec V205 :
+    // le lecteur V205 écrivait déjà "|submitted" à côté de sa copie locale.
+    const wk=legacyWorkKeyV206(d);
+    if(localStorage.getItem(wk+'|submitted')==='1'){
+      const migrated={
+        locked:true,
+        workKey:wk,
+        submittedAt:'',
+        revision:null,
+        createdBy:'migration-v205',
+        identity:identityV206(d)
+      };
+      localStorage.setItem(lockKeyV206(d),JSON.stringify(migrated));
+      return migrated;
+    }
+  }catch(_){}
+  return null;
+}
+function readUnlock(d){
+  try{
+    const raw=localStorage.getItem(unlockKeyV206(d));
+    return raw?parseJson(raw):null;
+  }catch(_){return null}
+}
+function readSnapshot(record){
+  if(!record?.workKey)return null;
+  try{
+    const raw=localStorage.getItem(record.workKey);
+    return raw?parseJson(raw):null;
+  }catch(_){return null}
+}
+function saveLock(d){
+  try{
+    const wk=legacyWorkKeyV206(d);
+    const rec={
+      locked:true,
+      workKey:wk,
+      submittedAt:d?.submission?.submittedAt||d?.dates?.rendu||new Date().toISOString(),
+      revision:Number(d?.submission?.revision)||1,
+      identity:identityV206(d),
+      createdBy:'v206'
+    };
+    localStorage.setItem(lockKeyV206(d),JSON.stringify(rec));
+    localStorage.removeItem(unlockKeyV206(d));
+    localStorage.setItem(wk+'|submitted','1');
+    // La copie locale contient les réponses réellement rendues.
+    localStorage.setItem(wk,JSON.stringify(d));
+    return rec;
+  }catch(e){
+    console.warn('V206 verrou local non enregistré',e);
+    return null;
+  }
+}
+function saveUnlockedSnapshot(d){
+  try{
+    const wk=legacyWorkKeyV206(d);
+    localStorage.setItem(wk,JSON.stringify(d));
+    localStorage.removeItem(wk+'|submitted');
+    localStorage.removeItem(lockKeyV206(d));
+    localStorage.setItem(unlockKeyV206(d),JSON.stringify({
+      unlocked:true,
+      workKey:wk,
+      unlockedAt:d?.submission?.unlockedAt||new Date().toISOString(),
+      identity:identityV206(d)
+    }));
+  }catch(e){console.warn('V206 reprise non mémorisée',e)}
+}
+function makeJsonFile(data,name){
+  try{
+    return new File([JSON.stringify(data,null,2)],name||'TP_RENDU.tp',{type:'application/json'});
+  }catch(_){
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    blob.name=name||'TP_RENDU.tp';
+    return blob;
+  }
+}
+function enhanceReadonlyMessage(){
+  const banner=document.getElementById('v205ReadOnlyBanner');
+  if(!banner||!document.body.classList.contains('v205-readonly'))return;
+  if((window.model?.status||window.model?.statut||'').toString().toUpperCase()==='CORRIGE'){
+    banner.innerHTML='<span class="v206-lock-title">🔒 TP corrigé — lecture seule</span><span class="v206-lock-help">Cette copie est terminée et ne peut plus être modifiée.</span>';
+  }else{
+    banner.innerHTML='<span class="v206-lock-title">🔒 TP déjà rendu — lecture seule</span><span class="v206-lock-help">Ce TP a déjà été remis au professeur. Tu peux uniquement relire ton travail. Pour reprendre ce TP, demande au professeur de cliquer sur « Déverrouiller avec le code professeur ».</span>';
+  }
+  const teacher=document.getElementById('teacherUnlockBtn');
+  if(teacher){
+    teacher.textContent='🔓 Déverrouiller avec le code professeur';
+    teacher.title='Seul le professeur peut autoriser la reprise de ce TP.';
+  }
+}
+window.tpV206EnhanceReadonlyMessage=enhanceReadonlyMessage;
+
+/* 1) Verrouillage strict à l'ouverture.
+   Même si l'élève recharge le fichier DIFFUSION d'origine, la dernière copie
+   réellement rendue est réouverte en lecture seule. */
+const oldLoad=window.loadFile;
+if(typeof oldLoad==='function'&&!oldLoad.__v206){
+  const wrapped=function(file){
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const incoming=JSON.parse(r.result);
+        const lock=readLock(incoming);
+        if(lock?.locked){
+          const submitted=readSnapshot(lock);
+          if(submitted){
+            const f=makeJsonFile(submitted,file?.name||'TP_DEJA_RENDU.tp');
+            oldLoad.call(window,f);
+          }else{
+            // Le verrou existe même si la copie de travail locale a été nettoyée :
+            // on interdit tout de même le retour en mode édition.
+            incoming.submission={...(incoming.submission||{}),final:true,submittedAt:lock.submittedAt||incoming?.submission?.submittedAt||''};
+            incoming.statut='RENDU';incoming.status='RENDU';
+            incoming.dates={...(incoming.dates||{}),rendu:lock.submittedAt||incoming?.dates?.rendu||''};
+            const f=makeJsonFile(incoming,file?.name||'TP_DEJA_RENDU.tp');
+            oldLoad.call(window,f);
+          }
+          [80,260,700].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms));
+          return;
+        }
+
+        // Après un déverrouillage professeur, si l'élève rouvre le fichier
+        // DIFFUSION d'origine, on reprend la dernière copie déverrouillée
+        // et non une copie vierge.
+        const permit=readUnlock(incoming);
+        const unlocked=readSnapshot(permit);
+        if(permit?.unlocked&&unlocked){
+          oldLoad.call(window,makeJsonFile(unlocked,file?.name||'TP_REOUVERT.tp'));
+          return;
+        }
+
+        oldLoad.call(window,file);
+      }catch(e){
+        console.error('V206 ouverture stricte',e);
+        oldLoad.call(window,file);
+      }
+    };
+    r.readAsText(file,'utf-8');
+  };
+  wrapped.__v206=true;
+  window.loadFile=wrapped;
+
+  const fi=document.getElementById('fileInput');
+  if(fi){
+    fi.onchange=e=>{
+      const f=e.target.files?.[0];
+      if(f)window.loadFile(f);
+      e.target.value='';
+    };
+  }
+}
+
+/* 2) Au rendu, inscription d'un verrou persistant pour élève + classe + TP. */
+const saveBtn=document.getElementById('saveBtn');
+if(saveBtn&&typeof saveBtn.onclick==='function'&&!saveBtn.onclick.__v206){
+  const oldSubmit=saveBtn.onclick;
+  const submitWrapped=async function(){
+    const out=await oldSubmit.apply(this,arguments);
+    try{
+      if(window.model?.submission?.final===true){
+        saveLock(window.model);
+        [0,120].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms));
+      }
+    }catch(e){console.warn('V206 après rendu',e)}
+    return out;
+  };
+  submitWrapped.__v206=true;
+  saveBtn.onclick=submitWrapped;
+}
+
+/* 3) Seul le professeur peut enlever le verrou.
+   On conserve immédiatement la copie avec toutes les réponses pour la reprise. */
+const teacher=document.getElementById('teacherUnlockBtn');
+if(teacher&&typeof teacher.onclick==='function'&&!teacher.onclick.__v206){
+  const oldUnlock=teacher.onclick;
+  const unlockWrapped=function(){
+    const before=window.model;
+    const result=oldUnlock.apply(this,arguments);
+    try{
+      const d=window.model;
+      const st=String(d?.status||d?.statut||'').toUpperCase();
+      if(d&&d?.submission?.final===false&&st!=='CORRIGE'){
+        saveUnlockedSnapshot(d);
+        document.body.classList.remove('v205-readonly');
+        const banner=document.getElementById('v205ReadOnlyBanner');
+        if(banner)banner.style.display='none';
+      }else if(before===d){
+        enhanceReadonlyMessage();
+      }
+    }catch(e){console.warn('V206 déverrouillage',e)}
+    return result;
+  };
+  unlockWrapped.__v206=true;
+  teacher.onclick=unlockWrapped;
+}
+
+/* 4) Si la copie actuellement affichée est déjà rendue, on crée aussi le
+   verrou V206 immédiatement : cela couvre les fichiers RENDU ouverts directement. */
+try{
+  if(window.model?.submission?.final===true||
+     ['RENDU','CORRIGE'].includes(String(window.model?.status||window.model?.statut||'').toUpperCase())){
+    saveLock(window.model);
+    setTimeout(enhanceReadonlyMessage,80);
+  }
+}catch(_){}
+
+document.title='Lecteur TP Élève — V206';
+const brand206=document.querySelector('.brand');
+if(brand206)brand206.textContent='Lecteur TP Élève — V206';
+
+console.info('Lecteur TP V206 : verrou strict après rendu, réouverture du fichier DIFFUSION impossible sans code professeur.');
+})();
+</script>
