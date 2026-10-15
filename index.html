@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V205</title>
+<title>Lecteur TP Élève — V218</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -32,6 +32,10 @@
 figure figcaption[data-auto-image-name]{display:none!important;}
 </style>
 
+<style id="followup-v218-style">
+body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-events:auto!important;user-select:auto!important}
+.v218-tools{margin:12px 0 20px;display:flex;gap:8px;flex-wrap:wrap}.v218-tools button{padding:9px 12px;border:1px solid #c4d8e8;border-radius:8px;background:white;color:#174677;cursor:pointer}.v218-tools p{width:100%;margin:4px 0;color:#58728c;font-size:12px;line-height:1.5}.v218-summary{color:#58728c;font-size:12px}
+</style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V205</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
@@ -652,7 +656,7 @@ function verify(code){
   return window.tpReaderHash(String(a.salt||'')+'|'+String(code||''))===String(a.hash||'');
 }
 function studentLabel(){
-  const s=currentStudent();
+  const s=session?.student||currentStudent();
   return [s.prenom,s.nom].filter(Boolean).join(' ')||'Élève';
 }
 
@@ -720,7 +724,7 @@ function install(){
      On ne lie donc plus leurs événements ici. La délégation document globale
      ci-dessous fonctionne même si les éléments apparaissent plus tard. */
 
-  $('v211AuthCancel').onclick=closeAuth;
+  $('v211AuthCancel').onclick=()=>{importedPending=null;closeAuth()};
   $('v211AuthOk').onclick=authenticate;
   $('v211StudentCode').oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);
   $('v211StudentCode').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();authenticate()}};
@@ -738,7 +742,7 @@ function delegatedClick(e){
   const avatar=e.target?.closest?.('#v210Avatar');
   if(avatar){
     e.preventDefault();
-    requestAccess('records');
+    requestAccess('history');
     return;
   }
 
@@ -770,23 +774,29 @@ if(!window.__tpV213StudentSpaceDelegation){
 function requestAccess(view){
   pendingView=view||'records';
   if(session){show(pendingView);return}
-  if(!canAuthenticate()){
-    alert('Ouvre d’abord un TP qui contient ton code élève. Tu pourras ensuite cliquer sur tes initiales pour accéder à ton espace.');
-    return;
-  }
-  $('v211AuthWho').textContent=`${studentLabel()} — saisis ton code élève à 4 chiffres pour ouvrir ton espace personnel sur cet appareil.`;
+  $('v211AuthWho').textContent='Saisis ton code élève pour accéder à ton espace, même sans ouvrir de TP. Sur un nouvel ordinateur, importe ton fichier « Mon suivi ».';
   $('v211StudentCode').value='';
   $('v211AuthError').textContent='';
   $('v211StudentAuth').classList.add('open');
   setTimeout(()=>$('v211StudentCode').focus(),40);
 }
-function closeAuth(){$('v211StudentAuth')?.classList.remove('open')}
+function closeAuth(){$('v211StudentAuth')?.classList.remove('open');if($('v211StudentCode'))$('v211StudentCode').value=''}
 async function authenticate(){
   const input=$('v211StudentCode'),err=$('v211AuthError');
   const code=String(input?.value||'').replace(/\D/g,'').slice(0,4);
   if(!/^\d{4}$/.test(code)){err.textContent='Saisis ton code élève à 4 chiffres.';return}
-  if(!verify(code)){err.textContent='Code incorrect.';input.select();return}
-  session={student:currentStudent(),identity:identityKey(window.model),code};
+  const button=$('v211AuthOk');if(button.disabled)return;button.disabled=true;
+  try{
+    const data=await authenticateData(code);
+    session={student:currentStudent(data),identity:identityKey(data),code,access:{required:true,salt:String(data.access.salt),hash:String(data.access.hash)}};
+    if(importedPending){
+      const safe=importedPending.rows.map(r=>summaryRow(r));
+      const existing=readFollowups();const merged=new Map(existing.map(r=>[r.id,r]));
+      for(const r of safe){const prev=merged.get(r.id);if(!prev||String(dateOf(r))>=String(dateOf(prev)))merged.set(r.id,r)}
+      localStorage.setItem(FOLLOWUP_KEY,JSON.stringify([...merged.values()]));importedPending=null;
+    }
+  }catch(e){session=null;err.textContent=e.message;input.select();return}
+  finally{button.disabled=false}
   closeAuth();
   unlockNav();
   await show(pendingView);
@@ -798,7 +808,7 @@ function unlockNav(){
     b.querySelector('.v211-lock')?.remove();
   }
   const av=$('v210Avatar');
-  if(av){av.classList.add('authenticated');av.title=`Espace de ${studentLabel()} — accès autorisé`}
+  if(av){av.textContent=((session.student.prenom||'E').charAt(0)+(session.student.nom||'L').charAt(0)).toUpperCase();av.classList.add('authenticated');av.title=`Espace de ${studentLabel()} — accès autorisé`}
 }
 function setActive(which){
   for(const id of ['v210NavTp','v211NavRecords','v211NavHistory'])$(id)?.classList.remove('active');
@@ -843,13 +853,13 @@ function readStrictSnapshots(){
   return out
 }
 async function rowsForStudent(){
-  const rows=[...(await readIndexedWorks()),...readStrictSnapshots()].filter(r=>r?.data&&sameStudent(r.data));
+  const rows=(await availableRows()).filter(r=>r?.data&&sameStudent(r.data));
   const map=new Map();
   for(const r of rows){
     const d=r.data;
     const key=[identityKey(d),codeOf(d),String(d?.submission?.revision||0),statusOf(d)].join('|');
     const prev=map.get(key);
-    if(!prev||String(dateOf(r))>String(dateOf(prev)))map.set(key,r);
+    if(!prev||String(dateOf(r))>String(dateOf(prev))||(String(dateOf(r))===String(dateOf(prev))&&prev.summaryOnly&&!r.summaryOnly))map.set(key,r);
   }
   return [...map.values()].sort((a,b)=>String(dateOf(b)).localeCompare(String(dateOf(a))));
 }
@@ -862,12 +872,13 @@ async function show(kind){
     <div><h2>${kind==='records'?'Mes enregistrements':'Mon historique'}</h2>
     <div class="v211-page-sub">${kind==='records'?'Mes TP enregistrés sur cet appareil et encore modifiables.':'Mes TP enregistrés, rendus ou corrigés présents sur cet appareil.'}</div></div>
     <span class="v211-session">🔓 ${esc(studentLabel())}</span>
-  </div><div class="v211-list"><div class="v211-empty">Chargement…</div></div>`;
-  const all=await rowsForStudent();
+  </div><div class="v218-tools"><button type="button" id="v218Export">Exporter mon suivi</button><button type="button" id="v218Import">Importer mon suivi</button><button type="button" id="v218Logout">Se déconnecter</button><p>Pour consulter ton avancement à la maison : exporte ton suivi, puis importe ce fichier sur ton ordinateur. Les statuts correspondent au dernier export ; aucune synchronisation automatique.</p></div><div class="v211-list"><div class="v211-empty">Chargement…</div></div>`;
+  $('v218Export').onclick=exportFollowup;$('v218Import').onclick=()=>$('v218FollowupFile').click();$('v218Logout').onclick=()=>logout();
+  const activeSession=session;const all=await rowsForStudent();if(session!==activeSession)return;
   const rows=kind==='records'
     ?all.filter(r=>{
         const st=statusOf(r.data);
-        return !r.data?.submission?.final && (st==='EN COURS'||st==='RÉOUVERT');
+        return !r.summaryOnly && !r.data?.submission?.final && (st==='EN COURS'||st==='RÉOUVERT');
       })
     :all;
   renderRows(rows,kind);
@@ -888,7 +899,7 @@ function renderRows(rows,kind){
         <div class="v211-record-meta">${esc(codeOf(d))} · ${esc(d.classe||d.identite?.classe||'')} · ${esc(frDate(dateOf(r)))}</div>
         <span class="v211-status ${cls}">${esc(st)}</span>
       </div>
-      <button class="v211-open" type="button" data-v211-open="${i}">${st==='EN COURS'||st==='RÉOUVERT'?'Reprendre':'Consulter'}</button>
+      ${r.summaryOnly?'<span class="v218-summary">Suivi importé</span>':`<button class="v211-open" type="button" data-v211-open="${i}">${st==='EN COURS'||st==='RÉOUVERT'?'Reprendre':'Consulter'}</button>`}
     </article>`
   }).join('');
   list.querySelectorAll('[data-v211-open]').forEach(b=>{
@@ -912,7 +923,7 @@ function autoUnlockSaved(attempt=0){
   setTimeout(()=>autoUnlockSaved(attempt+1),80);
 }
 function openSaved(data){
-  if(!data)return;
+  if(!data||!sameStudent(data))return;
   showTp();
   try{
     window.loadFile?.(makeFile(data));
@@ -947,7 +958,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V217 : si un rendu intervient pendant la session, la prochaine vue
+/* V218 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -957,11 +968,74 @@ document.addEventListener('tp-reader-rendered',()=>{
   else if(history)show('history');
 });
 
-window.tpV211StudentSpace={requestAccess,show,showTp,isAuthenticated:()=>!!session};
+window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V217';
-console.info('Lecteur TP V217 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V218';
+console.info('Lecteur TP V218 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+
+/* V218 : accès autonome et suivi transportable sans TP. */
+const FOLLOWUP_KEY='tp_reader_followup_v218';
+let importedPending=null;
+function verifyData(d,code){
+ const a=d?.access||{};
+ return !!(a.required&&a.hash&&a.salt&&typeof window.tpReaderHash==='function'&&window.tpReaderHash(String(a.salt)+'|'+code)===String(a.hash));
+}
+function readLocalWorks(){
+ const out=[];
+ try{for(let i=0;i<localStorage.length;i++){
+  const k=localStorage.key(i)||'';if(!k.startsWith('tp_work_v17|')||k.endsWith('|submitted'))continue;
+  try{const data=JSON.parse(localStorage.getItem(k));if(data&&typeof data==='object')out.push({id:k,data,updatedAt:data.lastSavedAt||data.dates?.derniereModification||data.submission?.submittedAt||''})}catch(_){}
+ }}catch(_){}return out;
+}
+function readFollowups(){try{const a=JSON.parse(localStorage.getItem(FOLLOWUP_KEY)||'[]');return Array.isArray(a)?a:[]}catch(_){return[]}}
+async function availableRows(){return [...await readIndexedWorks(),...readStrictSnapshots(),...readLocalWorks(),...readFollowups()]}
+async function authenticateData(code){
+ if(importedPending){if(!verifyData(importedPending.owner,code))throw Error('Code incorrect pour ce suivi.');return importedPending.owner}
+ if(canAuthenticate()){if(!verify(code))throw Error('Code incorrect.');return window.model}
+ const matches=(await availableRows()).filter(r=>verifyData(r.data,code));
+ const identities=new Map(matches.map(r=>[identityKey(r.data),r.data]));
+ if(!identities.size)throw Error('Code non reconnu sur cet appareil. À la maison, importe ton fichier « Mon suivi » exporté en classe.');
+ if(identities.size>1)throw Error('Plusieurs élèves utilisent ce code sur cet appareil. Importe ton fichier personnel « Mon suivi » pour identifier ton espace.');
+ return [...identities.values()][0];
+}
+function summaryRow(r){
+ const d=r.data,s=currentStudent(d);
+ return {id:'followup|'+identityKey(d)+'|'+codeOf(d)+'|'+String(d.submission?.revision||0)+'|'+statusOf(d),updatedAt:dateOf(r),summaryOnly:true,data:{studentId:s.id,eleve:{nom:s.nom,prenom:s.prenom},classe:s.classe,code:codeOf(d),titre:titleOf(d),statut:statusOf(d)==='CORRIGÉ'?'CORRIGE':statusOf(d)==='RÉOUVERT'?'REOUVERT':statusOf(d)==='RENDU'?'RENDU':'DIFFUSION',access:{required:true,salt:String(session.access.salt),hash:String(session.access.hash)},submission:{final:!!d.submission?.final,revision:d.submission?.revision||0},dates:{derniereModification:dateOf(r)}}};
+}
+async function exportFollowup(){
+ if(!session)return;
+ const rows=(await rowsForStudent()).map(summaryRow);
+ const file={schema:'tp.student.followup.v1',exportedAt:new Date().toISOString(),owner:{studentId:session.student.id,eleve:{nom:session.student.nom,prenom:session.student.prenom},classe:session.student.classe,access:session.access},rows};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(file,null,2)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='Mon_suivi_'+(session.student.prenom+'_'+session.student.nom).replace(/[^\wÀ-ÿ-]/g,'_')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function importFollowup(file){
+ if(!file)return;
+ try{
+  if(file.size>5*1024*1024)throw Error('Ce fichier de suivi est trop volumineux.');
+  const x=JSON.parse(await file.text());
+  if(x?.schema!=='tp.student.followup.v1'||!Array.isArray(x.rows)||x.rows.length>3000||!x.owner?.access?.required||!x.owner.access.hash||!x.owner.access.salt||!currentStudent(x.owner).nom)throw Error('Choisis un fichier « Mon suivi » exporté par le lecteur.');
+  const ownerKey=identityKey(x.owner);
+  if(x.rows.some(r=>!r?.data||identityKey(r.data)!==ownerKey||!r.summaryOnly))throw Error('Le fichier contient un suivi incohérent.');
+  logout(false);importedPending=x;
+  requestAccess('history');
+  $('v211AuthWho').textContent='Saisis ton code élève pour ouvrir ce fichier de suivi personnel.';
+ }catch(e){alert('Impossible d’importer le suivi : '+e.message)}
+}
+function logout(home=true){
+ session=null;importedPending=null;closeAuth();
+ const av=$('v210Avatar');if(av){av.classList.remove('authenticated');av.textContent='EL';av.title='Accéder à mon espace élève'}
+ for(const id of ['v211NavRecords','v211NavHistory']){const b=$(id);if(b){b.classList.add('v211-nav-locked');if(!b.querySelector('.v211-lock'))b.insertAdjacentHTML('beforeend','<span class="v211-lock">🔒</span>')}}
+ if($('v211PersonalPage'))$('v211PersonalPage').innerHTML='';if(home)showTp();
+}
+function mountFollowup(){
+ const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.hidden=true;input.id='v218FollowupFile';input.onchange=()=>{importFollowup(input.files[0]);input.value=''};document.body.appendChild(input);
+ const nav=$('v210Sidebar')?.querySelector('nav');if(nav){const b=document.createElement('button');b.className='v210-nav';b.type='button';b.textContent='Importer mon suivi';b.onclick=()=>input.click();nav.appendChild(b)}
+ const actions=$('v211StudentAuth')?.querySelector('.v211-auth-actions');if(actions){const b=document.createElement('button');b.type='button';b.textContent='Importer mon suivi';b.onclick=()=>input.click();actions.prepend(b)}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(mountFollowup,0),{once:true});else setTimeout(mountFollowup,0);
+
 })();
 </script>
 
@@ -1157,8 +1231,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV217FinalizeRendered=finalize;
-console.info('Lecteur TP V217 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV218FinalizeRendered=finalize;
+console.info('Lecteur TP V218 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1193,7 +1267,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V217 double clic : payload expiré.');
+    console.warn('V218 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1205,7 +1279,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V217 double clic',e);
+    console.error('V218 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1215,15 +1289,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V217 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V218 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV217OpenPayload=consume;
-console.info('Lecteur TP V217 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV218OpenPayload=consume;
+console.info('Lecteur TP V218 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -2578,12 +2652,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV217SubmitInProgress)return;
+ if(window.__tpV218SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV217SubmitInProgress=true;
+ window.__tpV218SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2593,11 +2667,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V217',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V218',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V217',suiteVersion:'V217'};
+   model.meta={...(model.meta||{}),readerVersion:'V218',suiteVersion:'V218'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2614,15 +2688,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V217 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV217FinalizeRendered?.(model)}catch(e){console.warn('V217 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V218 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV218FinalizeRendered?.(model)}catch(e){console.warn('V218 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV217SubmitInProgress=false;
+   window.__tpV218SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -3541,8 +3615,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V217';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V217';
+document.title='Lecteur TP Élève — V218';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V218';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
