@@ -947,7 +947,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V216 : si un rendu intervient pendant la session, la prochaine vue
+/* V217 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -960,8 +960,8 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V216';
-console.info('Lecteur TP V216 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V217';
+console.info('Lecteur TP V217 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 })();
 </script>
 
@@ -1060,7 +1060,7 @@ console.info('Lecteur TP V215 : saisie du code professeur masquée.');
 
 
 
-<script id="reader-v216-rendered-finalizer">
+<script id="reader-v217-rendered-finalizer">
 (function(){
 'use strict';
 
@@ -1157,13 +1157,13 @@ async function finalize(d){
   return true;
 }
 
-window.tpV216FinalizeRendered=finalize;
-console.info('Lecteur TP V216 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV217FinalizeRendered=finalize;
+console.info('Lecteur TP V217 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
 
-<script id="reader-v216-double-click-loader">
+<script id="reader-v217-double-click-loader">
 (function(){
 'use strict';
 
@@ -1193,7 +1193,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V216 double clic : payload expiré.');
+    console.warn('V217 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1205,7 +1205,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V216 double clic',e);
+    console.error('V217 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1215,15 +1215,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V216 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V217 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV216OpenPayload=consume;
-console.info('Lecteur TP V216 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV217OpenPayload=consume;
+console.info('Lecteur TP V217 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1486,7 +1486,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  function fontFieldStyle(obj,field){
    const d=obj?._textDefaults?.[field]||{};
    const c=validColour(d.color);
-   return (validAlign(d.align)?`text-align:${d.align};`:'')
+   return (['top','middle','bottom'].includes(d.verticalAlign)?`vertical-align:${d.verticalAlign};`:'')+(validAlign(d.align)?`text-align:${d.align};`:'')
      +(c?`color:${c};`:'')
      +(d.bold?'font-weight:700;':'')
      +(d.italic?'font-style:italic;':'')
@@ -1545,11 +1545,11 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  }
  function pic(obj){
    let ids=Array.isArray(obj?.pictogramIds)&&obj.pictogramIds.length?obj.pictogramIds:[obj?.pictogramId];
-   const ps=[...new Set(ids.filter(Boolean))].map(id=>pictos().find(p=>String(p.id)===String(id))).filter(p=>p?.image?.startsWith('data:image/'));
+   const ps=[...new Set(ids.filter(Boolean))].map(id=>pictos().find(p=>String(p.id)===String(id))).filter(p=>p?.image?.startsWith('data:image/')).slice(0,3);
    return ps.length?`<span class="builtin-picto-group">${ps.map(p=>`<img class="block-picto" src="${esc(p.image)}" alt="${esc(p.name)}" title="${esc(p.name)}">`).join('')}</span>`:'';
  }
  function callProf(o){
-   return o?.callProfessor?`<div class="call-prof"><strong>👨‍🏫 Appeler le professeur</strong></div>`:'';
+   return o?.callProfessor?`<div class="call-prof"><span class="call-prof-icon" aria-hidden="true">${READER_CALL_PROF_SVG}</span><strong>Appeler le professeur</strong></div>`:'';
  }
  function gommetteClass(label){
    return Array.from(String(label??'').trim().normalize('NFC')).length===1?'gommette-round':'gommette-flat';
@@ -1563,7 +1563,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
    }).join('');
  }
  function builtinCoverPhotos(m){
-   const photos=(m?.coverImages||[]).filter(im=>image(im));
+   const main=coverMain(m),photos=(m?.coverImages||[]).filter(im=>im!==main&&image(im));
    if(!photos.length)return '';
    const cols=Math.max(1,Math.min(4,Number(m.coverColumns)||2));
    const framed=m?.coverFrameColors?.photos||m?.coverFrameWidths?.photos!==undefined;
@@ -1585,6 +1585,25 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
    return str;
  }
 
+ const READER_REFERENCE={"source": "Référentiel 2025 et Audit critères — Catalogue_TP_BacPro_MV_Audit_2025.xlsx ; C1.4 — Extraction_structure_REFERENTIEL_BAC_CORRIGEE(1).pdf", "competences": [{"code": "C1.1", "title": "Organiser un entretien périodique", "criteria": [{"code": "C1.1-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C1.1-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C1.1-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C1.1-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C1.1-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C1.1-06", "label": "La propreté du véhicule est préservée"}, {"code": "C1.1-07", "label": "Le tri des déchets est réalisé"}, {"code": "C1.1-08", "label": "La réglementation environnementale est respectée"}, {"code": "C1.1-09", "label": "Le véhicule est identifié (VIN, plaque d'immatriculation)"}, {"code": "C1.1-10", "label": "L'outillage est conforme et adapté à l'intervention"}, {"code": "C1.1-11", "label": "Les informations collectées (historique, documentation, plan de maintenance, etc.) sont conformes et adaptées à l'intervention à réaliser"}, {"code": "C1.1-12", "label": "Les étapes de l'intervention sont identifiées et organisées"}, {"code": "C1.1-13", "label": "La disponibilité et la conformité des pièces y compris celles de réemploi sont vérifiées"}]}, {"code": "C1.2", "title": "Identifier les anomalies dans le cadre d’un entretien périodique", "criteria": [{"code": "C1.2-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C1.2-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C1.2-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C1.2-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C1.2-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C1.2-06", "label": "La propreté du véhicule est préservée"}, {"code": "C1.2-07", "label": "Les contrôles sont identifiés et hiérarchisés y compris, dans le cadre du pré-contrôle technique"}, {"code": "C1.2-08", "label": "Les contrôles et mesures sont réalisés en tenant compte des particularités des systèmes et du type de motorisation"}, {"code": "C1.2-09", "label": "Toutes les anomalies sont identifiées et retranscrites suivant la procédure prescrite"}]}, {"code": "C1.3", "title": "Réaliser les opérations de remplacement, d’ajustement dans le cadre de l’entretien périodique", "criteria": [{"code": "C1.3-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C1.3-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C1.3-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C1.3-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C1.3-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C1.3-06", "label": "La propreté du véhicule est préservée"}, {"code": "C1.3-07", "label": "Le tri des déchets est réalisé"}, {"code": "C1.3-08", "label": "La réglementation environnementale est respectée"}, {"code": "C1.3-09", "label": "Le temps imparti de l'intervention est respecté"}, {"code": "C1.3-10", "label": "Le remplacement des pièces d'usure et des fluides respecte les procédures du constructeur et de l'entreprise"}, {"code": "C1.3-11", "label": "Les niveaux et les pressions sont ajustés conformément aux procédures du constructeur et de l'entreprise"}, {"code": "C1.3-12", "label": "La procédure d'apprentissage, de paramétrage ou de réinitialisation est effectuée"}, {"code": "C1.3-13", "label": "Les indicateurs de maintenance sont mis à jour"}, {"code": "C1.3-14", "label": "L'ordre de réparation est complété"}]}, {"code": "C1.4", "title": "Apporter des conseils techniques à la clientèle sur l’entretien du véhicule", "criteria": [{"code": "C1.4-01", "label": "Les conseils à la clientèle sur l’utilisation et l’entretien du véhicule sont conformes aux règles de sécurité, aux procédures du constructeur et de l’entreprise"}, {"code": "C1.4-02", "label": "Les anomalies détectées sont présentées au client"}, {"code": "C1.4-03", "label": "Le client est informé du programme d’entretien à venir"}, {"code": "C1.4-04", "label": "La proposition de service, de produit est en lien avec les besoins du client"}, {"code": "C1.4-05", "label": "Le client est renseigné sur les pratiques d’usage du véhicule"}, {"code": "C1.4-06", "label": "Les procédures qualités sont respectées"}]}, {"code": "C2.1", "title": "Préparer une intervention corrective", "criteria": [{"code": "C2.1-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C2.1-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C2.1-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C2.1-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C2.1-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C2.1-06", "label": "La propreté du véhicule est préservée"}, {"code": "C2.1-07", "label": "Le tri des déchets est réalisé"}, {"code": "C2.1-08", "label": "La réglementation environnementale est respectée"}, {"code": "C2.1-09", "label": "Le véhicule est identifié (VIN, plaque d'immatriculation, spécificité technique etc...)"}, {"code": "C2.1-10", "label": "L'ordre de réparation est complété"}, {"code": "C2.1-11", "label": "L'outillage est conforme et adapté à l'intervention"}, {"code": "C2.1-12", "label": "Les informations collectées sont conformes et adaptées à l'intervention à réaliser"}, {"code": "C2.1-13", "label": "Les étapes de l'intervention sont identifiées"}, {"code": "C2.1-14", "label": "Le temps imparti de l'intervention est identifié"}, {"code": "C2.1-15", "label": "La disponibilité et la conformité des pièces sont vérifiées"}]}, {"code": "C2.2", "title": "Réaliser le remplacement ou la réparation des composants", "criteria": [{"code": "C2.2-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C2.2-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C2.2-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C2.2-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C2.2-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C2.2-06", "label": "La propreté du véhicule est préservée"}, {"code": "C2.2-07", "label": "Le tri des déchets est réalisé"}, {"code": "C2.2-08", "label": "La réglementation environnementale est respectée"}, {"code": "C2.2-09", "label": "Le temps imparti de l'intervention est respecté"}, {"code": "C2.2-10", "label": "Le remplacement des pièces respecte les procédures du constructeur et de l'entreprise"}, {"code": "C2.2-11", "label": "Les informations collectées (documentation, procédure du constructeur, etc.) sont adaptées à l'intervention à réaliser"}]}, {"code": "C2.3", "title": "Réaliser le réglage ou le paramétrage des systèmes", "criteria": [{"code": "C2.3-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C2.3-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C2.3-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C2.3-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C2.3-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C2.3-06", "label": "La propreté du véhicule est préservée"}, {"code": "C2.3-07", "label": "Les paramétrages respectent les caractéristiques et la configuration du véhicule"}]}, {"code": "C2.4", "title": "Réaliser le contrôle qualité d’une intervention corrective", "criteria": [{"code": "C2.4-01", "label": "Les procédures qualité de l'entreprise sont respectées"}, {"code": "C2.4-02", "label": "Les dossiers relatifs aux interventions sont complétés"}]}, {"code": "C3.1", "title": "Constater un dysfonctionnement", "criteria": [{"code": "C3.1-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C3.1-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C3.1-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C3.1-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C3.1-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C3.1-06", "label": "La propreté du véhicule est préservée"}, {"code": "C3.1-07", "label": "L'ordre de réparation est pris en compte puis complété"}, {"code": "C3.1-08", "label": "Le véhicule est identifié (VIN, plaque d'immatriculation)"}, {"code": "C3.1-09", "label": "Les informations collectées (historique, documentation, plan de maintenance, recueil des symptômes auprès du client etc.) sont conformes et adaptées au dysfonctionnement"}, {"code": "C3.1-10", "label": "L'utilisation est conforme et adaptée à l'intervention"}, {"code": "C3.1-11", "label": "Le dysfonctionnement et/ou l'anomalie sont confirmés"}, {"code": "C3.1-12", "label": "Les tests préliminaires réalisés recréent le contexte d'apparition de la panne"}, {"code": "C3.1-13", "label": "Les différentes conditions et les paramètres qui peuvent influencer l'apparition des symptômes sont identifiés"}, {"code": "C3.1-14", "label": "Les résultats sont explicités en utilisant un langage professionnel clair"}, {"code": "C3.1-15", "label": "Les essais ont été réalisés en respectant les procédures du constructeur"}, {"code": "C3.1-16", "label": "L'anomalie détectée est retranscrite"}]}, {"code": "C3.2", "title": "Hiérarchiser les hypothèses", "criteria": [{"code": "C3.2-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C3.2-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C3.2-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C3.2-04", "label": "Les informations collectées (historique, documentation, plan de maintenance, recueil des symptômes auprès du client, système embarqué de diagnostic prédictif) sont conformes et adaptées au dysfonctionnement"}, {"code": "C3.2-05", "label": "Les propositions sont pertinentes"}, {"code": "C3.2-06", "label": "Les hypothèses sont hiérarchisées selon une logique liée à la probabilité, à l'accessibilité, la rentabilité et la disponibilité"}]}, {"code": "C3.3", "title": "Mettre en œuvre un protocole d’intervention existant ou à définir", "criteria": [{"code": "C3.3-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C3.3-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C3.3-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C3.3-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C3.3-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C3.3-06", "label": "La propreté du véhicule est préservée"}, {"code": "C3.3-07", "label": "La liste des contrôles et des mesures est pertinente compte tenu des hypothèses"}, {"code": "C3.3-08", "label": "L'utilisation des outils de mesure et de contrôle est conforme et adaptée à la situation"}, {"code": "C3.3-09", "label": "Les résultats, les relevés obtenus ou les observations sont interprétés selon les valeurs de référence"}, {"code": "C3.3-10", "label": "L'interprétation des données recueillies permet d'expliquer l'origine de la défaillance"}, {"code": "C3.3-11", "label": "Un test alternatif permet de confirmer la panne"}, {"code": "C3.3-12", "label": "Les anomalies sont identifiées et retranscrites suivant la procédure prescrite"}, {"code": "C3.3-13", "label": "L'ordre de réparation est complété"}]}, {"code": "C3.4", "title": "Identifier les solutions correctives", "criteria": [{"code": "C3.4-01", "label": "Les opérations de remise en conformité sont identifiées et cohérentes avec l'origine de la panne"}, {"code": "C3.4-02", "label": "Les conséquences sur les autres éléments sont prises en compte"}]}]};
+ const READER_CALL_PROF_SVG="<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"48\" viewBox=\"0 0 64 48\" fill=\"none\"><g stroke=\"#182f46\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M24 25l4 16h9l-5-18\" fill=\"#a8cddd\"/><path d=\"M7 17h17L48 6v31L24 27H7z\" fill=\"#e8f3fa\"/><path d=\"M7 17h17v10H7z\" fill=\"#68aace\"/><path d=\"M48 6v31\" stroke-width=\"4\"/><path d=\"M4 20v4M54 21h6M53 12l5-4M53 31l5 4\"/></g></svg>";
+ function workLocked(){return !!model?.submission?.final||['RENDU','CORRIGE'].includes(String(model?.statut||model?.status||'').toUpperCase())}
+ function fixedToken(x){return (x.tokens||[]).find(t=>t.id===x.fixedTokenId)||(x.tokens||[]).find(t=>t.fixed===true)||null}
+ function nestedWidth(p,x){const n=Number(x.questionWidthPct);if(Number.isFinite(n)&&n>0)return Math.max(10,Math.min(100,n));if(x.isSpacer)return 100;return (p.flow||[]).filter(f=>f.type!=='question'&&getObj(p,f)?.parentQuestionId===x.parentQuestionId).length>1?50:100}
+ function nestedLayout(p,q){return 'question-contents'+((p.flow||[]).some(f=>getObj(p,f)?.parentQuestionId===q.id&&Number(getObj(p,f)?.questionWidthPct)>0)?' question-contents-sized':'')}
+ function nestedMarkup(p,children){return children.map((f,i)=>{const x=getObj(p,f),w=nestedWidth(p,x);return `${i>0&&i%2===0?'<div class="question-line-break" aria-hidden="true"></div>':''}<div class="question-content-item ${x.isSpacer?'question-content-spacer':''}" style="flex-basis:calc(${w}% - ${(1-w/100)*10}px)">${block(p,f)}</div>`}).join('')}
+ function orNumber(v,min,max,fallback=min){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback}
+ function orStyle(f,p){let size=orNumber(f.size,6,48,10);if(f.kind==='label'){try{const c=document.createElement('canvas').getContext('2d');c.font=(f.bold?'bold ':'')+size+'px Arial';const actual=c.measureText(f.label||'').width,available=Number(f.w)/100*p.width-2;if(actual>available&&available>0)size=Math.max(6,size*available/actual)}catch(e){}}const x=orNumber(f.x,0,99),y=orNumber(f.y,0,99);return `left:${x}%;top:${y}%;width:${orNumber(f.w,.5,100-x)}%;height:${orNumber(f.h,.5,100-y)}%;font-size:${100*size/p.width}cqw;color:${/^#[0-9a-f]{6}$/i.test(f.color)?f.color:'#164d78'};background:${/^#[0-9a-f]{6}$/i.test(f.background)?f.background:'#ffffff'};text-align:${validAlign(f.align)||'left'};align-items:${({top:'flex-start',middle:'center',bottom:'flex-end'})[f.vertical]||'center'};font-weight:${f.bold?'700':'400'};`}
+ function orBlock(x){const t=x.orTemplate;if(!t||!Array.isArray(t.pages)||!Array.isArray(t.items))return `<section class="table-block"><h3>Ordre de réparation</h3><p>Le modèle OR manque dans ce TP. Demandez au professeur une nouvelle exportation.</p></section>`;const stored=bag()[x.id]||{},locked=workLocked()?'disabled':'';return `<section class="table-block or-block" style="${blockFrameStyle(x)}">${pic(x)}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="or-document">${t.pages.map((page,pi)=>`<div class="or-page" style="aspect-ratio:${orNumber(page.width,1,10000,595)}/${orNumber(page.height,1,10000,842)}"><img class="or-background" src="${/^data:image\//.test(page.image)?esc(page.image):''}" alt="Ordre de réparation, page ${pi+1}">${t.items.filter(f=>f.page===pi).map(f=>{if(f.kind==='label')return f.original?'':`<div class="or-item or-label" style="${orStyle(f,page)}">${esc(f.label)}</div>`;const v=Object.hasOwn(stored,f.id)?stored[f.id]:x.orValues?.[f.id]??(f.kind==='checkbox'?false:''),attr=`data-v217-or="${esc(x.id)}" data-field="${esc(f.id)}" aria-label="${esc(f.label)}" ${locked}`;const field=f.kind==='checkbox'?`<input type="checkbox" ${attr} ${v?'checked':''}>`:f.kind==='select'?`<select ${attr}>${(Array.isArray(f.options)?f.options:['']).map(o=>`<option value="${esc(o)}" ${String(v)===String(o)?'selected':''}>${esc(o)}</option>`).join('')}</select>`:f.kind==='textarea'?`<textarea ${attr} rows="3">${esc(v)}</textarea>`:`<input type="text" ${attr} value="${esc(v)}">`;return `<div class="or-item or-fill" style="${orStyle(f,page)}">${field}<span class="or-print-value">${f.kind==='checkbox'?(v?'✓':''):esc(v)}</span></div>`}).join('')}</div>`).join('')}</div>${callProf(x)}</section>`}
+ function listBlock(x){const count=Math.max(1,Math.min(20,Number(x.rows)||3)),h=Math.max(28,Math.min(100,Number(x.lineHeightPx)||40)),stored=bag()[x.id]||[],locked=workLocked()?'disabled':'';return `<section class="table-block response-list-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="response-list-rows">${Array.from({length:count},(_,r)=>`<div class="response-list-line" style="min-height:${h}px"><span class="response-list-dash" aria-hidden="true">–</span><input type="text" class="response-list-answer" data-v217-list="${esc(x.id)}" data-r="${r}" aria-label="Réponse ${r+1} sur ${count}" style="${fontFieldStyle(x.cells?.[r]?.[0]||{},'text')}" value="${esc(stored[r]?.[0]??'')}" ${locked}></div>`).join('')}</div>${callProf(x)}</section>`}
+ function collect217(){if(workLocked())return;const b=bag();document.querySelectorAll('[data-v217-or]').forEach(el=>{const id=el.dataset.v217Or;if(!b[id]||Array.isArray(b[id]))b[id]={};b[id][el.dataset.field]=el.type==='checkbox'?el.checked:el.value;const mirror=el.closest('.or-fill')?.querySelector('.or-print-value');if(mirror)mirror.textContent=el.type==='checkbox'?(el.checked?'✓':''):el.value});document.querySelectorAll('[data-v217-list]').forEach(el=>{const id=el.dataset.v217List;if(!Array.isArray(b[id]))b[id]=[];b[id][Number(el.dataset.r)]=[el.value]});}
+ document.addEventListener('input',e=>{if(e.target.matches('[data-v217-or],[data-v217-list]'))collect217()});document.addEventListener('change',e=>{if(e.target.matches('[data-v217-or],[data-v217-list]'))collect217()});
+ function coverMain(m){return (m.coverImages||[]).filter(im=>image(im)).find(im=>im.coverPrimary)||(m.coverImages||[]).find(im=>image(im))||null}
+ function coverHero(m){const im=coverMain(m);if(!im)return '';return `<figure class="cover-illustration" style="--cover-illustration-height:${Math.max(60,Math.min(120,Number(m.coverIllustrationHeightMm)||85))}mm;${coverFrameStyle(m,'photos')}"><img src="${esc(image(im))}" alt="Illustration du TP"></figure>`}
+ function refData(code){return READER_REFERENCE.competences.find(c=>c.code===code)}
+ function coverEvaluated(m){if(Array.isArray(m.evaluationCoverGroups))return m.evaluationCoverGroups;const groups=new Map(),visible=new Set((m.flow||[]).map(f=>f.id));const add=(code,id,label)=>{const ref=refData(code);if(!code||!id&&!label)return;const c=ref?.criteria.find(c=>c.code===id);let group=groups.get(code);if(!group){group={code,title:ref?.title||model?.competences?.find(c=>c.code===code)?.libelle||code,criteria:[]};groups.set(code,group)}if(!group.criteria.some(c=>c.code===id&&c.label===(label||ref?.criteria.find(c=>c.code===id)?.label||id)))group.criteria.push({code:id,label:label||c?.label||id})};for(const f of m.flow||[]){const x=getObj(m,f);if(!x||x.excluded||!visible.has(x.id))continue;const role=x.evaluationRole||(['question','table','match','placement'].includes(f.type)?'evaluated':'support');if(role==='evaluated')add(x.competence,x.criterionId,x.criterion)}for(const c of READER_REFERENCE.competences)for(const k of c.criteria)if((String(m.criteresRetenus||'').match(/C\d+\.\d+-\d+/g)||[]).includes(k.code))add(c.code,k.code,k.label);for(const code of String(m.competencesRetenues||'').match(/C\d+\.\d+/g)||[])if(!groups.has(code))groups.set(code,{code,title:refData(code)?.title||code,criteria:[]});return [...groups.values()].sort((a,b)=>a.code.localeCompare(b.code,'fr',{numeric:true}))}
+ function coverEvaluation(m){const groups=coverEvaluated(m);return `<section class="cover-evaluation"><h2>Compétences et critères évalués</h2><table class="cover-evaluation-table"><thead><tr><th>Compétence</th><th>Critères d’évaluation</th></tr></thead><tbody>${groups.length?groups.map(g=>`<tr><th><b>${esc(g.code)}</b><br>${esc(g.title)}</th><td>${g.criteria.length?'<ul>'+g.criteria.map(c=>`<li><b>${esc(c.code)}</b> — ${esc(c.label)}</li>`).join('')+'</ul>':'Critère à renseigner dans l’éditeur'}</td></tr>`).join(''):'<tr><td colspan="2">Compétences et critères à renseigner dans les questions du TP.</td></tr>'}</tbody></table></section>`}
+
  // ---- Blocs interactifs ---------------------------------------------------
  function block(p,f){
    const x=getObj(p,f);if(!x)return '';
@@ -1600,6 +1619,8 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
    }
 
    if(f.type==='table'){
+     if(x.blockKind==='repairOrder')return orBlock(x);
+     if(x.blockKind==='responseList')return listBlock(x);
      const weights=(x.columnWeights||Array.from({length:x.cols||0},()=>1)).map(n=>Math.max(1,+n||1));
      const total=weights.reduce((sum,n)=>sum+n,0)||x.cols||1;
      return `<section class="table-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<table class="tp-grid"><colgroup>${Array.from({length:x.cols||0},(_,c)=>`<col style="width:${((weights[c]||1)/total)*100}%">`).join('')}</colgroup><tbody>${Array.from({length:x.rows||0},(_,ri)=>`<tr style="height:${Math.max(25,Math.min(250,+x.rowHeights?.[ri]||48))}px">${Array.from({length:x.cols||0},(_,ci)=>{
@@ -1623,22 +1644,15 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
    }
 
    if(f.type==='placement'){
-     const pos=a&&typeof a==='object'?a:{};
+     const pos=a&&typeof a==='object'?a:{},fixed=fixedToken(x);
      const img=image(x.image);
-     return `<section class="placement-block" style="${blockFrameStyle(x)}" data-v117-placement-block="${esc(x.id)}">${pic(x)}<h3>${formattedText(x,'title')||'Placement sur image'}</h3><p>${formattedText(x,'text')}</p>${img?`<div class="placement-bank">${(x.tokens||[]).map(t=>`<button type="button" class="placement-token ${gommetteClass(t.label)}" draggable="true" data-v117-placement-token="${esc(t.id)}">${formattedText(t,'label')}</button>`).join('')}</div><div class="placement-stage" data-v117-stage="${esc(x.id)}" style="${photoStyle(x.image)}max-width:600px"><img src="${esc(img)}">${(x.tokens||[]).filter(t=>pos[t.id]).map(t=>`<button type="button" class="placement-pin ${gommetteClass(t.label)}" data-v117-pin="${esc(t.id)}" style="left:${+pos[t.id].x||0}%;top:${+pos[t.id].y||0}%">${formattedText(t,'label')}</button>`).join('')}</div>`:'<p>Image à ajouter par le professeur.</p>'}${callProf(x)}</section>`;
+     return `<section class="placement-block" style="${blockFrameStyle(x)}" data-v117-placement-block="${esc(x.id)}">${pic(x)}<h3>${formattedText(x,'title')||'Placement sur image'}</h3><p>${formattedText(x,'text')}</p>${img?`<div class="placement-bank">${(x.tokens||[]).filter(t=>t!==fixed).map(t=>`<button type="button" class="placement-token ${gommetteClass(t.label)}" draggable="true" data-v117-placement-token="${esc(t.id)}">${formattedText(t,'label')}</button>`).join('')}</div><div class="placement-stage" data-v117-stage="${esc(x.id)}" style="${photoStyle(x.image)}max-width:600px"><img src="${esc(img)}">${(x.tokens||[]).filter(t=>t===fixed||pos[t.id]).map(t=>{const isFixed=t===fixed,p=isFixed?{x:Number.isFinite(t.x)?t.x:50,y:Number.isFinite(t.y)?t.y:50}:pos[t.id];return isFixed?`<span class="placement-pin placement-fixed ${gommetteClass(t.label)}" data-v217-fixed="${esc(t.id)}" role="img" aria-label="Gommette fixe : ${esc(t.label)}" style="left:${+p.x||0}%;top:${+p.y||0}%">${formattedText(t,'label')}</span>`:`<button type="button" class="placement-pin ${gommetteClass(t.label)}" data-v117-pin="${esc(t.id)}" style="left:${+p.x||0}%;top:${+p.y||0}%">${formattedText(t,'label')}</button>`}).join('')}</div>`:'<p>Image à ajouter par le professeur.</p>'}${callProf(x)}</section>`;
    }
 
    return '';
  }
 
- function meta(q){
-   if(q?.hideEvaluationCriteria)return '';
-   const bits=[];
-   if(q?.competence)bits.push(`<em>${esc(q.competence)}</em>`);
-   if(q?.criterionId)bits.push(`<em>${esc(q.criterionId)}</em>`);
-   if(q?.criterion)bits.push(esc(q.criterion));
-   return bits.length?`<div class="qmeta">${bits.join(' ')}</div>`:'';
- }
+ function meta(q){let c=String(q.competence||'').trim(),id=String(q.criterionId||'').trim(),label=String(q.criterion||'').trim();const meaningful=value=>!!value&&!/à\s+(préciser|définir|déterminer)|aucun\s+critère|aucune\s+compétence|non\s+(renseigné|défini)/i.test(value);if(!meaningful(label)&&meaningful(id)){const criterion=refData(c)?.criteria.find(item=>item.code===id);if(criterion)label=criterion.label}const bits=[];if(meaningful(c))bits.push(`<em>${esc(c)}</em>`);if(meaningful(id))bits.push(`<em>${esc(id)}</em>`);if(meaningful(label))bits.push(esc(label));if(!bits.length)return '';const role=q.evaluationRole==='preparatory'?' <span class="qmeta-role">· Question préparatoire</span>':q.evaluationRole==='support'?' <span class="qmeta-role">· Support / consigne</span>':'';return `<div class="qmeta">${bits.join(' ')}${role}</div>`}
 
  function render(){
    const p=pof();if(!p)return false;
@@ -1670,7 +1684,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
      const ans=bag()[q.id]||'';
      const children=flow.filter(z=>z.type!=='question'&&getObj(p,z)?.parentQuestionId===q.id);
 
-     html+=`<div class="question-card" style="${blockFrameStyle(q)}"><div class="qhead"><span class="qno">${++n}</span><div class="qbody">${pic(q)}<div class="qtext">${formattedText(q,'text')}</div>${meta(q)}${(q.images||[]).map(im=>photoMarkup(im,'question')).join('')}${q.answerType==='none'?'':`<textarea class="answer ${esc(q.answerType||'short')}" rows="${Math.max(1,Math.min(20,+q.answerRows||((q.answerType==='long')?5:2)))}" data-v117-answer="${esc(q.id)}">${esc(ans)}</textarea>`}${children.length?`<div class="question-contents">${children.map(z=>block(p,z)).join('')}</div>`:''}${callProf(q)}</div></div></div>`;
+     html+=`<div class="question-card" style="${blockFrameStyle(q)}"><div class="qhead"><span class="qno">${++n}</span><div class="qbody">${pic(q)}<div class="qtext">${formattedText(q,'text')}</div>${meta(q)}${(q.images||[]).map(im=>photoMarkup(im,'question')).join('')}${q.answerType==='none'?'':`<textarea class="answer ${esc(q.answerType||'short')}" rows="${Math.max(1,Math.min(20,+q.answerRows||((q.answerType==='long')?5:2)))}" data-v117-answer="${esc(q.id)}">${esc(ans)}</textarea>`}${children.length?`<div class="${nestedLayout(p,q)}">${nestedMarkup(p,children)}</div>`:''}${callProf(q)}</div></div></div>`;
    }
 
    const dateDisplayed=frDate(model?.eleve?.date||model?.identite?.date||model?.dates?.creation||'');
@@ -1698,7 +1712,9 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
            <section style="${coverFrameStyle(p,'resources')}"><h2>Ressources et matériels</h2><p>${formattedText(p,'resources')}</p></section>
          </div>
          ${coverBlocksMarkup(p,'afterBrief')}
+         ${coverHero(p)}
          ${builtinCoverPhotos(p)}
+         ${coverEvaluation(p)}
          ${coverBlocksMarkup(p,'afterPhotos')}
        </div>
      </div>
@@ -1715,8 +1731,8 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  }
 
  function collect(){
-   if(!pof())return;
-   const b=bag();
+   if(!pof()||workLocked())return;
+   collect217();const b=bag();
    document.querySelectorAll('[data-v117-answer]').forEach(e=>b[e.dataset.v117Answer]=e.value);
    document.querySelectorAll('[data-v117-table]').forEach(e=>{
      const id=e.dataset.v117Table;
@@ -1727,14 +1743,14 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  }
 
  let drag=null,active=null;
- document.addEventListener('dragstart',e=>{
+ document.addEventListener('dragstart',e=>{if(workLocked()){e.preventDefault();return;}
    const t=e.target.closest('[data-v117-token]');
    if(t){drag={kind:'match',id:t.dataset.v117Token};e.dataTransfer?.setData('text/plain',t.dataset.v117Token);return}
    const p=e.target.closest('[data-v117-placement-token]');
    if(p){drag={kind:'placement',id:p.dataset.v117PlacementToken};e.dataTransfer?.setData('text/plain',p.dataset.v117PlacementToken)}
  });
  document.addEventListener('dragover',e=>{if(e.target.closest('[data-v117-target],[data-v117-stage]'))e.preventDefault()});
- document.addEventListener('drop',e=>{
+ document.addEventListener('drop',e=>{if(workLocked()){e.preventDefault();return;}
    const d=e.target.closest('[data-v117-target]');
    if(d){
      e.preventDefault();
@@ -1746,7 +1762,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
    const stage=e.target.closest('[data-v117-stage]');
    if(stage){e.preventDefault();place(stage,drag?.id||e.dataTransfer.getData('text/plain'),e.clientX,e.clientY)}
  });
- document.addEventListener('click',e=>{
+ document.addEventListener('click',e=>{if(workLocked())return;
    const t=e.target.closest('[data-v117-placement-token]');
    if(t){
      active={block:t.closest('[data-v117-placement-block]').dataset.v117PlacementBlock,id:t.dataset.v117PlacementToken};
@@ -1754,12 +1770,12 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
      return;
    }
    const stage=e.target.closest('[data-v117-stage]');
-   if(stage&&active?.block===stage.dataset.v117Stage&&!e.target.closest('[data-v117-pin]')){
+   if(stage&&active?.block===stage.dataset.v117Stage&&!e.target.closest('[data-v117-pin],[data-v217-fixed]')){
      place(stage,active.id,e.clientX,e.clientY);active=null;
    }
  });
  function place(stage,id,cx,cy){
-   if(!id)return;
+   if(!id||workLocked())return;const x=(pof()?.placementBlocks||[]).find(b=>b.id===stage.dataset.v117Stage);if(!x||(fixedToken(x)?.id===id)||!(x.tokens||[]).some(t=>t.id===id))return;
    const r=stage.getBoundingClientRect(),b=bag(),bid=stage.dataset.v117Stage;
    b[bid]=b[bid]||{};
    b[bid][id]={
@@ -2562,12 +2578,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV216SubmitInProgress)return;
+ if(window.__tpV217SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV216SubmitInProgress=true;
+ window.__tpV217SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2577,11 +2593,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V216',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V217',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V216',suiteVersion:'V216'};
+   model.meta={...(model.meta||{}),readerVersion:'V217',suiteVersion:'V217'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2598,15 +2614,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V216 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV216FinalizeRendered?.(model)}catch(e){console.warn('V216 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V217 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV217FinalizeRendered?.(model)}catch(e){console.warn('V217 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV216SubmitInProgress=false;
+   window.__tpV217SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -3440,7 +3456,7 @@ function installShell(){
       <button class="v210-nav v211-nav-locked" type="button" id="v211NavRecords">${svg('clock')}<span>Mes enregistrements</span><span class="v211-lock">🔒</span></button>
       <button class="v210-nav v211-nav-locked" type="button" id="v211NavHistory">${svg('folder')}<span>Historique</span><span class="v211-lock">🔒</span></button>
     </nav>
-    <div class="v210-side-bottom">Lecteur local · Travail élève<br>Fidélité éditeur V74</div>`;
+    <div class="v210-side-bottom">Lecteur local · Travail élève<br>Compatible éditeur V103</div>`;
   document.body.insertBefore(side,document.body.firstChild);
 
   const head=document.createElement('header');
@@ -3525,9 +3541,11 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V216';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V216';
+document.title='Lecteur TP Élève — V217';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V217';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
 
+<style id="reader-v217-editor-v103">#v117ProjectHost .question-contents{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(290px,calc((100% - 10px)/2))),1fr))}#v117ProjectHost .question-contents.question-contents-sized{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}#v117ProjectHost .question-content-item{min-width:0;flex-grow:0;flex-shrink:0;box-sizing:border-box}#v117ProjectHost .question-content-item>*{width:100%;max-width:100%;box-sizing:border-box;min-width:0;margin:0!important}#v117ProjectHost .question-content-spacer{grid-column:1/-1}#v117ProjectHost .question-line-break{display:none}#v117ProjectHost .question-contents-sized>.question-line-break{display:block;flex:0 0 100%;height:0;min-height:0;margin:-5px 0!important;padding:0;border:0}#v117ProjectHost .placement-fixed{pointer-events:none;cursor:default}#v117ProjectHost .response-list-line{display:flex;align-items:center;gap:8px;border-bottom:1px solid #b9cddd;padding:5px 8px;background:white}#v117ProjectHost .response-list-dash{font-weight:700;flex:0 0 auto;user-select:none}#v117ProjectHost .response-list-answer{flex:1;width:100%;min-width:0;border:0;background:transparent}#v117ProjectHost .or-page{position:relative;width:100%;container-type:inline-size;background:white;overflow:hidden;break-inside:avoid;margin-bottom:12px}#v117ProjectHost .or-background{display:block!important;width:100%!important;height:100%!important;max-height:none!important;object-fit:fill!important;pointer-events:none}#v117ProjectHost .or-item{position:absolute;display:flex;box-sizing:border-box;overflow:hidden;font-family:Arial,sans-serif;line-height:1.1;padding:1px;border:0;white-space:pre-wrap}#v117ProjectHost .or-label{pointer-events:none}#v117ProjectHost .or-fill input,#v117ProjectHost .or-fill textarea,#v117ProjectHost .or-fill select{display:block;width:100%;max-width:100%;box-sizing:border-box;border:1px solid #bad5e5;background:transparent;font:inherit;color:inherit;text-align:inherit;padding:0 2px;min-height:0;outline-offset:-1px}#v117ProjectHost .or-fill input[type=checkbox]{width:100%;height:100%;margin:0;accent-color:#175b97}#v117ProjectHost .or-fill textarea{height:100%!important;resize:none}#v117ProjectHost .or-print-value{display:none}#v117ProjectHost .or-label[style*="text-align:center"]{justify-content:center}#v117ProjectHost .or-label[style*="text-align:right"]{justify-content:flex-end}#v117ProjectHost .call-prof{display:flex;align-items:center;gap:7px}#v117ProjectHost .call-prof-icon{display:flex}#v117ProjectHost .call-prof-icon svg{width:42px;height:34px}#v117ProjectHost .cover-illustration{margin:14px 0;min-height:var(--cover-illustration-height,85mm);border:1px solid #c2d2df;background:white;display:flex;align-items:center;justify-content:center}#v117ProjectHost .cover-illustration img{display:block;width:100%;height:var(--cover-illustration-height,85mm);max-height:none!important;object-fit:contain}#v117ProjectHost .cover-evaluation{margin:12px 0 18px}#v117ProjectHost .cover-evaluation h2{font-size:14px}#v117ProjectHost .cover-evaluation-table{width:100%;border-collapse:collapse;font-size:11px}#v117ProjectHost .cover-evaluation-table td,#v117ProjectHost .cover-evaluation-table th{padding:6px 8px;border:1px solid #aebfd0;vertical-align:top;text-align:left}#v117ProjectHost .cover-evaluation-table thead th{background:#eaf3f9}#v117ProjectHost .cover-evaluation-table ul{margin:0;padding-left:16px}#v117ProjectHost .qmeta{font-size:10px;line-height:1.4;margin-top:6px}#v117ProjectHost .qmeta-role{font-style:italic;color:#627889}@media print{#v117ProjectHost .or-fill input,#v117ProjectHost .or-fill textarea,#v117ProjectHost .or-fill select{display:none!important}#v117ProjectHost .or-print-value{display:block;width:100%;overflow-wrap:anywhere;white-space:pre-wrap}#v117ProjectHost .or-block{break-inside:auto!important}#v117ProjectHost .or-page{break-inside:avoid}}
+</style><style id="reader-v217-checkbox-print">@media print{#v117ProjectHost .or-fill input[type=checkbox]+.or-print-value{border:1px solid currentColor;height:100%;text-align:center;line-height:1}}</style>
