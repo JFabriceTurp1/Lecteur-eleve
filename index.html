@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V218</title>
+<title>Lecteur TP Élève — V219</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -36,6 +36,7 @@ figure figcaption[data-auto-image-name]{display:none!important;}
 body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-events:auto!important;user-select:auto!important}
 .v218-tools{margin:12px 0 20px;display:flex;gap:8px;flex-wrap:wrap}.v218-tools button{padding:9px 12px;border:1px solid #c4d8e8;border-radius:8px;background:white;color:#174677;cursor:pointer}.v218-tools p{width:100%;margin:4px 0;color:#58728c;font-size:12px;line-height:1.5}.v218-summary{color:#58728c;font-size:12px}
 </style>
+<style id="qcm-v219">.qcm-choices{margin:10px 0 0;padding:10px 12px;border:1px solid #bfd0df;border-radius:8px;min-width:0}.qcm-choices legend{padding:0 5px;font-size:12px;color:#42627d}.qcm-choice{display:flex;align-items:flex-start;gap:9px;padding:7px 2px;font-weight:400;cursor:pointer;break-inside:avoid;overflow-wrap:anywhere}.qcm-choice input[type=radio],.qcm-choice input[type=checkbox]{appearance:auto!important;-webkit-appearance:auto!important;display:inline-block!important;width:17px!important;height:17px!important;flex:0 0 17px;margin:2px 0 0!important;accent-color:#176497}.qcm-choice span{white-space:normal;min-width:0}.qcm-editor-option{padding:10px;border:1px solid #cddbe6;border-radius:8px;margin-bottom:8px}.qcm-editor-option input[type=checkbox]{width:auto}.qcm-editor-option .row{flex-wrap:wrap}.qcm-editor-option .row label{font-size:12px;margin-right:auto}@media print{.qcm-choice input{print-color-adjust:exact;-webkit-print-color-adjust:exact}.qcm-choices{break-inside:avoid}.qcm-choice{color:#000}}</style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V205</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
@@ -958,7 +959,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V218 : si un rendu intervient pendant la session, la prochaine vue
+/* V219 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -971,10 +972,10 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V218';
-console.info('Lecteur TP V218 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V219';
+console.info('Lecteur TP V219 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
-/* V218 : accès autonome et suivi transportable sans TP. */
+/* V219 : accès autonome et suivi transportable sans TP. */
 const FOLLOWUP_KEY='tp_reader_followup_v218';
 let importedPending=null;
 function verifyData(d,code){
@@ -1231,8 +1232,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV218FinalizeRendered=finalize;
-console.info('Lecteur TP V218 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV219FinalizeRendered=finalize;
+console.info('Lecteur TP V219 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1267,7 +1268,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V218 double clic : payload expiré.');
+    console.warn('V219 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1279,7 +1280,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V218 double clic',e);
+    console.error('V219 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1289,15 +1290,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V218 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V219 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV218OpenPayload=consume;
-console.info('Lecteur TP V218 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV219OpenPayload=consume;
+console.info('Lecteur TP V219 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1669,8 +1670,23 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  function orNumber(v,min,max,fallback=min){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback}
  function orStyle(f,p){let size=orNumber(f.size,6,48,10);if(f.kind==='label'){try{const c=document.createElement('canvas').getContext('2d');c.font=(f.bold?'bold ':'')+size+'px Arial';const actual=c.measureText(f.label||'').width,available=Number(f.w)/100*p.width-2;if(actual>available&&available>0)size=Math.max(6,size*available/actual)}catch(e){}}const x=orNumber(f.x,0,99),y=orNumber(f.y,0,99);return `left:${x}%;top:${y}%;width:${orNumber(f.w,.5,100-x)}%;height:${orNumber(f.h,.5,100-y)}%;font-size:${100*size/p.width}cqw;color:${/^#[0-9a-f]{6}$/i.test(f.color)?f.color:'#164d78'};background:${/^#[0-9a-f]{6}$/i.test(f.background)?f.background:'#ffffff'};text-align:${validAlign(f.align)||'left'};align-items:${({top:'flex-start',middle:'center',bottom:'flex-end'})[f.vertical]||'center'};font-weight:${f.bold?'700':'400'};`}
  function orBlock(x){const t=x.orTemplate;if(!t||!Array.isArray(t.pages)||!Array.isArray(t.items))return `<section class="table-block"><h3>Ordre de réparation</h3><p>Le modèle OR manque dans ce TP. Demandez au professeur une nouvelle exportation.</p></section>`;const stored=bag()[x.id]||{},locked=workLocked()?'disabled':'';return `<section class="table-block or-block" style="${blockFrameStyle(x)}">${pic(x)}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="or-document">${t.pages.map((page,pi)=>`<div class="or-page" style="aspect-ratio:${orNumber(page.width,1,10000,595)}/${orNumber(page.height,1,10000,842)}"><img class="or-background" src="${/^data:image\//.test(page.image)?esc(page.image):''}" alt="Ordre de réparation, page ${pi+1}">${t.items.filter(f=>f.page===pi).map(f=>{if(f.kind==='label')return f.original?'':`<div class="or-item or-label" style="${orStyle(f,page)}">${esc(f.label)}</div>`;const v=Object.hasOwn(stored,f.id)?stored[f.id]:x.orValues?.[f.id]??(f.kind==='checkbox'?false:''),attr=`data-v217-or="${esc(x.id)}" data-field="${esc(f.id)}" aria-label="${esc(f.label)}" ${locked}`;const field=f.kind==='checkbox'?`<input type="checkbox" ${attr} ${v?'checked':''}>`:f.kind==='select'?`<select ${attr}>${(Array.isArray(f.options)?f.options:['']).map(o=>`<option value="${esc(o)}" ${String(v)===String(o)?'selected':''}>${esc(o)}</option>`).join('')}</select>`:f.kind==='textarea'?`<textarea ${attr} rows="3">${esc(v)}</textarea>`:`<input type="text" ${attr} value="${esc(v)}">`;return `<div class="or-item or-fill" style="${orStyle(f,page)}">${field}<span class="or-print-value">${f.kind==='checkbox'?(v?'✓':''):esc(v)}</span></div>`}).join('')}</div>`).join('')}</div>${callProf(x)}</section>`}
+ function qcmBlock(x){
+   const options=Array.isArray(x.options)?x.options:[],stored=bag()[x.id],ids=Array.isArray(stored?.selectedOptionIds)?stored.selectedOptionIds:[],selected=x.qcmMode==='multiple'?ids:ids.slice(0,1),locked=workLocked()?'disabled':'';
+   return `<section class="table-block qcm-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<fieldset class="qcm-choices"><legend>${x.qcmMode==='multiple'?'Cochez la ou les réponses choisies.':'Cochez une seule réponse.'}</legend>${options.map(o=>`<label class="qcm-choice"><input type="${x.qcmMode==='multiple'?'checkbox':'radio'}" name="qcm-${esc(x.id)}" data-v219-qcm="${esc(x.id)}" value="${esc(o.id)}" ${selected.includes(o.id)?'checked':''} ${locked}><span>${esc(o.text).replace(/\n/g,'<br>')}</span></label>`).join('')}</fieldset>${callProf(x)}</section>`;
+ }
+ function collectQcm(){
+   if(workLocked())return;const p=pof();if(!p)return;
+   const nodes=[...document.querySelectorAll('[data-v219-qcm]')],b=bag();
+   for(const x of p.tableBlocks||[]){if(x.blockKind!=='qcm')continue;const inputs=nodes.filter(el=>el.dataset.v219Qcm===x.id);if(!inputs.length)continue;
+    const ids=inputs.filter(el=>el.checked&&(x.options||[]).some(o=>o.id===el.value)).map(el=>el.value);
+    b[x.id]={selectedOptionIds:x.qcmMode==='multiple'?ids:ids.slice(0,1)};
+   }
+ }
+ document.addEventListener('input',e=>{if(e.target.matches('[data-v219-qcm]'))collectQcm()});
+ document.addEventListener('change',e=>{if(e.target.matches('[data-v219-qcm]'))collectQcm()});
+
  function listBlock(x){const count=Math.max(1,Math.min(20,Number(x.rows)||3)),h=Math.max(28,Math.min(100,Number(x.lineHeightPx)||40)),stored=bag()[x.id]||[],locked=workLocked()?'disabled':'';return `<section class="table-block response-list-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="response-list-rows">${Array.from({length:count},(_,r)=>`<div class="response-list-line" style="min-height:${h}px"><span class="response-list-dash" aria-hidden="true">–</span><input type="text" class="response-list-answer" data-v217-list="${esc(x.id)}" data-r="${r}" aria-label="Réponse ${r+1} sur ${count}" style="${fontFieldStyle(x.cells?.[r]?.[0]||{},'text')}" value="${esc(stored[r]?.[0]??'')}" ${locked}></div>`).join('')}</div>${callProf(x)}</section>`}
- function collect217(){if(workLocked())return;const b=bag();document.querySelectorAll('[data-v217-or]').forEach(el=>{const id=el.dataset.v217Or;if(!b[id]||Array.isArray(b[id]))b[id]={};b[id][el.dataset.field]=el.type==='checkbox'?el.checked:el.value;const mirror=el.closest('.or-fill')?.querySelector('.or-print-value');if(mirror)mirror.textContent=el.type==='checkbox'?(el.checked?'✓':''):el.value});document.querySelectorAll('[data-v217-list]').forEach(el=>{const id=el.dataset.v217List;if(!Array.isArray(b[id]))b[id]=[];b[id][Number(el.dataset.r)]=[el.value]});}
+ function collect217(){if(workLocked())return;collectQcm();const b=bag();document.querySelectorAll('[data-v217-or]').forEach(el=>{const id=el.dataset.v217Or;if(!b[id]||Array.isArray(b[id]))b[id]={};b[id][el.dataset.field]=el.type==='checkbox'?el.checked:el.value;const mirror=el.closest('.or-fill')?.querySelector('.or-print-value');if(mirror)mirror.textContent=el.type==='checkbox'?(el.checked?'✓':''):el.value});document.querySelectorAll('[data-v217-list]').forEach(el=>{const id=el.dataset.v217List;if(!Array.isArray(b[id]))b[id]=[];b[id][Number(el.dataset.r)]=[el.value]});}
  document.addEventListener('input',e=>{if(e.target.matches('[data-v217-or],[data-v217-list]'))collect217()});document.addEventListener('change',e=>{if(e.target.matches('[data-v217-or],[data-v217-list]'))collect217()});
  function coverMain(m){return (m.coverImages||[]).filter(im=>image(im)).find(im=>im.coverPrimary)||(m.coverImages||[]).find(im=>image(im))||null}
  function coverHero(m){const im=coverMain(m);if(!im)return '';return `<figure class="cover-illustration" style="--cover-illustration-height:${Math.max(60,Math.min(120,Number(m.coverIllustrationHeightMm)||85))}mm;${coverFrameStyle(m,'photos')}"><img src="${esc(image(im))}" alt="Illustration du TP"></figure>`}
@@ -1694,6 +1710,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
 
    if(f.type==='table'){
      if(x.blockKind==='repairOrder')return orBlock(x);
+     if(x.blockKind==='qcm')return qcmBlock(x);
      if(x.blockKind==='responseList')return listBlock(x);
      const weights=(x.columnWeights||Array.from({length:x.cols||0},()=>1)).map(n=>Math.max(1,+n||1));
      const total=weights.reduce((sum,n)=>sum+n,0)||x.cols||1;
@@ -2652,12 +2669,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV218SubmitInProgress)return;
+ if(window.__tpV219SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV218SubmitInProgress=true;
+ window.__tpV219SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2667,11 +2684,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V218',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V219',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V218',suiteVersion:'V218'};
+   model.meta={...(model.meta||{}),readerVersion:'V219',suiteVersion:'V219'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2688,15 +2705,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V218 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV218FinalizeRendered?.(model)}catch(e){console.warn('V218 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V219 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV219FinalizeRendered?.(model)}catch(e){console.warn('V219 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV218SubmitInProgress=false;
+   window.__tpV219SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -3615,8 +3632,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V218';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V218';
+document.title='Lecteur TP Élève — V219';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V219';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
