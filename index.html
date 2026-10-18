@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V220</title>
+<title>Lecteur TP Élève — V221</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -38,6 +38,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 </style>
 <style id="qcm-v219">.qcm-choices{margin:10px 0 0;padding:10px 12px;border:1px solid #bfd0df;border-radius:8px;min-width:0}.qcm-choices legend{padding:0 5px;font-size:12px;color:#42627d}.qcm-choice{display:flex;align-items:flex-start;gap:9px;padding:7px 2px;font-weight:400;cursor:pointer;break-inside:avoid;overflow-wrap:anywhere}.qcm-choice input[type=radio],.qcm-choice input[type=checkbox]{appearance:auto!important;-webkit-appearance:auto!important;display:inline-block!important;width:17px!important;height:17px!important;flex:0 0 17px;margin:2px 0 0!important;accent-color:#176497}.qcm-choice span{white-space:normal;min-width:0}.qcm-editor-option{padding:10px;border:1px solid #cddbe6;border-radius:8px;margin-bottom:8px}.qcm-editor-option input[type=checkbox]{width:auto}.qcm-editor-option .row{flex-wrap:wrap}.qcm-editor-option .row label{font-size:12px;margin-right:auto}@media print{.qcm-choice input{print-color-adjust:exact;-webkit-print-color-adjust:exact}.qcm-choices{break-inside:avoid}.qcm-choice{color:#000}}</style>
 <style id="true-false-v220">.tf-grid{width:100%;table-layout:fixed;border-collapse:collapse}.tf-grid th,.tf-grid td{border:1px solid #a4c2d5;padding:8px;vertical-align:middle}.tf-grid th{background:#e7f1f8}.tf-grid th:first-child{text-align:left}.tf-grid td:first-child{overflow-wrap:anywhere;white-space:normal}.tf-grid th:not(:first-child),.tf-grid .tf-answer{text-align:center}.tf-choice{display:flex;align-items:center;justify-content:center;min-height:28px;width:100%;cursor:pointer;margin:0}.tf-choice input[type=radio]{appearance:auto!important;-webkit-appearance:auto!important;display:inline-block!important;position:static!important;width:18px!important;height:18px!important;margin:0!important;flex:0 0 18px;accent-color:#176497}.tf-grid tr{break-inside:avoid}@media print{.tf-choice input{print-color-adjust:exact;-webkit-print-color-adjust:exact}.tf-grid thead{display:table-header-group}.tf-grid td{color:#000}}</style>
+<style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V205</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
@@ -960,7 +961,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V220 : si un rendu intervient pendant la session, la prochaine vue
+/* V221 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -973,10 +974,10 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V220';
-console.info('Lecteur TP V220 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V221';
+console.info('Lecteur TP V221 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
-/* V220 : accès autonome et suivi transportable sans TP. */
+/* V221 : accès autonome et suivi transportable sans TP. */
 const FOLLOWUP_KEY='tp_reader_followup_v218';
 let importedPending=null;
 function verifyData(d,code){
@@ -1233,8 +1234,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV220FinalizeRendered=finalize;
-console.info('Lecteur TP V220 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV221FinalizeRendered=finalize;
+console.info('Lecteur TP V221 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1269,7 +1270,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V220 double clic : payload expiré.');
+    console.warn('V221 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1281,7 +1282,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V220 double clic',e);
+    console.error('V221 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1291,15 +1292,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V220 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V221 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV220OpenPayload=consume;
-console.info('Lecteur TP V220 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV221OpenPayload=consume;
+console.info('Lecteur TP V221 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1671,6 +1672,24 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  function orNumber(v,min,max,fallback=min){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback}
  function orStyle(f,p){let size=orNumber(f.size,6,48,10);if(f.kind==='label'){try{const c=document.createElement('canvas').getContext('2d');c.font=(f.bold?'bold ':'')+size+'px Arial';const actual=c.measureText(f.label||'').width,available=Number(f.w)/100*p.width-2;if(actual>available&&available>0)size=Math.max(6,size*available/actual)}catch(e){}}const x=orNumber(f.x,0,99),y=orNumber(f.y,0,99);return `left:${x}%;top:${y}%;width:${orNumber(f.w,.5,100-x)}%;height:${orNumber(f.h,.5,100-y)}%;font-size:${100*size/p.width}cqw;color:${/^#[0-9a-f]{6}$/i.test(f.color)?f.color:'#164d78'};background:${/^#[0-9a-f]{6}$/i.test(f.background)?f.background:'#ffffff'};text-align:${validAlign(f.align)||'left'};align-items:${({top:'flex-start',middle:'center',bottom:'flex-end'})[f.vertical]||'center'};font-weight:${f.bold?'700':'400'};`}
  function orBlock(x){const t=x.orTemplate;if(!t||!Array.isArray(t.pages)||!Array.isArray(t.items))return `<section class="table-block"><h3>Ordre de réparation</h3><p>Le modèle OR manque dans ce TP. Demandez au professeur une nouvelle exportation.</p></section>`;const stored=bag()[x.id]||{},locked=workLocked()?'disabled':'';return `<section class="table-block or-block" style="${blockFrameStyle(x)}">${pic(x)}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="or-document">${t.pages.map((page,pi)=>`<div class="or-page" style="aspect-ratio:${orNumber(page.width,1,10000,595)}/${orNumber(page.height,1,10000,842)}"><img class="or-background" src="${/^data:image\//.test(page.image)?esc(page.image):''}" alt="Ordre de réparation, page ${pi+1}">${t.items.filter(f=>f.page===pi).map(f=>{if(f.kind==='label')return f.original?'':`<div class="or-item or-label" style="${orStyle(f,page)}">${esc(f.label)}</div>`;const v=Object.hasOwn(stored,f.id)?stored[f.id]:x.orValues?.[f.id]??(f.kind==='checkbox'?false:''),attr=`data-v217-or="${esc(x.id)}" data-field="${esc(f.id)}" aria-label="${esc(f.label)}" ${locked}`;const field=f.kind==='checkbox'?`<input type="checkbox" ${attr} ${v?'checked':''}>`:f.kind==='select'?`<select ${attr}>${(Array.isArray(f.options)?f.options:['']).map(o=>`<option value="${esc(o)}" ${String(v)===String(o)?'selected':''}>${esc(o)}</option>`).join('')}</select>`:f.kind==='textarea'?`<textarea ${attr} rows="3">${esc(v)}</textarea>`:`<input type="text" ${attr} value="${esc(v)}">`;return `<div class="or-item or-fill" style="${orStyle(f,page)}">${field}<span class="or-print-value">${f.kind==='checkbox'?(v?'✓':''):esc(v)}</span></div>`}).join('')}</div>`).join('')}</div>${callProf(x)}</section>`}
+function orderItems(o){return Array.isArray(o?.items)?o.items:[]}
+function orderIds(o,ids){const valid=orderItems(o).map(x=>x.id),seen=new Set(),out=[];for(const id of Array.isArray(ids)?ids:[]){if(valid.includes(id)&&!seen.has(id)){seen.add(id);out.push(id)}}return out.concat(valid.filter(id=>!seen.has(id)))}
+function mixedOrder(o){const ids=orderItems(o).map(x=>x.id),out=ids.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}if(out.length>1&&out.every((id,i)=>id===ids[i]))[out[0],out[1]]=[out[1],out[0]];return out}
+function orderBody(o,ids,locked=false){
+ const order=orderIds(o,ids);return `<p class="ordering-hint">Déplacez les pastilles pour remettre les phrases dans l’ordre. Vous pouvez aussi utiliser les flèches.</p><ol class="ordering-list">${order.map((id,i)=>{const item=orderItems(o).find(x=>x.id===id);return `<li class="ordering-pill" data-order-item="${esc(id)}" draggable="${!locked}"><span class="ordering-number" aria-hidden="true">${i+1}</span><span class="ordering-text">${esc(item.text).replace(/\n/g,'<br>')}</span><span class="ordering-controls"><button type="button" data-order-move="-1" aria-label="Monter la phrase ${i+1}" ${locked||i===0?'disabled':''}>↑</button><button type="button" data-order-move="1" aria-label="Descendre la phrase ${i+1}" ${locked||i===order.length-1?'disabled':''}>↓</button></span></li>`}).join('')}</ol><button type="button" class="ordering-reset" data-order-reset ${locked?'disabled':''}>Recommencer</button>`;
+}
+function moveOrderId(o,ids,id,target){const out=orderIds(o,ids),i=out.indexOf(id);if(i<0||!Number.isInteger(target)||target<0||target>=out.length)return out;out.splice(i,1);out.splice(target,0,id);return out}
+
+ function orderingBlock(x){const ids=bag()[x.id]?.order||x.startOrder;return `<section class="table-block ordering-block" style="${blockFrameStyle(x)}" data-order-block="${esc(x.id)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<div class="ordering-body">${orderBody(x,ids,workLocked())}</div>${callProf(x)}</section>`}
+ function collectOrdering(){if(workLocked())return;const p=pof();if(!p)return;for(const host of document.querySelectorAll('#v117ProjectHost [data-order-block]')){const x=(p.tableBlocks||[]).find(x=>x.id===host.dataset.orderBlock&&x.blockKind==='ordering');if(x)bag()[x.id]={order:orderIds(x,[...host.querySelectorAll('[data-order-item]')].map(el=>el.dataset.orderItem))}}}
+ let orderingDrag=null;
+ function orderingHost(el){const host=el.closest('#v117ProjectHost [data-order-block]'),x=(pof()?.tableBlocks||[]).find(x=>x.id===host?.dataset.orderBlock&&x.blockKind==='ordering');return {host,x}}
+ function updateOrdering(host,x,ids,focusId){if(workLocked())return;bag()[x.id]={order:orderIds(x,ids)};host.querySelector('.ordering-body').innerHTML=orderBody(x,bag()[x.id].order);if(focusId){const item=[...host.querySelectorAll('[data-order-item]')].find(el=>el.dataset.orderItem===focusId);[...item?.querySelectorAll('button')||[]].find(el=>!el.disabled)?.focus({preventScroll:true})}}
+ document.addEventListener('click',e=>{if(workLocked())return;const move=e.target.closest('[data-order-move]'),reset=e.target.closest('[data-order-reset]');if(!move&&!reset)return;const {host,x}=orderingHost(e.target);if(!x)return;const ids=orderIds(x,bag()[x.id]?.order||x.startOrder),id=move?.closest('[data-order-item]')?.dataset.orderItem;if(reset)updateOrdering(host,x,x.startOrder);else updateOrdering(host,x,moveOrderId(x,ids,id,ids.indexOf(id)+Number(move.dataset.orderMove)),id)});
+ document.addEventListener('dragstart',e=>{if(workLocked())return;const item=e.target.closest('[data-order-item]');if(!item)return;const {host,x}=orderingHost(item);if(!x)return;orderingDrag={block:x.id,id:item.dataset.orderItem};e.dataTransfer?.setData('application/x-tp-order',JSON.stringify(orderingDrag));if(e.dataTransfer)e.dataTransfer.effectAllowed='move'});
+ document.addEventListener('dragover',e=>{if(workLocked())return;const {host}=orderingHost(e.target);if(orderingDrag&&host?.dataset.orderBlock===orderingDrag.block)e.preventDefault()});
+ document.addEventListener('drop',e=>{if(workLocked())return;const {host,x}=orderingHost(e.target),item=e.target.closest('[data-order-item]');if(!x||!item||orderingDrag?.block!==x.id)return;e.preventDefault();const ids=orderIds(x,bag()[x.id]?.order||x.startOrder);updateOrdering(host,x,moveOrderId(x,ids,orderingDrag.id,ids.indexOf(item.dataset.orderItem)));orderingDrag=null});document.addEventListener('dragend',()=>orderingDrag=null);
+
  function trueFalseBlock(x){
   const stored=bag()[x.id]?.answers||{},locked=workLocked()?'disabled':'';
   return `<section class="table-block true-false-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<table class="tp-grid tf-grid"><colgroup><col style="width:72%"><col style="width:14%"><col style="width:14%"></colgroup><thead><tr><th scope="col">Affirmation</th><th scope="col">Vrai</th><th scope="col">Faux</th></tr></thead><tbody>${(x.statements||[]).map((r,i)=>`<tr><td>${esc(r.text).replace(/\n/g,'<br>')}</td>${['true','false'].map(value=>`<td class="tf-answer"><label class="tf-choice"><input type="radio" name="tf-${esc(x.id)}-${esc(r.id)}" data-v220-tf="${esc(x.id)}" data-tf-row="${esc(r.id)}" value="${value}" aria-label="${value==='true'?'Vrai':'Faux'} : affirmation ${i+1}" ${stored[r.id]===value?'checked':''} ${locked}></label></td>`).join('')}</tr>`).join('')}</tbody></table>${callProf(x)}</section>`;
@@ -1698,7 +1717,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  document.addEventListener('change',e=>{if(e.target.matches('[data-v219-qcm]'))collectQcm()});
 
  function listBlock(x){const count=Math.max(1,Math.min(20,Number(x.rows)||3)),h=Math.max(28,Math.min(100,Number(x.lineHeightPx)||40)),stored=bag()[x.id]||[],locked=workLocked()?'disabled':'';return `<section class="table-block response-list-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="response-list-rows">${Array.from({length:count},(_,r)=>`<div class="response-list-line" style="min-height:${h}px"><span class="response-list-dash" aria-hidden="true">–</span><input type="text" class="response-list-answer" data-v217-list="${esc(x.id)}" data-r="${r}" aria-label="Réponse ${r+1} sur ${count}" style="${fontFieldStyle(x.cells?.[r]?.[0]||{},'text')}" value="${esc(stored[r]?.[0]??'')}" ${locked}></div>`).join('')}</div>${callProf(x)}</section>`}
- function collect217(){if(workLocked())return;collectTrueFalse();collectQcm();const b=bag();document.querySelectorAll('[data-v217-or]').forEach(el=>{const id=el.dataset.v217Or;if(!b[id]||Array.isArray(b[id]))b[id]={};b[id][el.dataset.field]=el.type==='checkbox'?el.checked:el.value;const mirror=el.closest('.or-fill')?.querySelector('.or-print-value');if(mirror)mirror.textContent=el.type==='checkbox'?(el.checked?'✓':''):el.value});document.querySelectorAll('[data-v217-list]').forEach(el=>{const id=el.dataset.v217List;if(!Array.isArray(b[id]))b[id]=[];b[id][Number(el.dataset.r)]=[el.value]});}
+ function collect217(){if(workLocked())return;collectOrdering();collectTrueFalse();collectQcm();const b=bag();document.querySelectorAll('[data-v217-or]').forEach(el=>{const id=el.dataset.v217Or;if(!b[id]||Array.isArray(b[id]))b[id]={};b[id][el.dataset.field]=el.type==='checkbox'?el.checked:el.value;const mirror=el.closest('.or-fill')?.querySelector('.or-print-value');if(mirror)mirror.textContent=el.type==='checkbox'?(el.checked?'✓':''):el.value});document.querySelectorAll('[data-v217-list]').forEach(el=>{const id=el.dataset.v217List;if(!Array.isArray(b[id]))b[id]=[];b[id][Number(el.dataset.r)]=[el.value]});}
  document.addEventListener('input',e=>{if(e.target.matches('[data-v217-or],[data-v217-list]'))collect217()});document.addEventListener('change',e=>{if(e.target.matches('[data-v217-or],[data-v217-list]'))collect217()});
  function coverMain(m){return (m.coverImages||[]).filter(im=>image(im)).find(im=>im.coverPrimary)||(m.coverImages||[]).find(im=>image(im))||null}
  function coverHero(m){const im=coverMain(m);if(!im)return '';return `<figure class="cover-illustration" style="--cover-illustration-height:${Math.max(60,Math.min(120,Number(m.coverIllustrationHeightMm)||85))}mm;${coverFrameStyle(m,'photos')}"><img src="${esc(image(im))}" alt="Illustration du TP"></figure>`}
@@ -1722,6 +1741,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
 
    if(f.type==='table'){
      if(x.blockKind==='repairOrder')return orBlock(x);
+     if(x.blockKind==='ordering')return orderingBlock(x);
      if(x.blockKind==='trueFalse')return trueFalseBlock(x);
      if(x.blockKind==='qcm')return qcmBlock(x);
      if(x.blockKind==='responseList')return listBlock(x);
@@ -2682,12 +2702,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV220SubmitInProgress)return;
+ if(window.__tpV221SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV220SubmitInProgress=true;
+ window.__tpV221SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2697,11 +2717,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V220',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V221',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V220',suiteVersion:'V220'};
+   model.meta={...(model.meta||{}),readerVersion:'V221',suiteVersion:'V221'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2718,15 +2738,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V220 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV220FinalizeRendered?.(model)}catch(e){console.warn('V220 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V221 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV221FinalizeRendered?.(model)}catch(e){console.warn('V221 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV220SubmitInProgress=false;
+   window.__tpV221SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -3645,8 +3665,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V220';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V220';
+document.title='Lecteur TP Élève — V221';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V221';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
