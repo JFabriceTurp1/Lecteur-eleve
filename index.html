@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V222</title>
+<title>Lecteur TP Élève — V223</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -39,7 +39,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 <style id="qcm-v219">.qcm-choices{margin:10px 0 0;padding:10px 12px;border:1px solid #bfd0df;border-radius:8px;min-width:0}.qcm-choices legend{padding:0 5px;font-size:12px;color:#42627d}.qcm-choice{display:flex;align-items:flex-start;gap:9px;padding:7px 2px;font-weight:400;cursor:pointer;break-inside:avoid;overflow-wrap:anywhere}.qcm-choice input[type=radio],.qcm-choice input[type=checkbox]{appearance:auto!important;-webkit-appearance:auto!important;display:inline-block!important;width:17px!important;height:17px!important;flex:0 0 17px;margin:2px 0 0!important;accent-color:#176497}.qcm-choice span{white-space:normal;min-width:0}.qcm-editor-option{padding:10px;border:1px solid #cddbe6;border-radius:8px;margin-bottom:8px}.qcm-editor-option input[type=checkbox]{width:auto}.qcm-editor-option .row{flex-wrap:wrap}.qcm-editor-option .row label{font-size:12px;margin-right:auto}@media print{.qcm-choice input{print-color-adjust:exact;-webkit-print-color-adjust:exact}.qcm-choices{break-inside:avoid}.qcm-choice{color:#000}}</style>
 <style id="true-false-v220">.tf-grid{width:100%;table-layout:fixed;border-collapse:collapse}.tf-grid th,.tf-grid td{border:1px solid #a4c2d5;padding:8px;vertical-align:middle}.tf-grid th{background:#e7f1f8}.tf-grid th:first-child{text-align:left}.tf-grid td:first-child{overflow-wrap:anywhere;white-space:normal}.tf-grid th:not(:first-child),.tf-grid .tf-answer{text-align:center}.tf-choice{display:flex;align-items:center;justify-content:center;min-height:28px;width:100%;cursor:pointer;margin:0}.tf-choice input[type=radio]{appearance:auto!important;-webkit-appearance:auto!important;display:inline-block!important;position:static!important;width:18px!important;height:18px!important;margin:0!important;flex:0 0 18px;accent-color:#176497}.tf-grid tr{break-inside:avoid}@media print{.tf-choice input{print-color-adjust:exact;-webkit-print-color-adjust:exact}.tf-grid thead{display:table-header-group}.tf-grid td{color:#000}}</style>
 <style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
-<style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style></head>
+<style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style><style id="observation-style">.observation-answer{display:block;width:100%;box-sizing:border-box;min-height:80px;resize:vertical;padding:10px;border:1px solid #a9c8d8;border-radius:7px;line-height:1.5;font:inherit;white-space:pre-wrap}@media print{.observation-answer{resize:none;overflow:visible}}</style></head>
 <body>
 <div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V205</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
 <div class="wrap">
@@ -961,7 +961,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V222 : si un rendu intervient pendant la session, la prochaine vue
+/* V223 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -974,10 +974,10 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V222';
-console.info('Lecteur TP V222 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V223';
+console.info('Lecteur TP V223 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
-/* V222 : accès autonome et suivi transportable sans TP. */
+/* V223 : accès autonome et suivi transportable sans TP. */
 const FOLLOWUP_KEY='tp_reader_followup_v218';
 let importedPending=null;
 function verifyData(d,code){
@@ -1234,8 +1234,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV222FinalizeRendered=finalize;
-console.info('Lecteur TP V222 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV223FinalizeRendered=finalize;
+console.info('Lecteur TP V223 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1270,7 +1270,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V222 double clic : payload expiré.');
+    console.warn('V223 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1282,7 +1282,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V222 double clic',e);
+    console.error('V223 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1292,15 +1292,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V222 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V223 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV222OpenPayload=consume;
-console.info('Lecteur TP V222 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV223OpenPayload=consume;
+console.info('Lecteur TP V223 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1680,6 +1680,8 @@ function orderBody(o,ids,locked=false){
 }
 function moveOrderId(o,ids,id,target){const out=orderIds(o,ids),i=out.indexOf(id);if(i<0||!Number.isInteger(target)||target<0||target>=out.length)return out;out.splice(i,1);out.splice(target,0,id);return out}
 
+ function observationBlock(x){const value=bag()[x.id]?.[0]?.[0]??'',rows=Math.max(2,Math.min(20,Number(x.answerRows)||5));return `<section class="table-block observation-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<textarea class="observation-answer" data-v223-observation data-v117-table="${esc(x.id)}" data-r="0" data-c="0" rows="${rows}" aria-label="${esc(x.title||'Observation')}" placeholder="Rédigez votre conclusion…" ${workLocked()?'disabled':''}>${esc(value)}</textarea>${callProf(x)}</section>`}
+ document.addEventListener('input',e=>{if(e.target.matches('[data-v223-observation]'))collect()});
  function orderingBlock(x){const ids=bag()[x.id]?.order||x.startOrder;return `<section class="table-block ordering-block" style="${blockFrameStyle(x)}" data-order-block="${esc(x.id)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<div class="ordering-body">${orderBody(x,ids,workLocked())}</div>${callProf(x)}</section>`}
  function collectOrdering(){if(workLocked())return;const p=pof();if(!p)return;for(const host of document.querySelectorAll('#v117ProjectHost [data-order-block]')){const x=(p.tableBlocks||[]).find(x=>x.id===host.dataset.orderBlock&&x.blockKind==='ordering');if(x)bag()[x.id]={order:orderIds(x,[...host.querySelectorAll('[data-order-item]')].map(el=>el.dataset.orderItem))}}}
  let orderingDrag=null;
@@ -1742,6 +1744,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
 
    if(f.type==='table'){
      if(x.blockKind==='repairOrder')return orBlock(x);
+     if(x.blockKind==='observation')return observationBlock(x);
      if(x.blockKind==='ordering')return orderingBlock(x);
      if(['trueFalse','endTp'].includes(x.blockKind))return trueFalseBlock(x);
      if(x.blockKind==='qcm')return qcmBlock(x);
@@ -2703,12 +2706,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV222SubmitInProgress)return;
+ if(window.__tpV223SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV222SubmitInProgress=true;
+ window.__tpV223SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2718,11 +2721,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V222',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V223',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V222',suiteVersion:'V222'};
+   model.meta={...(model.meta||{}),readerVersion:'V223',suiteVersion:'V223'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2739,15 +2742,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V222 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV222FinalizeRendered?.(model)}catch(e){console.warn('V222 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V223 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV223FinalizeRendered?.(model)}catch(e){console.warn('V223 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV222SubmitInProgress=false;
+   window.__tpV223SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -3666,8 +3669,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V222';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V222';
+document.title='Lecteur TP Élève — V223';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V223';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
