@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V225</title>
+<title>Lecteur TP Élève — V226</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -41,7 +41,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 <style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
 <style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style><style id="observation-style">.observation-answer{display:block;width:100%;box-sizing:border-box;min-height:80px;resize:vertical;padding:10px;border:1px solid #a9c8d8;border-radius:7px;line-height:1.5;font:inherit;white-space:pre-wrap}@media print{.observation-answer{resize:none;overflow:visible}}</style></head>
 <body>
-<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V205</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
+<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V226</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
 <div class="wrap">
 <div class="helper"><strong>Ouvrez votre fichier TP personnel pour commencer.</strong> Le TP reste verrouillé tant que le fichier et le code élève ne sont pas validés.</div>
 <div class="fileName" id="loadedName" style="display:none"></div>
@@ -126,24 +126,7 @@ render();
 </script>
 <!-- V22 — standard commun diffusion / rendu / correction -->
 <style id="reader-v22-common-style">body.tp-send-pending #saveBtn{display:inline-flex!important;background:#d97706!important}.tp-v22-state{font-size:12px;font-weight:900;padding:7px 10px;border-radius:999px;background:#e2e8f0;color:#334155}.tp-v22-state.pending{background:#ffedd5;color:#9a3412}.tp-v22-state.sent{background:#dcfce7;color:#166534}</style>
-<script id="reader-v22-common-standard">
-(function(){
- const SIGNATURE='FDMAHY_TP_SYSTEM',FORMAT='4.0',now=()=>new Date().toISOString();
- const safe=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[<>:"/\\|?*\x00-\x1F]/g,'_').replace(/[^a-zA-Z0-9._-]+/g,'_').replace(/[. ]+$/g,'').replace(/^_+|_+$/g,'').slice(0,80)||'INCONNU';
- const key=()=>['tp_common_v4',model?.studentId||'',model?.code||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|');
- const fileName=status=>[safe(model?.eleve?.nom||'ELEVE').toUpperCase(),safe(model?.eleve?.prenom||''),safe(model?.titre||model?.code||'TP'),status].filter(Boolean).join('_')+'.json';
- function normalize(status){model=model||{};model.signature=SIGNATURE;model.formatVersion=FORMAT;model.schemaVersion=model.schemaVersion||'3.1';model.type='tp-eleve';model.identite={...(model.identite||{}),nom:model.eleve?.nom||model.identite?.nom||'',prenom:model.eleve?.prenom||model.identite?.prenom||'',classe:model.classe||model.identite?.classe||''};model.tp={...(model.tp||{}),id:model.code||model.tp?.id||model.meta?.activityId||'',titre:model.titre||model.tp?.titre||''};model.statut=status||model.statut||'DIFFUSION';model.dates=model.dates||{};model.dates.creation=model.dates.creation||model.meta?.generatedAt||now();model.dates.derniereModification=now();if(model.statut==='RENDU')model.dates.rendu=model.dates.rendu||now();model.suivi=model.suivi||{};model.suivi.competences=model.competences||model.suivi.competences||[];return model}
- function download(text,name){const b=new Blob([text],{type:'application/json;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),700)}
- async function verifiedWrite(h,name,text){const fh=await h.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(text);await w.close();const f=await fh.getFile(),d=JSON.parse(await f.text());if(f.size!==new Blob([text]).size||d.signature!==SIGNATURE||d.statut!=='RENDU')throw Error('Vérification de copie impossible');return true}
- function state(v){document.body.classList.toggle('tp-send-pending',v==='PENDING');const b=document.getElementById('saveBtn');if(b)b.textContent=v==='PENDING'?'🔁 RETENTER L’ENVOI':'📤 RENDRE MON TP';let s=document.getElementById('tpV22State');if(!s){s=document.createElement('span');s.id='tpV22State';document.querySelector('.topbar-inner')?.insertBefore(s,b)}s.className='tp-v22-state '+(v==='PENDING'?'pending':v==='SENT'?'sent':'');s.textContent=v==='PENDING'?'RENDU EN ATTENTE D’ENVOI':v==='SENT'?'RENDU TRANSMIS':'TP EN COURS'}
- async function idb(){return await new Promise((res,rej)=>{const q=indexedDB.open('tp_reader_v17',1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains('settings'))q.result.createObjectStore('settings')};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
- async function getHandle(){try{const d=await idb();return await new Promise((res,rej)=>{const q=d.transaction('settings').objectStore('settings').get('returnDir');q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}catch(e){return null}}
- async function putHandle(h){try{const d=await idb();await new Promise((res,rej)=>{const tx=d.transaction('settings','readwrite');tx.objectStore('settings').put(h,'returnDir');tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})}catch(e){}}
- async function submit(){const pending=model?.submission?.transmissionStatus==='PENDING';if(!pending&&!confirm('ATTENTION : rendre ton TP verrouille la copie.\n\nVeux-tu continuer ?'))return;if(!pending){collect();normalize('RENDU');model.submission={...(model.submission||{}),final:true,submittedAt:model.dates.rendu,transmissionStatus:'PENDING',attempts:0}}model.submission.attempts++;model.submission.lastAttemptAt=now();normalize('RENDU');let text=JSON.stringify(model,null,2);localStorage.setItem(key(),text);localStorage.setItem(key()+'|submitted','1');let h=await getHandle();if(!h&&window.showDirectoryPicker){try{h=await showDirectoryPicker({mode:'readwrite'});await putHandle(h)}catch(e){}}let sent=false;try{if(h){let p=await h.queryPermission?.({mode:'readwrite'});if(p!=='granted')p=await h.requestPermission?.({mode:'readwrite'});if(p==='granted')sent=await verifiedWrite(h,fileName('RENDU'),text)}}catch(e){console.warn(e)}if(sent){model.submission.transmissionStatus='SENT';model.submission.transmittedAt=now();normalize('RENDU');text=JSON.stringify(model,null,2);localStorage.setItem(key(),text);state('SENT');document.body.classList.add('submitted');toast('Votre TP a été transmis et vérifié. Une copie reste enregistrée sur cet ordinateur.')}else{model.submission.transmissionStatus='PENDING';text=JSON.stringify(model,null,2);localStorage.setItem(key(),text);download(text,fileName('RENDU'));document.body.classList.add('submitted');state('PENDING');alert("Le réseau professeur n'est pas disponible. Votre TP est enregistré sur cet ordinateur. Reconnectez-vous au réseau de la classe puis cliquez de nouveau sur Rendre mon TP.")}}
- function install(){const b=document.getElementById('saveBtn');if(!b)return;b.onclick=submit;normalize(model?.statut||'DIFFUSION');state(model?.submission?.transmissionStatus==='PENDING'?'PENDING':model?.submission?.transmissionStatus==='SENT'||model?.statut==='CORRIGE'?'SENT':'WORKING')}
- document.getElementById('fileInput')?.addEventListener('change',()=>setTimeout(install,180));setTimeout(install,450);window.tpCommonV4={signature:SIGNATURE,format:FORMAT,normalize,fileName};
-})();
-</script>
+<script id="reader-v22-common-standard">/* V226: traitement historique retiré. Le runtime final gère seul ouverture et remise. */</script>
 
 <style id="reader-v3-style">
 .tp-access-overlay{position:fixed;inset:0;background:#0f172acc;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}.tp-access-box{width:min(440px,96vw);background:#fff;border-radius:18px;padding:24px;box-shadow:0 20px 60px #0005;text-align:center}.tp-access-box h2{margin:0 0 8px;color:#17365d}.tp-access-box input{font-size:26px;text-align:center;letter-spacing:6px;font-weight:800;margin:14px 0}.tp-access-error{color:#b91c1c;font-weight:800;min-height:22px}.reader-locked .wrap{filter:blur(4px);pointer-events:none;user-select:none}.support-generic .fieldRow:nth-child(n+4){display:none}
@@ -530,7 +513,7 @@ textarea.tp-auto,input.tp-auto{overflow:hidden;resize:none;min-height:42px}.tp-s
 })();
 </script>
 
-<style id="reader-v116-active-style">body.tp-active-file .wrap{opacity:1!important;filter:none!important;pointer-events:auto!important}body.tp-active-file #v115ProjectHost{opacity:1!important;filter:none!important;pointer-events:auto!important}body.tp-active-file .wait-card{display:none!important}</style><script id="reader-v116-active-runtime">(function(){function go(){const ov=document.getElementById('tpAccessOverlay');if(ov&&ov.style.display!=='none')return;document.body.classList.remove('tp-awaiting-file');document.body.classList.add('tp-active-file');const loaded=document.getElementById('loadedName');if(loaded)loaded.style.display='block';document.querySelectorAll('.wrap input,.wrap textarea,.wrap select').forEach(el=>{if(!el.readOnly&&!el.hasAttribute('readonly'))el.disabled=false});const p=document.getElementById('pauseBtn'),r=document.getElementById('saveBtn');if(p)p.disabled=false;if(r)r.disabled=false;try{window.render?.()}catch(e){console.error('V116 render',e)}}const input=document.getElementById('fileInput');if(input)input.addEventListener('change',()=>setTimeout(go,260),true);const old=window.loadFile;if(typeof old==='function')window.loadFile=function(file){const z=old.apply(this,arguments);setTimeout(go,320);return z};const ov=document.getElementById('tpAccessOverlay');if(ov)new MutationObserver(()=>{if(ov.style.display==='none')setTimeout(go,60)}).observe(ov,{attributes:true,attributeFilter:['style']});console.info('Lecteur TP V117 actif');})();</script>
+<style id="reader-v116-active-style">body.tp-active-file .wrap{opacity:1!important;filter:none!important;pointer-events:auto!important}body.tp-active-file #v115ProjectHost{opacity:1!important;filter:none!important;pointer-events:auto!important}body.tp-active-file .wait-card{display:none!important}</style><script id="reader-v116-active-runtime">/* V226: traitement historique retiré. Le runtime final gère seul ouverture et remise. */</script>
 <!-- V126 — chargeur élève final : aucun TP démo, code individuel obligatoire, modèle réel -->
 <style id="reader-v126-final-style">
 body.v126-awaiting .wrap{opacity:.28;filter:grayscale(.7);pointer-events:none;user-select:none}
@@ -567,53 +550,13 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  window.loadFile=function(file){lock();const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));const p=projectFrom(d);if(!p)throw Error('Ce fichier ne contient pas le projet evaluation.tp.v1 attendu.');model=d;window.model=model;try{localStorage.removeItem('tp_reader_last_submission')}catch(_){}access(file.name)}catch(e){console.error('V127 load',e);alert('Impossible de charger ce TP : '+(e?.message||e));lock()}};r.readAsText(file,'utf-8')};
  const input=document.getElementById('fileInput');if(input){input.onchange=function(e){const f=e.target.files&&e.target.files[0];if(f)window.loadFile(f);e.target.value=''}}
  const btn=document.getElementById('tpAccessBtn'),inp=document.getElementById('tpAccessCode');if(btn)btn.onclick=unlock;if(inp){inp.oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();unlock()}}}
- document.title='Lecteur TP Élève — V130';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V130';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
+ document.title='Lecteur TP Élève — V226';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
 })();
 </script>
 
 
 <!-- V128 — rendu physique vérifié + quitter fiable -->
-<script id="reader-v128-submit-quit-runtime">
-(function(){
- const safe=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').replace(/^_+|_+$/g,'');
- function db(){return new Promise((res,rej)=>{const q=indexedDB.open('tp_reader_v17',1);q.onupgradeneeded=()=>{if(!q.result.objectStoreNames.contains('settings'))q.result.createObjectStore('settings')};q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
- async function getHandle(){const d=await db();return new Promise((res,rej)=>{const q=d.transaction('settings').objectStore('settings').get('returnDir');q.onsuccess=()=>res(q.result||null);q.onerror=()=>rej(q.error)})}
- async function setHandle(h){const d=await db();return new Promise((res,rej)=>{const tx=d.transaction('settings','readwrite');tx.objectStore('settings').put(h,'returnDir');tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error)})}
- async function chooseHandle(){if(!window.showDirectoryPicker){alert("Ce navigateur ne permet pas l’écriture directe dans un dossier. Utilisez Edge ou Chrome pour choisir le dossier de remise.");return null}try{const h=await window.showDirectoryPicker({mode:'readwrite'});await setHandle(h);const b=document.getElementById('returnFolderBtn');if(b)b.textContent='📁 '+h.name;return h}catch(e){if(e?.name!=='AbortError')alert('Impossible de choisir le dossier : '+(e?.message||e));return null}}
- async function writable(){let h=await getHandle().catch(()=>null);if(!h)h=await chooseHandle();if(!h)return null;let p=await h.queryPermission?.({mode:'readwrite'});if(p!=='granted')p=await h.requestPermission?.({mode:'readwrite'});if(p!=='granted'){alert('Autorisation d’écriture refusée pour le dossier de remise.');return null}const b=document.getElementById('returnFolderBtn');if(b)b.textContent='📁 '+h.name;return h}
- function fname(){return [safe(model?.eleve?.nom||model?.identite?.nom||'ELEVE'),safe(model?.eleve?.prenom||model?.identite?.prenom||''),safe(model?.code||model?.tp?.id||'TP'),'RENDU'].filter(Boolean).join('_')+'.tp'}
- async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{create:true});const w=await fh.createWritable();await w.write(new Blob([text],{type:'application/json;charset=utf-8'}));await w.close();const f=await fh.getFile();const back=await f.text();if(back!==text)throw new Error('La vérification du fichier écrit a échoué.');return true}
- async function submitV128(){
-   if(document.body.classList.contains('submitted')||model?.submission?.final===true){alert('Cette copie a déjà été rendue et est verrouillée.');return}
-   if(!confirm('Rendre ce TP est définitif. Le fichier sera enregistré dans le dossier de remise choisi.\n\nContinuer ?'))return;
-   try{window.collect?.()}catch(e){console.warn(e)}
-   const h=await writable();if(!h){alert('Le TP n’a pas été rendu : aucun fichier n’a été écrit.');return}
-   const previous=JSON.parse(JSON.stringify(model?.submission||{}));
-   const stamp=new Date().toISOString();
-   model.submission={...(model.submission||{}),final:true,submittedAt:stamp,transmissionStatus:'SENT',readerVersion:'V128'};
-   model.statut='RENDU';model.dates=model.dates||{};model.dates.rendu=stamp;model.dates.derniereModification=stamp;
-   const text=JSON.stringify(model,null,2),name=fname();
-   try{
-     await writeVerified(h,name,text);
-   }catch(e){model.submission=previous;model.statut='DIFFUSION';delete model.dates.rendu;alert('Le TP n’a pas été rendu car le fichier n’a pas pu être enregistré : '+(e?.message||e));return}
-   try{localStorage.setItem(['tp_work_v17',model.studentId||'',model.code||'',model.classe||'',model.eleve?.nom||'',model.eleve?.prenom||''].join('|'),text);localStorage.setItem(['tp_work_v17',model.studentId||'',model.code||'',model.classe||'',model.eleve?.nom||'',model.eleve?.prenom||''].join('|')+'|submitted','1')}catch(e){}
-   document.body.classList.add('submitted');
-   const banner=document.getElementById('submittedBanner');if(banner)banner.style.display='block';
-   document.querySelectorAll('.wrap input,.wrap textarea,.wrap select').forEach(el=>el.disabled=true);
-   alert('TP rendu enregistré avec succès dans « '+h.name+' »\n\nFichier : '+name);
- }
- function saveLocal(){try{window.collect?.();const key=['tp_work_v17',model.studentId||'',model.code||'',model.classe||'',model.eleve?.nom||'',model.eleve?.prenom||''].join('|');localStorage.setItem(key,JSON.stringify(model));return true}catch(e){alert('Impossible d’enregistrer le travail avant de quitter : '+(e?.message||e));return false}}
- function quitV128(){if(!saveLocal())return;if(!confirm('Votre travail a été enregistré sur cet ordinateur.\n\nQuitter ce TP et revenir à l’écran d’ouverture ?'))return;location.reload()}
- function install(){
-   const send=document.getElementById('saveBtn');if(send){send.textContent='📤 Rendre mon TP';send.onclick=submitV128}
-   const quit=document.getElementById('quitBtn');if(quit){quit.disabled=false;quit.onclick=quitV128}
-   const folder=document.getElementById('returnFolderBtn');if(folder)folder.onclick=chooseHandle;
- }
- install();setTimeout(install,300);setTimeout(install,1200);
- const mo=new MutationObserver(()=>install());mo.observe(document.body,{attributes:true,attributeFilter:['class']});
- console.info('Lecteur TP V128 — rendu vérifié et quitter fiable');
-})();
-</script>
+<script id="reader-v128-submit-quit-runtime">/* V226: traitement historique retiré. Le runtime final gère seul ouverture et remise. */</script>
 
 
 
@@ -963,7 +906,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V225 : si un rendu intervient pendant la session, la prochaine vue
+/* V226 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -976,10 +919,10 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V225';
-console.info('Lecteur TP V225 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V226';
+console.info('Lecteur TP V226 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
-/* V225 : accès autonome et suivi transportable sans TP. */
+/* V226 : accès autonome et suivi transportable sans TP. */
 const FOLLOWUP_KEY='tp_reader_followup_v218';
 let importedPending=null;
 function verifyData(d,code){
@@ -1236,8 +1179,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV225FinalizeRendered=finalize;
-console.info('Lecteur TP V225 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV226FinalizeRendered=finalize;
+console.info('Lecteur TP V226 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1272,7 +1215,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V225 double clic : payload expiré.');
+    console.warn('V226 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1284,7 +1227,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V225 double clic',e);
+    console.error('V226 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1294,15 +1237,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V225 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V226 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV225OpenPayload=consume;
-console.info('Lecteur TP V225 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV226OpenPayload=consume;
+console.info('Lecteur TP V226 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1358,7 +1301,7 @@ body{padding-right:0!important}
       if(typeof toast==='function')toast('Pause enregistrée sur cet ordinateur. Tu pourras reprendre ce TP plus tard.');
     };
   }
-  setTimeout(installPause,0);setTimeout(installPause,300);
+  /* V226 : pause gérée par le stockage IndexedDB V130. */
   // Nettoyage visuel après chaque reprise/rendu.
   const mo=new MutationObserver(()=>{document.querySelectorAll('#supportBox .fieldRow').forEach(row=>{const vals=[...row.querySelectorAll('.tp-display-value')];vals.slice(0,-1).forEach(x=>x.remove())})});
   mo.observe(document.body,{childList:true,subtree:true});
@@ -1422,7 +1365,7 @@ body:not(.tp-awaiting-file) .tp-wait-message{display:none}
    if(editable){const box=document.querySelector('#p1 .vehicle');if(box){const note=document.createElement('div');note.className='vehicle-support-edit-note';note.textContent='✎ Vous pouvez compléter ou corriger les informations du véhicule support.';box.prepend(note)}}
  }
  function awaiting(){active=false;document.body.classList.add('tp-awaiting-file');document.body.classList.remove('tp-active-file');if(loaded)loaded.style.display='none';const pause=document.getElementById('pauseBtn'),send=document.getElementById('saveBtn');if(pause)pause.disabled=true;if(send)send.disabled=true;document.querySelectorAll('.wrap input,.wrap textarea,.wrap select').forEach(el=>el.disabled=true);configureVehicle()}
- function activate(){if(!chosen)return;active=true;document.body.classList.remove('tp-awaiting-file');document.body.classList.add('tp-active-file');if(loaded){loaded.style.display='block'};document.querySelectorAll('.wrap input,.wrap textarea,.wrap select').forEach(el=>el.disabled=false);const pause=document.getElementById('pauseBtn'),send=document.getElementById('saveBtn');if(pause)pause.disabled=isSubmitted();if(send)send.disabled=isSubmitted()&&model?.submission?.transmissionStatus!=='PENDING';if(typeof window.render==='function')window.render();configureVehicle()}
+ function activate(){if(!chosen)return;if(model?.submission?.final||document.body.classList.contains('v205-readonly')){configureVehicle();return}active=true;document.body.classList.remove('tp-awaiting-file');document.body.classList.add('tp-active-file');if(loaded){loaded.style.display='block'};document.querySelectorAll('.wrap input,.wrap textarea,.wrap select').forEach(el=>el.disabled=false);const pause=document.getElementById('pauseBtn'),send=document.getElementById('saveBtn');if(pause)pause.disabled=isSubmitted();if(send)send.disabled=isSubmitted()&&model?.submission?.transmissionStatus!=='PENDING';if(typeof window.render==='function')window.render();configureVehicle()}
  if(input)input.addEventListener('change',e=>{if(e.target.files&&e.target.files[0]){chosen=true;setTimeout(()=>{const overlay=document.getElementById('tpAccessOverlay');if(!overlay||overlay.style.display==='none')activate()},180)}},true);
  const overlay=document.getElementById('tpAccessOverlay');if(overlay){new MutationObserver(()=>{if(chosen&&overlay.style.display==='none')setTimeout(activate,30)}).observe(overlay,{attributes:true,attributeFilter:['style']})}
  const previousRender=window.render;window.render=function(){previousRender.apply(this,arguments);if(active)setTimeout(configureVehicle,0)};
@@ -1949,7 +1892,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
  async function getWork(){const d=await openDb();const v=await new Promise((ok,no)=>{const r=d.transaction(STORE).objectStore(STORE).get(key());r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});d.close();return v?.data||null}
  async function quit(){try{await putWork()}catch(e){console.error('V130 sauvegarde IndexedDB',e);if(!confirm('La sauvegarde locale a rencontré un problème. Quitter quand même ?'))return}if(!confirm('Votre travail a été enregistré sur cet ordinateur.\n\nQuitter ce TP et revenir à l’écran d’ouverture ?'))return;location.reload()}
  async function pause(){if(model?.submission?.final){alert('Cette copie a déjà été rendue.');return}try{await putWork();window.toast?.('Pause enregistrée sur cet ordinateur. Tu pourras reprendre ce TP plus tard.')}catch(e){alert('Impossible d’enregistrer la pause : '+(e?.message||e))}}
- function install(){const q=document.getElementById('quitBtn');if(q){q.disabled=false;q.onclick=quit}const p=document.getElementById('pauseBtn');if(p)p.onclick=pause}
+ function install(){const q=document.getElementById('quitBtn');if(q){q.disabled=!!model?.submission?.final||document.body.classList.contains('v205-readonly');q.onclick=quit}const p=document.getElementById('pauseBtn');if(p)p.onclick=pause}
  install();setTimeout(install,100);setTimeout(install,800);new MutationObserver(install).observe(document.body,{childList:true,subtree:true});
  window.tpV130SaveWork=putWork;window.tpV130GetWork=getWork;
  console.info('Lecteur TP V130 — sauvegarde travail IndexedDB active, localStorage lourd désactivé.');
@@ -1970,7 +1913,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
    }catch(e){reject('Impossible de lire ce TP : '+(e?.message||e))}};r.readAsText(file,'utf-8')
  };
  const input=document.getElementById('fileInput');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.loadFile(f);e.target.value=''};
- document.title='Lecteur TP Élève — V157';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V157';
+ document.title='Lecteur TP Élève — V226';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';
  console.info('Lecteur V157 : verrou RENDU/CORRIGE + anti-réouverture actif.');
 })();
 </script>
@@ -2498,9 +2441,9 @@ if(typeof oldCollect==='function'){
 }
 
 function stamp(){
-  document.title='Lecteur TP Élève — V205';
+  document.title='Lecteur TP Élève — V226';
   const b=document.querySelector('.brand');
-  if(b)b.textContent='Lecteur TP Élève — V205';
+  if(b)b.textContent='Lecteur TP Élève — V226';
 }
 stamp();
 setTimeout(stamp,600);
@@ -2633,7 +2576,7 @@ function setReadOnly(on,corrected=false){
  ['pauseBtn','saveBtn','quitBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!!on});
 }
 
-window.tpV225ApplyReadonly=function(data){model=data;window.model=data;renderProjectOnly();setReadOnly(true,statusOf(data)==='CORRIGE');window.tpV206EnhanceReadonlyMessage?.()};
+window.tpV226ApplyReadonly=function(data){model=data;window.model=data;renderProjectOnly();setReadOnly(true,statusOf(data)==='CORRIGE');window.tpV206EnhanceReadonlyMessage?.()};
 function access(fileName,readonly){
  const a=model?.access||{};
  const ov=document.getElementById('tpAccessOverlay'),student=document.getElementById('tpAccessStudent'),inp=document.getElementById('tpAccessCode'),err=document.getElementById('tpAccessError');
@@ -2705,16 +2648,31 @@ function stampFile(){
  return [safe(model?.eleve?.nom||model?.identite?.nom||'ELEVE'),safe(model?.eleve?.prenom||model?.identite?.prenom||''),safe(title),`R${rev}`,date,'RENDU'].filter(Boolean).join('_')+'.tp';
 }
 function download(text,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),800)}
-async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(new Blob([text],{type:'application/json;charset=utf-8'}));await w.close();const back=await(await fh.getFile()).text();if(back!==text)throw new Error('La vérification du fichier écrit a échoué.')}
+async function writeVerified(h,name,text){
+ // A returned copy is immutable: never open an existing file for writing.
+ const stem=name.replace(/\.tp$/i,''),suffix=globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+ for(let attempt=0;attempt<100;attempt++){
+   const candidate=attempt?stem+'_'+suffix+'_'+attempt+'.tp':name;
+   let exists=false;
+   try{await h.getFileHandle(candidate,{create:false});exists=true}catch(e){if(e?.name!=='NotFoundError')throw e}
+   if(exists)continue;
+   const fh=await h.getFileHandle(candidate,{create:true}),w=await fh.createWritable();
+   await w.write(new Blob([text],{type:'application/json;charset=utf-8'}));await w.close();
+   const back=await(await fh.getFile()).text();if(back!==text)throw new Error('La vérification du fichier écrit a échoué.');
+   return candidate;
+ }
+ throw new Error('Impossible de créer une nouvelle copie sans remplacer un fichier existant.');
+}
+
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV225SubmitInProgress)return;
+ if(window.__tpV226SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV225SubmitInProgress=true;
+ window.__tpV226SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2724,16 +2682,16 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V225',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V226',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V225',suiteVersion:'V225'};
+   model.meta={...(model.meta||{}),readerVersion:'V226',suiteVersion:'V226'};
 
-   const text=JSON.stringify(model,null,2),name=stampFile();
+   const text=JSON.stringify(model,null,2);let name=stampFile();
    let h=await writable(),saved=false;
    if(h){
-     try{await writeVerified(h,name,text);saved=true}
+     try{name=await writeVerified(h,name,text);saved=true}
      catch(e){alert('Écriture directe impossible : '+(e?.message||e))}
    }
    if(!saved)download(text,name);
@@ -2744,15 +2702,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V225 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV225FinalizeRendered?.(model)}catch(e){console.warn('V225 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V226 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV226FinalizeRendered?.(model)}catch(e){console.warn('V226 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV225SubmitInProgress=false;
+   window.__tpV226SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -2805,8 +2763,8 @@ function settle(){
 }
 [0,120,500].forEach(ms=>setTimeout(settle,ms));
 
-document.title='Lecteur TP Élève — V205';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V205';
+document.title='Lecteur TP Élève — V226';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';
 
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
 })();
@@ -2889,7 +2847,7 @@ function workKeyData(k){const p=String(k||'').split('|');return {studentId:p[1]|
 function localEvidence(){const rows=[],receipts=[];try{for(let i=0;i<localStorage.length;i++){
  const k=localStorage.key(i)||'';
  if(k.startsWith(PREFIX)){const r=storedJson(k);if(r?.data)receipts.push(r);continue}
- if(k.startsWith('tp_work_v17|')||k.startsWith('tp_work_v29|')){if(k.endsWith('|submitted')){if(localStorage.getItem(k)==='1'){const wk=k.slice(0,-10),snapshot=storedJson(wk),data=snapshot||workKeyData(wk);rows.push({id:k,submitted:true,receiptOnly:!snapshot,data})}}else{const data=storedJson(k);if(data)rows.push({id:k,data})}continue}
+ if(k.startsWith('tp_work_v17|')||k.startsWith('tp_work_v29|')||k.startsWith('tp_common_v4|')){if(k.endsWith('|submitted')){if(localStorage.getItem(k)==='1'){const wk=k.slice(0,-10),snapshot=storedJson(wk),data=snapshot||workKeyData(wk);rows.push({id:k,submitted:true,receiptOnly:!snapshot,data})}}else{const data=storedJson(k);if(data)rows.push({id:k,data})}continue}
  if(k.startsWith('tp_reader_strict_lock_v206|')){const lock=storedJson(k);if(lock?.locked){const snapshot=storedJson(lock.workKey),data=snapshot||workKeyData(lock.workKey);rows.push({id:k,submitted:true,receiptOnly:!snapshot,updatedAt:lock.submittedAt,data:{...data,submission:{...(data.submission||{}),submittedAt:lock.submittedAt||data.submission?.submittedAt,revision:lock.revision||data.submission?.revision}}})}}
  if(k.startsWith('tp_reader_strict_unlock_v206|')){const permit=storedJson(k),data=storedJson(permit?.workKey);if(permit?.unlocked&&data?.submission?.unlockedByTeacher)receipts.push({id:key(data),data:identityData(data),state:'open',revision:revision(data),unlockedAt:permit.unlockedAt||data.submission.unlockedAt,updatedAt:permit.unlockedAt||''})}
  }}catch(e){}return {rows,receipts}}
@@ -2920,7 +2878,7 @@ async function recordFinal(d){if(!valid(d)||!final(d))return false;const r={id:k
 async function recordOpen(d){if(!valid(d)||!d.submission?.unlockedByTeacher)return false;return putReceipt({id:key(d),data:identityData(d),state:'open',revision:revision(d),unlockedAt:d.submission.unlockedAt,updatedAt:new Date().toISOString()})}
 async function serialize(d,action){if(globalThis.navigator?.locks?.request)return navigator.locks.request('tp-reader-submit|'+key(d),action);return action()}
 window.tpSubmissionGuard225={same,final,corrected,resolve,reconcileRows,recordFinal,recordOpen,serialize,decide,identity:key};
-function checkCurrent(){const current=window.model;if(!valid(current)||final(current))return;resolve(current).then(result=>{if(window.model===current&&result.locked)window.tpV225ApplyReadonly?.(result.data)})}
+function checkCurrent(){const current=window.model;if(!valid(current)||final(current))return;resolve(current).then(result=>{if(window.model===current&&result.locked)window.tpV226ApplyReadonly?.(result.data)})}
 let channel;try{channel=new BroadcastChannel('tp-reader-receipts-v225');channel.onmessage=checkCurrent}catch(e){}
 window.addEventListener('storage',e=>{if(e.key?.startsWith(PREFIX)||e.key?.startsWith('tp_reader_strict_lock_v206|'))checkCurrent()});
 })();
@@ -3085,18 +3043,18 @@ const oldLoad=window.loadFile;
 if(typeof oldLoad==='function'&&!oldLoad.__v206){
   let loadEpoch=0;
   const wrapped=function(file){
-    if(submitChecking||window.__tpV225SubmitInProgress){alert('Le rendu est en cours. Patiente avant d’ouvrir un autre TP.');return}
+    if(submitChecking||window.__tpV226SubmitInProgress){alert('Le rendu est en cours. Patiente avant d’ouvrir un autre TP.');return}
     const epoch=++loadEpoch,r=new FileReader();
     r.onload=async()=>{
       try{
         const incoming=JSON.parse(r.result);
         const result=await window.tpSubmissionGuard225.resolve(incoming);
-        if(epoch!==loadEpoch||submitChecking||window.__tpV225SubmitInProgress)return;
+        if(epoch!==loadEpoch||submitChecking||window.__tpV226SubmitInProgress)return;
         if(result.locked)await window.tpSubmissionGuard225.recordFinal(result.data);
         if(epoch!==loadEpoch)return;
         oldLoad.call(window,makeJsonFile(result.data,file?.name));
         [80,260,700].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms));
-      }catch(e){console.error('V225 contrôle du rendu',e);alert('Ouverture interrompue : impossible de vérifier cette copie. '+(e?.message||e))}
+      }catch(e){console.error('V226 contrôle du rendu',e);alert('Ouverture interrompue : impossible de vérifier cette copie. '+(e?.message||e))}
     };
     r.onerror=()=>alert('Impossible de lire ce fichier TP.');
     r.readAsText(file,'utf-8');
@@ -3119,17 +3077,17 @@ const saveBtn=document.getElementById('saveBtn');
 if(saveBtn&&typeof saveBtn.onclick==='function'&&!saveBtn.onclick.__v206){
   const oldSubmit=saveBtn.onclick;
   const submitWrapped=async function(){
-    if(submitChecking||window.__tpV225SubmitInProgress)return;
+    if(submitChecking||window.__tpV226SubmitInProgress)return;
     submitChecking=true;
     const current=window.model,self=this,args=arguments;
     try{return await window.tpSubmissionGuard225.serialize(current,async()=>{
       const result=await window.tpSubmissionGuard225.resolve(current);
       if(window.model!==current)return;
-      if(result.locked){window.tpV225ApplyReadonly(result.data);alert('Ce TP a déjà été rendu. Seul le professeur peut autoriser une nouvelle remise.');return}
+      if(result.locked){window.tpV226ApplyReadonly(result.data);alert('Ce TP a déjà été rendu. Seul le professeur peut autoriser une nouvelle remise.');return}
       const out=await oldSubmit.apply(self,args);
       if(window.model?.submission?.final===true){saveLock(window.model);[0,120].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms))}
       return out;
-    })}catch(e){console.error('V225 contrôle avant rendu',e);alert('Rendu interrompu : '+(e?.message||e))}
+    })}catch(e){console.error('V226 contrôle avant rendu',e);alert('Rendu interrompu : '+(e?.message||e))}
     finally{submitChecking=false}
   };
   submitWrapped.__v206=true;
@@ -3173,9 +3131,9 @@ try{
   }
 }catch(_){}
 
-document.title='Lecteur TP Élève — V206';
+document.title='Lecteur TP Élève — V226';
 const brand206=document.querySelector('.brand');
-if(brand206)brand206.textContent='Lecteur TP Élève — V206';
+if(brand206)brand206.textContent='Lecteur TP Élève — V226';
 
 console.info('Lecteur TP V206 : verrou strict après rendu, réouverture du fichier DIFFUSION impossible sans code professeur.');
 })();
@@ -3243,9 +3201,9 @@ body.v205-readonly #teacherUnlockBtn{
 
 <script id="reader-v208-stamp">
 (function(){
- document.title='Lecteur TP Élève — V209';
+ document.title='Lecteur TP Élève — V226';
  const b=document.querySelector('.brand');
- if(b)b.textContent='Lecteur TP Élève — V209';
+ if(b)b.textContent='Lecteur TP Élève — V226';
  console.info('Lecteur TP V209 : fidélité graphique éditeur V74, verrou strict V206/V207, date JJ-MM-AAAA et nouvelle charte compacte d’auto-évaluation.');
 })();
 </script>
@@ -3712,8 +3670,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V225';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V225';
+document.title='Lecteur TP Élève — V226';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
