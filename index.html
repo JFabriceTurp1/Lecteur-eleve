@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V223</title>
+<title>Lecteur TP Élève — V224</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -961,7 +961,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V223 : si un rendu intervient pendant la session, la prochaine vue
+/* V224 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -974,10 +974,10 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V223';
-console.info('Lecteur TP V223 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V224';
+console.info('Lecteur TP V224 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
-/* V223 : accès autonome et suivi transportable sans TP. */
+/* V224 : accès autonome et suivi transportable sans TP. */
 const FOLLOWUP_KEY='tp_reader_followup_v218';
 let importedPending=null;
 function verifyData(d,code){
@@ -1234,8 +1234,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV223FinalizeRendered=finalize;
-console.info('Lecteur TP V223 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV224FinalizeRendered=finalize;
+console.info('Lecteur TP V224 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1270,7 +1270,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V223 double clic : payload expiré.');
+    console.warn('V224 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1282,7 +1282,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V223 double clic',e);
+    console.error('V224 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1292,15 +1292,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V223 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V224 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV223OpenPayload=consume;
-console.info('Lecteur TP V223 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV224OpenPayload=consume;
+console.info('Lecteur TP V224 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1695,7 +1695,7 @@ function moveOrderId(o,ids,id,target){const out=orderIds(o,ids),i=out.indexOf(id
 function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:'OK',no:'PAS OK',row:'action'}:{first:'Affirmation',yes:'Vrai',no:'Faux',row:'affirmation'}}
  function trueFalseBlock(x){const labels=binaryTableLabels(x);
   const stored=bag()[x.id]?.answers||{},locked=workLocked()?'disabled':'';
-  return `<section class="table-block true-false-block" style="${blockFrameStyle(x)}">${pic(x)}${x.blockKind==='endTp'?'<div class="fin-tp-label">FIN TP</div>':''}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<table class="tp-grid tf-grid"><colgroup><col style="width:72%"><col style="width:14%"><col style="width:14%"></colgroup><thead><tr><th scope="col">${labels.first}</th><th scope="col">${labels.yes}</th><th scope="col">${labels.no}</th></tr></thead><tbody>${(x.statements||[]).map((r,i)=>`<tr><td>${esc(r.text).replace(/\n/g,'<br>')}</td>${['true','false'].map(value=>`<td class="tf-answer"><label class="tf-choice"><input type="radio" name="tf-${esc(x.id)}-${esc(r.id)}" data-v220-tf="${esc(x.id)}" data-tf-row="${esc(r.id)}" value="${value}" aria-label="${value==='true'?labels.yes:labels.no} : ${labels.row} ${i+1}" ${stored[r.id]===value?'checked':''} ${locked}></label></td>`).join('')}</tr>`).join('')}</tbody></table>${callProf(x)}</section>`;
+  return `<section class="table-block true-false-block" style="${blockFrameStyle(x)}">${pic(x)}${x.title?`<h3>${formattedText(x,'title')}</h3>`:''}${x.text?`<p>${formattedText(x,'text')}</p>`:''}${meta(x)}<table class="tp-grid tf-grid"><colgroup><col style="width:72%"><col style="width:14%"><col style="width:14%"></colgroup><thead><tr><th scope="col">${labels.first}</th><th scope="col">${labels.yes}</th><th scope="col">${labels.no}</th></tr></thead><tbody>${(x.statements||[]).map((r,i)=>`<tr><td>${esc(r.text).replace(/\n/g,'<br>')}</td>${['true','false'].map(value=>`<td class="tf-answer"><label class="tf-choice"><input type="radio" name="tf-${esc(x.id)}-${esc(r.id)}" data-v220-tf="${esc(x.id)}" data-tf-row="${esc(r.id)}" value="${value}" aria-label="${value==='true'?labels.yes:labels.no} : ${labels.row} ${i+1}" ${stored[r.id]===value?'checked':''} ${locked}></label></td>`).join('')}</tr>`).join('')}</tbody></table>${callProf(x)}</section>`;
  }
  function collectTrueFalse(){
   if(workLocked())return;const p=pof();if(!p)return;const nodes=[...document.querySelectorAll('[data-v220-tf]')],b=bag();
@@ -2706,12 +2706,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV223SubmitInProgress)return;
+ if(window.__tpV224SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV223SubmitInProgress=true;
+ window.__tpV224SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2721,11 +2721,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V223',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V224',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V223',suiteVersion:'V223'};
+   model.meta={...(model.meta||{}),readerVersion:'V224',suiteVersion:'V224'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2742,15 +2742,15 @@ async function submit205(){
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V223 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV223FinalizeRendered?.(model)}catch(e){console.warn('V223 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V224 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV224FinalizeRendered?.(model)}catch(e){console.warn('V224 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV223SubmitInProgress=false;
+   window.__tpV224SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -3669,8 +3669,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V223';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V223';
+document.title='Lecteur TP Élève — V224';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V224';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
