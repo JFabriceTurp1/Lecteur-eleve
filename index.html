@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V224</title>
+<title>Lecteur TP Élève — V225</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -681,7 +681,8 @@ function frDate(v){
   return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`
 }
 function statusOf(d){
-  const s=String(d?.status||d?.statut||d?.submission?.status||'').toUpperCase();
+  const states=[d?.status,d?.statut,d?.submission?.status,d?.workflowState,d?.transmission?.etat].map(v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
+  const s=states.includes('CORRIGE')?'CORRIGE':states.includes('RENDU')?'RENDU':states[0];
   const transmission=String(d?.transmission?.etat||'').toUpperCase();
   if(s==='CORRIGE')return 'CORRIGÉ';
   if(d?.submission?.final===true||s==='RENDU')return 'RENDU';
@@ -857,6 +858,7 @@ function readStrictSnapshots(){
 }
 async function rowsForStudent(){
   const rows=(await availableRows()).filter(r=>r?.data&&sameStudent(r.data));
+  if(window.tpSubmissionGuard225)return (await window.tpSubmissionGuard225.reconcileRows(rows)).sort((a,b)=>String(dateOf(b)).localeCompare(String(dateOf(a))));
   const map=new Map();
   for(const r of rows){
     const d=r.data;
@@ -961,7 +963,7 @@ if(document.readyState==='loading'){
 }
 
 /* Compatibilité + nouvel alias V213. */
-/* V224 : si un rendu intervient pendant la session, la prochaine vue
+/* V225 : si un rendu intervient pendant la session, la prochaine vue
    de l'espace personnel est recalculée immédiatement depuis IndexedDB. */
 document.addEventListener('tp-reader-rendered',()=>{
   if(!session||!document.body.classList.contains('v211-personal-view'))return;
@@ -974,10 +976,10 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V224';
-console.info('Lecteur TP V224 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
+document.title='Lecteur TP Élève — V225';
+console.info('Lecteur TP V225 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
-/* V224 : accès autonome et suivi transportable sans TP. */
+/* V225 : accès autonome et suivi transportable sans TP. */
 const FOLLOWUP_KEY='tp_reader_followup_v218';
 let importedPending=null;
 function verifyData(d,code){
@@ -1234,8 +1236,8 @@ async function finalize(d){
   return true;
 }
 
-window.tpV224FinalizeRendered=finalize;
-console.info('Lecteur TP V224 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
+window.tpV225FinalizeRendered=finalize;
+console.info('Lecteur TP V225 : finalisation RENDU IndexedDB + suppression des anciennes copies actives.');
 })();
 </script>
 
@@ -1270,7 +1272,7 @@ function consume(){
   if(!p||!p.base64)return;
   const age=Math.abs(Date.now()-Number(p.createdAt||0));
   if(!Number.isFinite(age)||age>120000){
-    console.warn('V224 double clic : payload expiré.');
+    console.warn('V225 double clic : payload expiré.');
     delete window.__TP_DOUBLE_CLICK_PAYLOAD;
     return;
   }
@@ -1282,7 +1284,7 @@ function consume(){
     history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>window.loadFile?.(f),0);
   }catch(e){
-    console.error('V224 double clic',e);
+    console.error('V225 double clic',e);
     alert('Impossible d’ouvrir automatiquement ce TP : '+(e?.message||e));
   }
 }
@@ -1292,15 +1294,15 @@ function boot(){
   const sc=document.createElement('script');
   sc.src=name+'?t='+Date.now();
   sc.onload=consume;
-  sc.onerror=()=>console.warn('V224 double clic : payload introuvable ou déjà nettoyé.');
+  sc.onerror=()=>console.warn('V225 double clic : payload introuvable ou déjà nettoyé.');
   document.head.appendChild(sc);
 }
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
 else setTimeout(boot,0);
 
-window.tpV224OpenPayload=consume;
-console.info('Lecteur TP V224 : ouverture automatique compatible utilitaire double-clic Windows.');
+window.tpV225OpenPayload=consume;
+console.info('Lecteur TP V225 : ouverture automatique compatible utilitaire double-clic Windows.');
 })();
 </script>
 
@@ -1664,7 +1666,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
 
  const READER_REFERENCE={"source": "Référentiel 2025 et Audit critères — Catalogue_TP_BacPro_MV_Audit_2025.xlsx ; C1.4 — Extraction_structure_REFERENTIEL_BAC_CORRIGEE(1).pdf", "competences": [{"code": "C1.1", "title": "Organiser un entretien périodique", "criteria": [{"code": "C1.1-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C1.1-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C1.1-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C1.1-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C1.1-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C1.1-06", "label": "La propreté du véhicule est préservée"}, {"code": "C1.1-07", "label": "Le tri des déchets est réalisé"}, {"code": "C1.1-08", "label": "La réglementation environnementale est respectée"}, {"code": "C1.1-09", "label": "Le véhicule est identifié (VIN, plaque d'immatriculation)"}, {"code": "C1.1-10", "label": "L'outillage est conforme et adapté à l'intervention"}, {"code": "C1.1-11", "label": "Les informations collectées (historique, documentation, plan de maintenance, etc.) sont conformes et adaptées à l'intervention à réaliser"}, {"code": "C1.1-12", "label": "Les étapes de l'intervention sont identifiées et organisées"}, {"code": "C1.1-13", "label": "La disponibilité et la conformité des pièces y compris celles de réemploi sont vérifiées"}]}, {"code": "C1.2", "title": "Identifier les anomalies dans le cadre d’un entretien périodique", "criteria": [{"code": "C1.2-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C1.2-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C1.2-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C1.2-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C1.2-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C1.2-06", "label": "La propreté du véhicule est préservée"}, {"code": "C1.2-07", "label": "Les contrôles sont identifiés et hiérarchisés y compris, dans le cadre du pré-contrôle technique"}, {"code": "C1.2-08", "label": "Les contrôles et mesures sont réalisés en tenant compte des particularités des systèmes et du type de motorisation"}, {"code": "C1.2-09", "label": "Toutes les anomalies sont identifiées et retranscrites suivant la procédure prescrite"}]}, {"code": "C1.3", "title": "Réaliser les opérations de remplacement, d’ajustement dans le cadre de l’entretien périodique", "criteria": [{"code": "C1.3-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C1.3-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C1.3-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C1.3-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C1.3-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C1.3-06", "label": "La propreté du véhicule est préservée"}, {"code": "C1.3-07", "label": "Le tri des déchets est réalisé"}, {"code": "C1.3-08", "label": "La réglementation environnementale est respectée"}, {"code": "C1.3-09", "label": "Le temps imparti de l'intervention est respecté"}, {"code": "C1.3-10", "label": "Le remplacement des pièces d'usure et des fluides respecte les procédures du constructeur et de l'entreprise"}, {"code": "C1.3-11", "label": "Les niveaux et les pressions sont ajustés conformément aux procédures du constructeur et de l'entreprise"}, {"code": "C1.3-12", "label": "La procédure d'apprentissage, de paramétrage ou de réinitialisation est effectuée"}, {"code": "C1.3-13", "label": "Les indicateurs de maintenance sont mis à jour"}, {"code": "C1.3-14", "label": "L'ordre de réparation est complété"}]}, {"code": "C1.4", "title": "Apporter des conseils techniques à la clientèle sur l’entretien du véhicule", "criteria": [{"code": "C1.4-01", "label": "Les conseils à la clientèle sur l’utilisation et l’entretien du véhicule sont conformes aux règles de sécurité, aux procédures du constructeur et de l’entreprise"}, {"code": "C1.4-02", "label": "Les anomalies détectées sont présentées au client"}, {"code": "C1.4-03", "label": "Le client est informé du programme d’entretien à venir"}, {"code": "C1.4-04", "label": "La proposition de service, de produit est en lien avec les besoins du client"}, {"code": "C1.4-05", "label": "Le client est renseigné sur les pratiques d’usage du véhicule"}, {"code": "C1.4-06", "label": "Les procédures qualités sont respectées"}]}, {"code": "C2.1", "title": "Préparer une intervention corrective", "criteria": [{"code": "C2.1-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C2.1-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C2.1-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C2.1-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C2.1-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C2.1-06", "label": "La propreté du véhicule est préservée"}, {"code": "C2.1-07", "label": "Le tri des déchets est réalisé"}, {"code": "C2.1-08", "label": "La réglementation environnementale est respectée"}, {"code": "C2.1-09", "label": "Le véhicule est identifié (VIN, plaque d'immatriculation, spécificité technique etc...)"}, {"code": "C2.1-10", "label": "L'ordre de réparation est complété"}, {"code": "C2.1-11", "label": "L'outillage est conforme et adapté à l'intervention"}, {"code": "C2.1-12", "label": "Les informations collectées sont conformes et adaptées à l'intervention à réaliser"}, {"code": "C2.1-13", "label": "Les étapes de l'intervention sont identifiées"}, {"code": "C2.1-14", "label": "Le temps imparti de l'intervention est identifié"}, {"code": "C2.1-15", "label": "La disponibilité et la conformité des pièces sont vérifiées"}]}, {"code": "C2.2", "title": "Réaliser le remplacement ou la réparation des composants", "criteria": [{"code": "C2.2-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C2.2-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C2.2-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C2.2-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C2.2-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C2.2-06", "label": "La propreté du véhicule est préservée"}, {"code": "C2.2-07", "label": "Le tri des déchets est réalisé"}, {"code": "C2.2-08", "label": "La réglementation environnementale est respectée"}, {"code": "C2.2-09", "label": "Le temps imparti de l'intervention est respecté"}, {"code": "C2.2-10", "label": "Le remplacement des pièces respecte les procédures du constructeur et de l'entreprise"}, {"code": "C2.2-11", "label": "Les informations collectées (documentation, procédure du constructeur, etc.) sont adaptées à l'intervention à réaliser"}]}, {"code": "C2.3", "title": "Réaliser le réglage ou le paramétrage des systèmes", "criteria": [{"code": "C2.3-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C2.3-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C2.3-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C2.3-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C2.3-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C2.3-06", "label": "La propreté du véhicule est préservée"}, {"code": "C2.3-07", "label": "Les paramétrages respectent les caractéristiques et la configuration du véhicule"}]}, {"code": "C2.4", "title": "Réaliser le contrôle qualité d’une intervention corrective", "criteria": [{"code": "C2.4-01", "label": "Les procédures qualité de l'entreprise sont respectées"}, {"code": "C2.4-02", "label": "Les dossiers relatifs aux interventions sont complétés"}]}, {"code": "C3.1", "title": "Constater un dysfonctionnement", "criteria": [{"code": "C3.1-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C3.1-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C3.1-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C3.1-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C3.1-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C3.1-06", "label": "La propreté du véhicule est préservée"}, {"code": "C3.1-07", "label": "L'ordre de réparation est pris en compte puis complété"}, {"code": "C3.1-08", "label": "Le véhicule est identifié (VIN, plaque d'immatriculation)"}, {"code": "C3.1-09", "label": "Les informations collectées (historique, documentation, plan de maintenance, recueil des symptômes auprès du client etc.) sont conformes et adaptées au dysfonctionnement"}, {"code": "C3.1-10", "label": "L'utilisation est conforme et adaptée à l'intervention"}, {"code": "C3.1-11", "label": "Le dysfonctionnement et/ou l'anomalie sont confirmés"}, {"code": "C3.1-12", "label": "Les tests préliminaires réalisés recréent le contexte d'apparition de la panne"}, {"code": "C3.1-13", "label": "Les différentes conditions et les paramètres qui peuvent influencer l'apparition des symptômes sont identifiés"}, {"code": "C3.1-14", "label": "Les résultats sont explicités en utilisant un langage professionnel clair"}, {"code": "C3.1-15", "label": "Les essais ont été réalisés en respectant les procédures du constructeur"}, {"code": "C3.1-16", "label": "L'anomalie détectée est retranscrite"}]}, {"code": "C3.2", "title": "Hiérarchiser les hypothèses", "criteria": [{"code": "C3.2-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C3.2-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C3.2-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C3.2-04", "label": "Les informations collectées (historique, documentation, plan de maintenance, recueil des symptômes auprès du client, système embarqué de diagnostic prédictif) sont conformes et adaptées au dysfonctionnement"}, {"code": "C3.2-05", "label": "Les propositions sont pertinentes"}, {"code": "C3.2-06", "label": "Les hypothèses sont hiérarchisées selon une logique liée à la probabilité, à l'accessibilité, la rentabilité et la disponibilité"}]}, {"code": "C3.3", "title": "Mettre en œuvre un protocole d’intervention existant ou à définir", "criteria": [{"code": "C3.3-01", "label": "L'organisation du poste de travail, les moyens de prévention et le choix des équipements de protection collective et individuelle sont adaptés à l'intervention"}, {"code": "C3.3-02", "label": "Les risques liés à l'intervention sont identifiés et signalés"}, {"code": "C3.3-03", "label": "Les consignes d'hygiène et de sécurité sont respectées"}, {"code": "C3.3-04", "label": "Les éléments de protection du véhicule sont adaptés et correctement utilisés"}, {"code": "C3.3-05", "label": "Aucune détérioration n'est constatée"}, {"code": "C3.3-06", "label": "La propreté du véhicule est préservée"}, {"code": "C3.3-07", "label": "La liste des contrôles et des mesures est pertinente compte tenu des hypothèses"}, {"code": "C3.3-08", "label": "L'utilisation des outils de mesure et de contrôle est conforme et adaptée à la situation"}, {"code": "C3.3-09", "label": "Les résultats, les relevés obtenus ou les observations sont interprétés selon les valeurs de référence"}, {"code": "C3.3-10", "label": "L'interprétation des données recueillies permet d'expliquer l'origine de la défaillance"}, {"code": "C3.3-11", "label": "Un test alternatif permet de confirmer la panne"}, {"code": "C3.3-12", "label": "Les anomalies sont identifiées et retranscrites suivant la procédure prescrite"}, {"code": "C3.3-13", "label": "L'ordre de réparation est complété"}]}, {"code": "C3.4", "title": "Identifier les solutions correctives", "criteria": [{"code": "C3.4-01", "label": "Les opérations de remise en conformité sont identifiées et cohérentes avec l'origine de la panne"}, {"code": "C3.4-02", "label": "Les conséquences sur les autres éléments sont prises en compte"}]}]};
  const READER_CALL_PROF_SVG="<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"48\" viewBox=\"0 0 64 48\" fill=\"none\"><g stroke=\"#182f46\" stroke-width=\"2.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M24 25l4 16h9l-5-18\" fill=\"#a8cddd\"/><path d=\"M7 17h17L48 6v31L24 27H7z\" fill=\"#e8f3fa\"/><path d=\"M7 17h17v10H7z\" fill=\"#68aace\"/><path d=\"M48 6v31\" stroke-width=\"4\"/><path d=\"M4 20v4M54 21h6M53 12l5-4M53 31l5 4\"/></g></svg>";
- function workLocked(){return !!model?.submission?.final||['RENDU','CORRIGE'].includes(String(model?.statut||model?.status||'').toUpperCase())}
+ function workLocked(){return window.tpSubmissionGuard225?window.tpSubmissionGuard225.final(model):!!model?.submission?.final||[model?.statut,model?.status].some(s=>['RENDU','CORRIGE'].includes(String(s||'').toUpperCase()))}
  function fixedToken(x){return (x.tokens||[]).find(t=>t.id===x.fixedTokenId)||(x.tokens||[]).find(t=>t.fixed===true)||null}
  function nestedWidth(p,x){const n=Number(x.questionWidthPct);if(Number.isFinite(n)&&n>0)return Math.max(10,Math.min(100,n));if(x.isSpacer)return 100;return (p.flow||[]).filter(f=>f.type!=='question'&&getObj(p,f)?.parentQuestionId===x.parentQuestionId).length>1?50:100}
  function nestedLayout(p,q){return 'question-contents'+((p.flow||[]).some(f=>getObj(p,f)?.parentQuestionId===q.id&&Number(getObj(p,f)?.questionWidthPct)>0)?' question-contents-sized':'')}
@@ -2562,7 +2564,7 @@ function toIsoDate(v){
 }
 window.tpV205FormatDate=frDate;
 
-function statusOf(d){return String(d?.statut||d?.status||d?.workflowState||(d?.submission?.final?'RENDU':'DIFFUSION')).toUpperCase()}
+function statusOf(d){const states=[d?.statut,d?.status,d?.workflowState,d?.submission?.status,d?.transmission?.etat].map(v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());return states.includes('CORRIGE')?'CORRIGE':d?.submission?.final||states.includes('RENDU')?'RENDU':states[0]||'DIFFUSION'}
 function isReturned(d){const st=statusOf(d);return st==='RENDU'||st==='CORRIGE'||d?.submission?.final===true}
 function projectOf(d){let p=d?.tpProject||d?.sourceProject||d?.project||d?.projet||null;if(p?.schema==='evaluation.tp.v1'&&p.data)return p.data;if(p?.publicId||p?.questions)return p;if(d?.schema==='evaluation.tp.v1'&&d.data)return d.data;return null}
 
@@ -2631,6 +2633,7 @@ function setReadOnly(on,corrected=false){
  ['pauseBtn','saveBtn','quitBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!!on});
 }
 
+window.tpV225ApplyReadonly=function(data){model=data;window.model=data;renderProjectOnly();setReadOnly(true,statusOf(data)==='CORRIGE');window.tpV206EnhanceReadonlyMessage?.()};
 function access(fileName,readonly){
  const a=model?.access||{};
  const ov=document.getElementById('tpAccessOverlay'),student=document.getElementById('tpAccessStudent'),inp=document.getElementById('tpAccessCode'),err=document.getElementById('tpAccessError');
@@ -2706,12 +2709,12 @@ async function writeVerified(h,name,text){const fh=await h.getFileHandle(name,{c
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
- if(window.__tpV224SubmitInProgress)return;
+ if(window.__tpV225SubmitInProgress)return;
  if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
  if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
 
- window.__tpV224SubmitInProgress=true;
+ window.__tpV225SubmitInProgress=true;
  const submitButton=document.getElementById('saveBtn');
  if(submitButton)submitButton.disabled=true;
 
@@ -2721,11 +2724,11 @@ async function submit205(){
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V224',revision};
+   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V225',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
    model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
-   model.meta={...(model.meta||{}),readerVersion:'V224',suiteVersion:'V224'};
+   model.meta={...(model.meta||{}),readerVersion:'V225',suiteVersion:'V225'};
 
    const text=JSON.stringify(model,null,2),name=stampFile();
    let h=await writable(),saved=false;
@@ -2735,22 +2738,21 @@ async function submit205(){
    }
    if(!saved)download(text,name);
 
-   try{
-     localStorage.setItem(localKey(),text);
-     localStorage.setItem(localKey()+'|submitted','1');
-   }catch(_){}
+   await window.tpSubmissionGuard225?.recordFinal(model);
+   try{localStorage.setItem(localKey()+'|submitted','1')}catch(_){}
+   try{localStorage.setItem(localKey(),text)}catch(_){}
 
    /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
       de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V224 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV224FinalizeRendered?.(model)}catch(e){console.warn('V224 finalisation rendu',e)}
+   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V225 sauvegarde finale IndexedDB',e)}
+   try{await window.tpV225FinalizeRendered?.(model)}catch(e){console.warn('V225 finalisation rendu',e)}
 
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
    alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
  }finally{
-   window.__tpV224SubmitInProgress=false;
+   window.__tpV225SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
    if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
@@ -2864,7 +2866,66 @@ body.v205-readonly #quitBtn{
 }
 </style>
 
-<script id="reader-v206-strict-lock-runtime">
+<script id="reader-v225-submission-guard">(function(){
+'use strict';
+const PREFIX='tp_receipt_v225|',DB='tp_reader_receipts_v225',memory=new Map();
+const clone=x=>JSON.parse(JSON.stringify(x)),norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+function person(d){return {id:norm(d?.studentId||d?.eleve?.id||d?.identite?.id||d?.meta?.studentId),nom:norm(d?.eleve?.nom||d?.identite?.nom),prenom:norm(d?.eleve?.prenom||d?.identite?.prenom),classe:norm(d?.classe||d?.identite?.classe)}}
+function code(d){let p=d?.tpProject||d?.sourceProject||d?.project||d?.projet||{};if(p?.schema==='evaluation.tp.v1')p=p.data||{};return norm(d?.code||d?.tp?.id||d?.tpId||d?.tpCode||p?.publicId||p?.id)}
+function valid(d){const s=person(d);return !!code(d)&&!!(s.id||(s.nom&&s.prenom))}
+function same(a,b){if(!valid(a)||!valid(b)||code(a)!==code(b))return false;const x=person(a),y=person(b);if(x.id&&y.id)return x.id===y.id;return x.nom===y.nom&&x.prenom===y.prenom&&(!x.classe||!y.classe||x.classe===y.classe)}
+function key(d){const s=person(d);return [s.id?'id:'+s.id:'nom:'+s.nom+'|'+s.prenom+'|'+s.classe,code(d)].join('|')}
+function statuses(d){return [d?.status,d?.statut,d?.workflowState,d?.submission?.status,d?.transmission?.etat].map(v=>norm(v))}
+function corrected(d){return statuses(d).some(s=>['corrige','corrigee','corrected'].includes(s))}
+function final(d,row){return !!(row?.submitted||d?.submission?.final||corrected(d)||statuses(d).some(s=>['rendu','rendue','submitted'].includes(s)))}
+function date(d){return String(d?.submission?.submittedAt||d?.dates?.rendu||'')}
+function revision(d){return Number(d?.submission?.revision)||0}
+function identityData(d){return {studentId:d.studentId||d.eleve?.id||d.identite?.id||d.meta?.studentId||'',eleve:{nom:d.eleve?.nom||d.identite?.nom||'',prenom:d.eleve?.prenom||d.identite?.prenom||''},classe:d.classe||d.identite?.classe||'',code:d.code||d.tp?.id||d.tpId||code(d)}}
+function openDb(name=DB,store='receipts'){return new Promise((ok,no)=>{const r=indexedDB.open(name,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(store))r.result.createObjectStore(store,{keyPath:'id'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function readAll(name=DB,store='receipts'){let db;try{db=await openDb(name,store);return await new Promise((ok,no)=>{const r=db.transaction(store).objectStore(store).getAll();r.onsuccess=()=>ok(r.result||[]);r.onerror=()=>no(r.error)})}catch(e){return[]}finally{db?.close()}}
+function putReceipt(r){return (async()=>{let persistent=false;memory.set(r.id,r);try{localStorage.setItem(PREFIX+r.id,JSON.stringify(r));persistent=true}catch(e){}let db;try{db=await openDb();await new Promise((ok,no)=>{const tx=db.transaction('receipts','readwrite');tx.objectStore('receipts').put(r);tx.oncomplete=ok;tx.onerror=()=>no(tx.error);tx.onabort=()=>no(tx.error)});persistent=true}catch(e){}finally{db?.close()}try{channel?.postMessage({id:r.id})}catch(e){}return persistent})()}
+function storedJson(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}
+function workKeyData(k){const p=String(k||'').split('|');return {studentId:p[1]||'',code:p[2]||'',classe:p[3]||'',eleve:{nom:p[4]||'',prenom:p[5]||''}}}
+function localEvidence(){const rows=[],receipts=[];try{for(let i=0;i<localStorage.length;i++){
+ const k=localStorage.key(i)||'';
+ if(k.startsWith(PREFIX)){const r=storedJson(k);if(r?.data)receipts.push(r);continue}
+ if(k.startsWith('tp_work_v17|')||k.startsWith('tp_work_v29|')){if(k.endsWith('|submitted')){if(localStorage.getItem(k)==='1'){const wk=k.slice(0,-10),snapshot=storedJson(wk),data=snapshot||workKeyData(wk);rows.push({id:k,submitted:true,receiptOnly:!snapshot,data})}}else{const data=storedJson(k);if(data)rows.push({id:k,data})}continue}
+ if(k.startsWith('tp_reader_strict_lock_v206|')){const lock=storedJson(k);if(lock?.locked){const snapshot=storedJson(lock.workKey),data=snapshot||workKeyData(lock.workKey);rows.push({id:k,submitted:true,receiptOnly:!snapshot,updatedAt:lock.submittedAt,data:{...data,submission:{...(data.submission||{}),submittedAt:lock.submittedAt||data.submission?.submittedAt,revision:lock.revision||data.submission?.revision}}})}}
+ if(k.startsWith('tp_reader_strict_unlock_v206|')){const permit=storedJson(k),data=storedJson(permit?.workKey);if(permit?.unlocked&&data?.submission?.unlockedByTeacher)receipts.push({id:key(data),data:identityData(data),state:'open',revision:revision(data),unlockedAt:permit.unlockedAt||data.submission.unlockedAt,updatedAt:permit.unlockedAt||''})}
+ }}catch(e){}return {rows,receipts}}
+async function receipts(){const local=localEvidence();return [...memory.values(),...local.receipts,...await readAll()]}
+function forceFinal(d,evidence){const out=clone(d);out.status=out.statut=corrected(evidence)?'CORRIGE':'RENDU';out.submission={...(out.submission||{}),final:true,submittedAt:date(evidence)||date(out)||'',revision:Math.max(revision(out),revision(evidence))};out.transmission={...(out.transmission||{}),etat:out.statut};return out}
+function decide(incoming,rows,records){
+ const matching=rows.filter(r=>r?.data&&same(incoming,r.data));
+ const recs=records.filter(r=>r?.data&&same(incoming,r.data)).sort((a,b)=>String(b.updatedAt||b.unlockedAt||b.submittedAt||'').localeCompare(String(a.updatedAt||a.unlockedAt||a.submittedAt||'')));
+ const permit=recs[0]?.state==='open'?recs[0]:null;
+ const finals=matching.filter(r=>final(r.data,r));
+ for(const r of recs)if(r.state==='final')finals.push({data:{...r.data,statut:r.corrected?'CORRIGE':'RENDU',submission:{final:true,submittedAt:r.submittedAt,revision:r.revision}},receiptOnly:true});
+ const blocking=finals.filter(r=>!permit||corrected(r.data)||revision(r.data)>Number(permit.revision||0)||(date(r.data)&&date(r.data)>String(permit.unlockedAt||'')));
+ if(!blocking.length){
+  if(permit){const reopened=matching.filter(r=>!final(r.data,r)&&r.data.submission?.unlockedByTeacher).sort((a,b)=>String(b.data.submission?.unlockedAt||b.updatedAt||'').localeCompare(String(a.data.submission?.unlockedAt||a.updatedAt||'')))[0];if(reopened)return {locked:false,data:clone(reopened.data)}}
+  return {locked:false,data:clone(incoming)};
+ }
+ blocking.sort((a,b)=>Number(corrected(b.data))-Number(corrected(a.data))||revision(b.data)-revision(a.data)||date(b.data).localeCompare(date(a.data))||Number(!!a.receiptOnly)-Number(!!b.receiptOnly)||Number(!!a.summaryOnly)-Number(!!b.summaryOnly));
+ const evidence=blocking[0].data;
+ const snapshot=blocking.find(r=>!r.receiptOnly&&!r.summaryOnly)?.data||incoming;
+ return {locked:true,data:forceFinal(snapshot,evidence)};
+}
+async function resolve(incoming){const local=localEvidence(),rows=[{data:incoming},...local.rows,...await readAll('fdmahy_reader_work_v129','works')];return decide(incoming,rows,await receipts())}
+async function reconcileRows(rows){const local=localEvidence(),records=await receipts(),groups=[];
+ for(const row of rows){if(!row?.data)continue;let group=groups.find(g=>same(g[0].data,row.data));if(!group){group=[];groups.push(group)}group.push(row)}
+ return groups.map(group=>{const result=decide(group[0].data,[...group,...local.rows],records);if(result.locked){const row=group.find(r=>final(r.data,r)&&!r.summaryOnly)||group.find(r=>!r.summaryOnly)||group[0];return {...row,submitted:true,data:result.data}}const row=group.find(r=>!final(r.data,r)&&r.data.submission?.unlockedByTeacher)||group.slice().sort((a,b)=>String(b.updatedAt||'').localeCompare(String(a.updatedAt||'')))[0];return {...row,data:result.data.submission?.unlockedByTeacher?result.data:row.data}});
+}
+async function recordFinal(d){if(!valid(d)||!final(d))return false;const r={id:key(d),data:identityData(d),state:'final',revision:revision(d),submittedAt:date(d)||new Date().toISOString(),updatedAt:new Date().toISOString(),corrected:corrected(d)};const ok=await putReceipt(r);if(!ok)alert('La copie est rendue, mais le verrou n’a pas pu être mémorisé sur cet appareil. Conservez le fichier rendu et prévenez le professeur.');return ok}
+async function recordOpen(d){if(!valid(d)||!d.submission?.unlockedByTeacher)return false;return putReceipt({id:key(d),data:identityData(d),state:'open',revision:revision(d),unlockedAt:d.submission.unlockedAt,updatedAt:new Date().toISOString()})}
+async function serialize(d,action){if(globalThis.navigator?.locks?.request)return navigator.locks.request('tp-reader-submit|'+key(d),action);return action()}
+window.tpSubmissionGuard225={same,final,corrected,resolve,reconcileRows,recordFinal,recordOpen,serialize,decide,identity:key};
+function checkCurrent(){const current=window.model;if(!valid(current)||final(current))return;resolve(current).then(result=>{if(window.model===current&&result.locked)window.tpV225ApplyReadonly?.(result.data)})}
+let channel;try{channel=new BroadcastChannel('tp-reader-receipts-v225');channel.onmessage=checkCurrent}catch(e){}
+window.addEventListener('storage',e=>{if(e.key?.startsWith(PREFIX)||e.key?.startsWith('tp_reader_strict_lock_v206|'))checkCurrent()});
+})();
+</script>
+<script id="reader-v225-strict-lock-runtime">
 (function(){
 'use strict';
 
@@ -3019,48 +3080,25 @@ window.tpV206EnhanceReadonlyMessage=enhanceReadonlyMessage;
 /* 1) Verrouillage strict à l'ouverture.
    Même si l'élève recharge le fichier DIFFUSION d'origine, la dernière copie
    réellement rendue est réouverte en lecture seule. */
+let submitChecking=false;
 const oldLoad=window.loadFile;
 if(typeof oldLoad==='function'&&!oldLoad.__v206){
+  let loadEpoch=0;
   const wrapped=function(file){
-    const r=new FileReader();
-    r.onload=()=>{
+    if(submitChecking||window.__tpV225SubmitInProgress){alert('Le rendu est en cours. Patiente avant d’ouvrir un autre TP.');return}
+    const epoch=++loadEpoch,r=new FileReader();
+    r.onload=async()=>{
       try{
         const incoming=JSON.parse(r.result);
-        const lock=readLock(incoming);
-        if(lock?.locked){
-          const submitted=readSnapshot(lock);
-          if(submitted){
-            const f=makeJsonFile(submitted,file?.name||'TP_DEJA_RENDU.tp');
-            oldLoad.call(window,f);
-          }else{
-            // Le verrou existe même si la copie de travail locale a été nettoyée :
-            // on interdit tout de même le retour en mode édition.
-            incoming.submission={...(incoming.submission||{}),final:true,submittedAt:lock.submittedAt||incoming?.submission?.submittedAt||''};
-            incoming.statut='RENDU';incoming.status='RENDU';
-            incoming.dates={...(incoming.dates||{}),rendu:lock.submittedAt||incoming?.dates?.rendu||''};
-            const f=makeJsonFile(incoming,file?.name||'TP_DEJA_RENDU.tp');
-            oldLoad.call(window,f);
-          }
-          [80,260,700].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms));
-          return;
-        }
-
-        // Après un déverrouillage professeur, si l'élève rouvre le fichier
-        // DIFFUSION d'origine, on reprend la dernière copie déverrouillée
-        // et non une copie vierge.
-        const permit=readUnlock(incoming);
-        const unlocked=readSnapshot(permit);
-        if(permit?.unlocked&&unlocked){
-          oldLoad.call(window,makeJsonFile(unlocked,file?.name||'TP_REOUVERT.tp'));
-          return;
-        }
-
-        oldLoad.call(window,file);
-      }catch(e){
-        console.error('V206 ouverture stricte',e);
-        oldLoad.call(window,file);
-      }
+        const result=await window.tpSubmissionGuard225.resolve(incoming);
+        if(epoch!==loadEpoch||submitChecking||window.__tpV225SubmitInProgress)return;
+        if(result.locked)await window.tpSubmissionGuard225.recordFinal(result.data);
+        if(epoch!==loadEpoch)return;
+        oldLoad.call(window,makeJsonFile(result.data,file?.name));
+        [80,260,700].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms));
+      }catch(e){console.error('V225 contrôle du rendu',e);alert('Ouverture interrompue : impossible de vérifier cette copie. '+(e?.message||e))}
     };
+    r.onerror=()=>alert('Impossible de lire ce fichier TP.');
     r.readAsText(file,'utf-8');
   };
   wrapped.__v206=true;
@@ -3081,14 +3119,18 @@ const saveBtn=document.getElementById('saveBtn');
 if(saveBtn&&typeof saveBtn.onclick==='function'&&!saveBtn.onclick.__v206){
   const oldSubmit=saveBtn.onclick;
   const submitWrapped=async function(){
-    const out=await oldSubmit.apply(this,arguments);
-    try{
-      if(window.model?.submission?.final===true){
-        saveLock(window.model);
-        [0,120].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms));
-      }
-    }catch(e){console.warn('V206 après rendu',e)}
-    return out;
+    if(submitChecking||window.__tpV225SubmitInProgress)return;
+    submitChecking=true;
+    const current=window.model,self=this,args=arguments;
+    try{return await window.tpSubmissionGuard225.serialize(current,async()=>{
+      const result=await window.tpSubmissionGuard225.resolve(current);
+      if(window.model!==current)return;
+      if(result.locked){window.tpV225ApplyReadonly(result.data);alert('Ce TP a déjà été rendu. Seul le professeur peut autoriser une nouvelle remise.');return}
+      const out=await oldSubmit.apply(self,args);
+      if(window.model?.submission?.final===true){saveLock(window.model);[0,120].forEach(ms=>setTimeout(enhanceReadonlyMessage,ms))}
+      return out;
+    })}catch(e){console.error('V225 contrôle avant rendu',e);alert('Rendu interrompu : '+(e?.message||e))}
+    finally{submitChecking=false}
   };
   submitWrapped.__v206=true;
   saveBtn.onclick=submitWrapped;
@@ -3100,13 +3142,14 @@ const teacher=document.getElementById('teacherUnlockBtn');
 if(teacher&&typeof teacher.onclick==='function'&&!teacher.onclick.__v206){
   const oldUnlock=teacher.onclick;
   const unlockWrapped=async function(){
-    const before=window.model;
+    const before=window.model,wasFinal=window.tpSubmissionGuard225.final(before),previousUnlock=before?.submission?.unlockedAt;
     const result=await oldUnlock.apply(this,arguments);
     try{
       const d=window.model;
       const st=String(d?.status||d?.statut||'').toUpperCase();
-      if(d&&d?.submission?.final===false&&st!=='CORRIGE'){
+      if(d===before&&wasFinal&&d?.submission?.final===false&&d.submission.unlockedByTeacher&&d.submission.unlockedAt!==previousUnlock&&!window.tpSubmissionGuard225.corrected(d)){
         saveUnlockedSnapshot(d);
+        await window.tpSubmissionGuard225.recordOpen(d);
         document.body.classList.remove('v205-readonly');
         const banner=document.getElementById('v205ReadOnlyBanner');
         if(banner)banner.style.display='none';
@@ -3669,8 +3712,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V224';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V224';
+document.title='Lecteur TP Élève — V225';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V225';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
