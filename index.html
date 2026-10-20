@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V226</title>
+<title>Lecteur TP Élève — V227 Cloud</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -41,7 +41,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 <style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
 <style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style><style id="observation-style">.observation-answer{display:block;width:100%;box-sizing:border-box;min-height:80px;resize:vertical;padding:10px;border:1px solid #a9c8d8;border-radius:7px;line-height:1.5;font:inherit;white-space:pre-wrap}@media print{.observation-answer{resize:none;overflow:visible}}</style></head>
 <body>
-<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V226</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
+<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V227 Cloud</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
 <div class="wrap">
 <div class="helper"><strong>Ouvrez votre fichier TP personnel pour commencer.</strong> Le TP reste verrouillé tant que le fichier et le code élève ne sont pas validés.</div>
 <div class="fileName" id="loadedName" style="display:none"></div>
@@ -550,7 +550,7 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  window.loadFile=function(file){lock();const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));const p=projectFrom(d);if(!p)throw Error('Ce fichier ne contient pas le projet evaluation.tp.v1 attendu.');model=d;window.model=model;try{localStorage.removeItem('tp_reader_last_submission')}catch(_){}access(file.name)}catch(e){console.error('V127 load',e);alert('Impossible de charger ce TP : '+(e?.message||e));lock()}};r.readAsText(file,'utf-8')};
  const input=document.getElementById('fileInput');if(input){input.onchange=function(e){const f=e.target.files&&e.target.files[0];if(f)window.loadFile(f);e.target.value=''}}
  const btn=document.getElementById('tpAccessBtn'),inp=document.getElementById('tpAccessCode');if(btn)btn.onclick=unlock;if(inp){inp.oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();unlock()}}}
- document.title='Lecteur TP Élève — V226';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
+ document.title='Lecteur TP Élève — V227 Cloud';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V227 Cloud';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
 })();
 </script>
 
@@ -919,7 +919,7 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V226';
+document.title='Lecteur TP Élève — V227 Cloud';
 console.info('Lecteur TP V226 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
 /* V226 : accès autonome et suivi transportable sans TP. */
@@ -1913,7 +1913,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
    }catch(e){reject('Impossible de lire ce TP : '+(e?.message||e))}};r.readAsText(file,'utf-8')
  };
  const input=document.getElementById('fileInput');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.loadFile(f);e.target.value=''};
- document.title='Lecteur TP Élève — V226';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';
+ document.title='Lecteur TP Élève — V227 Cloud';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V227 Cloud';
  console.info('Lecteur V157 : verrou RENDU/CORRIGE + anti-réouverture actif.');
 })();
 </script>
@@ -2441,9 +2441,9 @@ if(typeof oldCollect==='function'){
 }
 
 function stamp(){
-  document.title='Lecteur TP Élève — V226';
+  document.title='Lecteur TP Élève — V227 Cloud';
   const b=document.querySelector('.brand');
-  if(b)b.textContent='Lecteur TP Élève — V226';
+  if(b)b.textContent='Lecteur TP Élève — V227 Cloud';
 }
 stamp();
 setTimeout(stamp,600);
@@ -2587,7 +2587,7 @@ function access(fileName,readonly){
    return;
  }
  if(student)student.textContent=`${model?.eleve?.prenom||model?.identite?.prenom||''} ${model?.eleve?.nom||model?.identite?.nom||''} — ${model?.classe||model?.identite?.classe||''}`.trim();
- inp.value='';if(err)err.textContent='';ov.dataset.fileName=fileName||'';ov.dataset.v205Readonly=readonly?'1':'0';ov.style.display='flex';setTimeout(()=>inp.focus(),50);
+ inp.value='';if(err)err.textContent='';ov.dataset.fileName=fileName||'';ov.dataset.v205Readonly=readonly?'1':'0';ov.style.display='flex';setTimeout(()=>{window.tpCloud227?.tryUnlock();if(ov.style.display!=='none')inp.focus()},50);
 }
 function openFile(fileName,readonly){
  document.getElementById('tpAccessOverlay')?.style.setProperty('display','none');
@@ -2678,23 +2678,25 @@ async function submit205(){
 
  try{
    try{window.collect?.()}catch(_){}
-   const now=isoNow(),previous=model.submission||{},revision=Math.max(1,(Number(previous.revision)||0)+1);
+   const cloud=!!model.cloud227,receipt=cloud?await window.tpCloud227.submit(model):null;
+   if(receipt?.already){alert('Ce TP est déjà rendu sur Cloudflare. Ouvre-le depuis Mon espace Cloud pour consulter la copie remise.');window.tpCloud227.show();return}
+   const now=receipt?.submittedAt||isoNow(),previous=model.submission||{},revision=receipt?.revision||Math.max(1,(Number(previous.revision)||0)+1);
 
    /* Le statut final est posé AVANT toute écriture asynchrone :
       un second clic ne peut donc jamais produire une deuxième remise. */
    model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V226',revision};
    model.statut='RENDU';model.status='RENDU';
    model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
-   model.transmission={...(model.transmission||{}),etat:'RENDU',mode:'fichier'};
+   model.transmission={...(model.transmission||{}),etat:'RENDU',mode:cloud?'cloudflare':'fichier'};if(cloud)model.cloud227.revision=revision;
    model.meta={...(model.meta||{}),readerVersion:'V226',suiteVersion:'V226'};
 
    const text=JSON.stringify(model,null,2);let name=stampFile();
-   let h=await writable(),saved=false;
+   let h=cloud?null:await writable(),saved=false;
    if(h){
      try{name=await writeVerified(h,name,text);saved=true}
      catch(e){alert('Écriture directe impossible : '+(e?.message||e))}
    }
-   if(!saved)download(text,name);
+   if(!saved&&!cloud)download(text,name);
 
    await window.tpSubmissionGuard225?.recordFinal(model);
    try{localStorage.setItem(localKey()+'|submitted','1')}catch(_){}
@@ -2708,8 +2710,8 @@ async function submit205(){
    setReadOnly(true,false);
    document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
 
-   alert(saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
- }finally{
+   alert(cloud?'TP rendu sur Cloudflare. Ta copie est maintenant verrouillée.':saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
+ }catch(e){alert('Rendu non confirmé : '+(e?.message||e)+'\nTon travail reste disponible.')}finally{
    window.__tpV226SubmitInProgress=false;
    /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
       En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
@@ -2732,12 +2734,13 @@ if(teacher){
    const code=await window.tpV215PromptProfessorCode('Code du professeur pour autoriser une nouvelle reprise :');if(code===null)return;
    const h=window.tpReaderHash?window.tpReaderHash(String(a.salt||'')+'|'+String(code).trim()):'';
    if(h!==String(a.hash||'')){alert('Code professeur incorrect.');return}
+   if(model.cloud227){try{await window.tpCloud227.unlock(model,code)}catch(e){alert(e.message);return}}
    const oldAE=model.autoEvaluation||model.auto_evaluation||null;
    model.autoEvaluationHistory=Array.isArray(model.autoEvaluationHistory)?model.autoEvaluationHistory:[];
    if(oldAE)model.autoEvaluationHistory.push({...oldAE,archivedAt:isoNow()});
    delete model.autoEvaluation;delete model.auto_evaluation;
    model.submission={...(model.submission||{}),final:false,unlockedAt:isoNow(),unlockedByTeacher:true,previousSubmittedAt:model.submission?.submittedAt||model.dates?.rendu||''};
-   model.statut='DIFFUSION';model.status='DIFFUSION';model.transmission={...(model.transmission||{}),etat:'REOUVERT'};
+   model.statut='DIFFUSION';model.status='DIFFUSION';model.workflowState='DIFFUSION';model.submission.status='DIFFUSION';model.transmission={...(model.transmission||{}),etat:'REOUVERT'};
    try{localStorage.removeItem(localKey()+'|submitted')}catch(_){}
    setReadOnly(false,false);
    renderProjectOnly();
@@ -2763,8 +2766,8 @@ function settle(){
 }
 [0,120,500].forEach(ms=>setTimeout(settle,ms));
 
-document.title='Lecteur TP Élève — V226';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';
+document.title='Lecteur TP Élève — V227 Cloud';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V227 Cloud';
 
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
 })();
@@ -3048,7 +3051,7 @@ if(typeof oldLoad==='function'&&!oldLoad.__v206){
     r.onload=async()=>{
       try{
         const incoming=JSON.parse(r.result);
-        const result=await window.tpSubmissionGuard225.resolve(incoming);
+        const result=incoming.cloud227&&incoming.submission?.final?{locked:true,data:incoming}:await window.tpSubmissionGuard225.resolve(incoming);if(incoming.cloud227)result.data.cloud227=incoming.cloud227;
         if(epoch!==loadEpoch||submitChecking||window.__tpV226SubmitInProgress)return;
         if(result.locked)await window.tpSubmissionGuard225.recordFinal(result.data);
         if(epoch!==loadEpoch)return;
@@ -3131,9 +3134,9 @@ try{
   }
 }catch(_){}
 
-document.title='Lecteur TP Élève — V226';
+document.title='Lecteur TP Élève — V227 Cloud';
 const brand206=document.querySelector('.brand');
-if(brand206)brand206.textContent='Lecteur TP Élève — V226';
+if(brand206)brand206.textContent='Lecteur TP Élève — V227 Cloud';
 
 console.info('Lecteur TP V206 : verrou strict après rendu, réouverture du fichier DIFFUSION impossible sans code professeur.');
 })();
@@ -3201,9 +3204,9 @@ body.v205-readonly #teacherUnlockBtn{
 
 <script id="reader-v208-stamp">
 (function(){
- document.title='Lecteur TP Élève — V226';
+ document.title='Lecteur TP Élève — V227 Cloud';
  const b=document.querySelector('.brand');
- if(b)b.textContent='Lecteur TP Élève — V226';
+ if(b)b.textContent='Lecteur TP Élève — V227 Cloud';
  console.info('Lecteur TP V209 : fidélité graphique éditeur V74, verrou strict V206/V207, date JJ-MM-AAAA et nouvelle charte compacte d’auto-évaluation.');
 })();
 </script>
@@ -3670,11 +3673,59 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V226';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V226';
+document.title='Lecteur TP Élève — V227 Cloud';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V227 Cloud';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
 
 <style id="reader-v217-editor-v103">#v117ProjectHost .question-contents{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(290px,calc((100% - 10px)/2))),1fr))}#v117ProjectHost .question-contents.question-contents-sized{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}#v117ProjectHost .question-content-item{min-width:0;flex-grow:0;flex-shrink:0;box-sizing:border-box}#v117ProjectHost .question-content-item>*{width:100%;max-width:100%;box-sizing:border-box;min-width:0;margin:0!important}#v117ProjectHost .question-content-spacer{grid-column:1/-1}#v117ProjectHost .question-line-break{display:none}#v117ProjectHost .question-contents-sized>.question-line-break{display:block;flex:0 0 100%;height:0;min-height:0;margin:-5px 0!important;padding:0;border:0}#v117ProjectHost .placement-fixed{pointer-events:none;cursor:default}#v117ProjectHost .response-list-line{display:flex;align-items:center;gap:8px;border-bottom:1px solid #b9cddd;padding:5px 8px;background:white}#v117ProjectHost .response-list-dash{font-weight:700;flex:0 0 auto;user-select:none}#v117ProjectHost .response-list-answer{flex:1;width:100%;min-width:0;border:0;background:transparent}#v117ProjectHost .or-page{position:relative;width:100%;container-type:inline-size;background:white;overflow:hidden;break-inside:avoid;margin-bottom:12px}#v117ProjectHost .or-background{display:block!important;width:100%!important;height:100%!important;max-height:none!important;object-fit:fill!important;pointer-events:none}#v117ProjectHost .or-item{position:absolute;display:flex;box-sizing:border-box;overflow:hidden;font-family:Arial,sans-serif;line-height:1.1;padding:1px;border:0;white-space:pre-wrap}#v117ProjectHost .or-label{pointer-events:none}#v117ProjectHost .or-fill input,#v117ProjectHost .or-fill textarea,#v117ProjectHost .or-fill select{display:block;width:100%;max-width:100%;box-sizing:border-box;border:1px solid #bad5e5;background:transparent;font:inherit;color:inherit;text-align:inherit;padding:0 2px;min-height:0;outline-offset:-1px}#v117ProjectHost .or-fill input[type=checkbox]{width:100%;height:100%;margin:0;accent-color:#175b97}#v117ProjectHost .or-fill textarea{height:100%!important;resize:none}#v117ProjectHost .or-print-value{display:none}#v117ProjectHost .or-label[style*="text-align:center"]{justify-content:center}#v117ProjectHost .or-label[style*="text-align:right"]{justify-content:flex-end}#v117ProjectHost .call-prof{display:flex;align-items:center;gap:7px}#v117ProjectHost .call-prof-icon{display:flex}#v117ProjectHost .call-prof-icon svg{width:42px;height:34px}#v117ProjectHost .cover-illustration{margin:14px 0;min-height:var(--cover-illustration-height,85mm);border:1px solid #c2d2df;background:white;display:flex;align-items:center;justify-content:center}#v117ProjectHost .cover-illustration img{display:block;width:100%;height:var(--cover-illustration-height,85mm);max-height:none!important;object-fit:contain}#v117ProjectHost .cover-evaluation{margin:12px 0 18px}#v117ProjectHost .cover-evaluation h2{font-size:14px}#v117ProjectHost .cover-evaluation-table{width:100%;border-collapse:collapse;font-size:11px}#v117ProjectHost .cover-evaluation-table td,#v117ProjectHost .cover-evaluation-table th{padding:6px 8px;border:1px solid #aebfd0;vertical-align:top;text-align:left}#v117ProjectHost .cover-evaluation-table thead th{background:#eaf3f9}#v117ProjectHost .cover-evaluation-table ul{margin:0;padding-left:16px}#v117ProjectHost .qmeta{font-size:10px;line-height:1.4;margin-top:6px}#v117ProjectHost .qmeta-role{font-style:italic;color:#627889}@media print{#v117ProjectHost .or-fill input,#v117ProjectHost .or-fill textarea,#v117ProjectHost .or-fill select{display:none!important}#v117ProjectHost .or-print-value{display:block;width:100%;overflow-wrap:anywhere;white-space:pre-wrap}#v117ProjectHost .or-block{break-inside:auto!important}#v117ProjectHost .or-page{break-inside:avoid}}
 </style><style id="reader-v217-checkbox-print">@media print{#v117ProjectHost .or-fill input[type=checkbox]+.or-print-value{border:1px solid currentColor;height:100%;text-align:center;line-height:1}}</style>
+<script id="reader-cloud-v227">(function(){
+'use strict';
+const BASE='https://portail-partage.khmg8np9yj.workers.dev',hosted=location.origin===BASE;
+let user=null,code='',busy=false,folders=[],files=[],tab='diffuses';
+const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
+async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});let d;try{d=await r.json()}catch{throw Error('Réponse du serveur illisible.')}if(!r.ok)throw Error(d.error||'Connexion impossible.');return d}
+const panel=document.createElement('dialog');panel.id='cloud227-panel';panel.innerHTML='<div class="cloud227-head"><h2>Mon espace Cloud</h2><button type="button" id="cloud227-close">Fermer</button></div><form id="cloud227-login"><p>Entre ton code élève pour retrouver tes TP.</p><label for="cloud227-code">Code personnel</label><input id="cloud227-code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" required pattern="[0-9]{4}"><button type="submit">Accéder à mes TP</button></form><div id="cloud227-space" hidden><p id="cloud227-person"></p><nav id="cloud227-tabs"></nav><label for="cloud227-search">Rechercher un TP</label><input id="cloud227-search" type="search" placeholder="Titre du TP…"><div class="cloud227-tools"><button type="button" id="cloud227-refresh">Actualiser</button><button type="button" id="cloud227-logout">Se déconnecter</button></div><div id="cloud227-list"></div></div><p id="cloud227-status" role="status" aria-live="polite"></p>';document.body.append(panel);
+const style=document.createElement('style');style.textContent='#cloud227-panel{box-sizing:border-box;width:min(760px,96vw);max-height:92dvh;border:0;border-radius:18px;padding:22px;color:#17324d;background:#f8fafc;overflow:auto}#cloud227-panel::backdrop{background:#10243d99}#cloud227-panel button,#cloud227-panel input{font:inherit;font-size:16px;min-height:46px;border-radius:10px;padding:10px 14px}#cloud227-panel input{box-sizing:border-box;width:100%;margin:8px 0 14px;border:1px solid #b9c9dc}#cloud227-panel button{border:1px solid #bccbdb;background:white;color:#193b63;cursor:pointer}#cloud227-panel button:disabled{opacity:.5;cursor:wait}.cloud227-head,.cloud227-tools,#cloud227-tabs{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cloud227-head h2{margin:0}#cloud227-tabs button[aria-selected=true]{background:#174d87;color:white}#cloud227-list{display:grid;gap:10px;margin-top:16px}#cloud227-list .cloud227-file{text-align:left;width:100%;padding:16px;overflow-wrap:anywhere}#cloud227-list small{display:block;color:#526b83;margin-top:5px}#cloud227-status{white-space:pre-wrap}#cloud227-launch{min-height:44px;position:fixed;bottom:16px;right:16px;z-index:10001;border:0;border-radius:24px;padding:12px 18px;background:#174d87;color:white;font-weight:bold;box-shadow:0 4px 14px #1234}@media print{#cloud227-launch,#cloud227-panel{display:none!important}}';document.head.append(style);
+const launch=document.createElement('button');launch.id='cloud227-launch';launch.textContent='☁ Mon espace Cloud';launch.type='button';document.body.append(launch);
+function status(s){$('cloud227-status').textContent=s}
+function show(){if(!hosted){location.href=BASE+'/lecteur';return}if(!panel.open)panel.showModal()}
+launch.onclick=show;$('cloud227-close').onclick=()=>{if(!busy)panel.close()};panel.addEventListener('cancel',e=>{if(busy)e.preventDefault()});
+function enabled(on){busy=!on;panel.querySelectorAll('button').forEach(b=>b.disabled=!on)}
+function folderFor(f){const m=String(f.chemin||'').match(/^@(\d+)(?:\/|$)/);return m?folders.find(d=>String(d.id)===m[1]):null}
+function category(f){if(f.kind==='commun')return 'diffuses';const d=folderFor(f);if(d)return d.type;const name=(f.chemin||'')+'/'+f.nom_fichier;if(/corrig/i.test(name))return 'corriges';if(/rendu/i.test(name))return 'rendus';return 'diffuses'}
+function draw(){
+ const labels={diffuses:'TP remis',rendus:'TP rendus',corriges:'TP corrigés'};$('cloud227-tabs').replaceChildren();
+ for(const [id,label]of Object.entries(labels)){const b=document.createElement('button');b.type='button';b.textContent=label+' ('+files.filter(f=>category(f)===id).length+')';b.setAttribute('aria-selected',String(id===tab));b.onclick=()=>{tab=id;draw()};$('cloud227-tabs').append(b)}
+ const q=$('cloud227-search').value.toLocaleLowerCase('fr');const list=$('cloud227-list');list.replaceChildren();
+ const matches=files.filter(f=>category(f)===tab&&f.nom_fichier.toLocaleLowerCase('fr').includes(q));
+ for(const f of matches){const b=document.createElement('button');b.type='button';b.className='cloud227-file';const title=document.createElement('strong'),hint=document.createElement('small');title.textContent=f.nom_fichier;hint.textContent=/\.(tp|json)$/i.test(f.nom_fichier)?(tab==='diffuses'?'Ouvrir dans le lecteur':'Consulter dans le lecteur'):'Ouvrir le document';b.append(title,hint);b.onclick=()=>open(f);list.append(b)}
+ if(!matches.length){const p=document.createElement('p');p.textContent='Aucun document à afficher.';list.append(p)}
+}
+async function refresh(){const [a,b,c]=await Promise.all([api('/api/dossiers'),api('/api/fichiers'),api('/api/communs')]);folders=a.dossiers||[];files=[...(b.fichiers||[]).map(f=>({...f,kind:'personnel'})),...(c.fichiers||[]).map(f=>({...f,kind:'commun'}))];draw();status('Clique sur un TP pour l’ouvrir. Les enregistrements intermédiaires restent sur cet appareil.');}
+$('cloud227-login').onsubmit=async e=>{e.preventDefault();enabled(false);status('Connexion…');try{const pin=$('cloud227-code').value.trim(),result=await api('/api/connexion',{code:pin});if(result.role!=='user'){await api('/api/deconnexion',{});throw Error('Utilise le code élève. Le compte administrateur reste dans le portail.')}const me=await api('/api/moi');user=me.utilisateur;code=pin;$('cloud227-code').value='';$('cloud227-login').hidden=true;$('cloud227-space').hidden=false;$('cloud227-person').textContent=user.nom;await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
+$('cloud227-search').oninput=draw;$('cloud227-refresh').onclick=async()=>{enabled(false);try{await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
+$('cloud227-logout').onclick=async()=>{if(!confirm('Te déconnecter ? Pense à enregistrer ton travail sur cet appareil.'))return;enabled(false);try{if(window.model?.cloud227)await window.tpV130SaveWork?.();await api('/api/deconnexion',{});code='';user=null;location.reload()}catch(e){status(e.message);enabled(true)}};
+async function open(source){
+ if(busy||window.__tpV226SubmitInProgress)return;
+ if(!/\.(tp|json)$/i.test(source.nom_fichier||'')){window.open('/api/'+(source.kind==='commun'?'communs':'fichiers')+'/'+encodeURIComponent(source.id)+'/telecharger','_blank','noopener');return}
+ if(document.body.classList.contains('tp-active-file')&&!window.model?.submission?.final){if(!confirm('Enregistrer le travail actuel sur cet appareil puis ouvrir ce TP ?'))return;try{window.collect?.();await window.tpV130SaveWork?.()}catch(e){status('Enregistrement impossible : '+e.message);return}}
+ enabled(false);status('Ouverture du TP…');
+ try{
+  const result=await api('/api/lecteur/ouvrir',{source:{id:source.id,kind:source.kind}}),d=result.data;
+  if(d.access?.hash&&window.tpReaderHash(String(d.access.salt)+'|'+code)!==String(d.access.hash))throw Error('Le code de ce TP ne correspond pas à ton code Cloud. Demande au professeur de vérifier sa diffusion.');
+  if(result.state==='open'){await window.tpSubmissionGuard225.recordOpen(d)}
+  window.loadFile(new File([JSON.stringify(d)],result.name,{type:'application/json'}));panel.close();
+ }catch(e){status(e.message)}finally{enabled(true)}
+}
+window.tpCloud227={
+ tryUnlock(){const d=window.model;if(!user||!code||String(d?.cloud227?.userId)!==String(user.id))return;const input=$('tpAccessCode');if(input){input.value=code;$('tpAccessBtn')?.click()}},
+ async submit(d){if(!hosted||!user||String(d.cloud227.userId)!==String(user.id)){show();throw Error('Connecte-toi à ton espace Cloud puis clique à nouveau sur Rendre.')}return api('/api/lecteur/rendre',{source:{id:d.cloud227.id,kind:d.cloud227.kind},revision:d.cloud227.revision||0,data:clone(d)})},
+ async unlock(d,pin){if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Connecte-toi au compte de cet élève dans Mon espace Cloud.');await api('/api/lecteur/deverrouiller',{source:d.cloud227,code:pin});return true},
+ show
+};
+if(hosted)setTimeout(show,250);
+})();
+</script>
