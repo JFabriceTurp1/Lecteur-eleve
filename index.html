@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V228 Cloud</title>
+<title>Lecteur TP Élève — V228 Cloud / Local</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -41,7 +41,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 <style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
 <style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style><style id="observation-style">.observation-answer{display:block;width:100%;box-sizing:border-box;min-height:80px;resize:vertical;padding:10px;border:1px solid #a9c8d8;border-radius:7px;line-height:1.5;font:inherit;white-space:pre-wrap}@media print{.observation-answer{resize:none;overflow:visible}}</style></head>
 <body>
-<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V228 Cloud</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
+<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V228 Cloud / Local</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
 <div class="wrap">
 <div class="helper"><strong>Ouvrez votre fichier TP personnel pour commencer.</strong> Le TP reste verrouillé tant que le fichier et le code élève ne sont pas validés.</div>
 <div class="fileName" id="loadedName" style="display:none"></div>
@@ -550,7 +550,7 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  window.loadFile=function(file){lock();const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));const p=projectFrom(d);if(!p)throw Error('Ce fichier ne contient pas le projet evaluation.tp.v1 attendu.');model=d;window.model=model;try{localStorage.removeItem('tp_reader_last_submission')}catch(_){}access(file.name)}catch(e){console.error('V127 load',e);alert('Impossible de charger ce TP : '+(e?.message||e));lock()}};r.readAsText(file,'utf-8')};
  const input=document.getElementById('fileInput');if(input){input.onchange=function(e){const f=e.target.files&&e.target.files[0];if(f)window.loadFile(f);e.target.value=''}}
  const btn=document.getElementById('tpAccessBtn'),inp=document.getElementById('tpAccessCode');if(btn)btn.onclick=unlock;if(inp){inp.oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();unlock()}}}
- document.title='Lecteur TP Élève — V228 Cloud';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
+ document.title='Lecteur TP Élève — V228 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
 })();
 </script>
 
@@ -919,7 +919,7 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V228 Cloud';
+document.title='Lecteur TP Élève — V228 Cloud / Local';
 console.info('Lecteur TP V226 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
 /* V226 : accès autonome et suivi transportable sans TP. */
@@ -1249,7 +1249,15 @@ console.info('Lecteur TP V226 : ouverture automatique compatible utilitaire doub
 })();
 </script>
 
-</body></html><style id="v8-symbols-always-visible">
+<style id="reader-v228-style">#v210Sidebar #cloud227-launch{display:flex;align-items:center;gap:7px}#cloud227-panel .cloud227-download{background:#e7f2ff;color:#12528a;border:1px solid #a8c5e2;text-align:left;margin-top:-7px;font-size:13px;min-height:40px}@media(max-width:950px){#v210AppHeader .v210-bell{display:inline-flex!important}}</style><script id="tp-v228-pending-visual">(function(){
+ function check(){
+  const m=window.model,waiting=!!m&&(m.transmission?.etat==='EN_ATTENTE'||m.submission?.transmissionStatus==='PENDING');
+  let el=document.getElementById('tpV228PendingNotice');
+  if(waiting&&!el){el=document.createElement('div');el.id='tpV228PendingNotice';el.setAttribute('role','alert');el.style.cssText='position:sticky;top:0;z-index:10030;background:#fff0d8;color:#6f3100;border:2px solid #d87d15;padding:12px 16px;text-align:center;font:700 14px system-ui';el.textContent='⚠ TP EN ATTENTE DE TRANSMISSION — IL N’EST PAS RENDU. Reconnecte-toi, ouvre le lecteur Cloud et utilise « Rendre mon TP ». Conserve le fichier de secours.';document.body.insertBefore(el,document.body.firstChild)}
+  if(!waiting&&el)el.remove();
+ }
+ setInterval(check,1500);document.addEventListener('tp-reader-rendered',check);
+})();</script></body></html><style id="v8-symbols-always-visible">
 /* V214 — le panneau historique permanent est désactivé.
    Seule la pastille Ω (#tp13symbtn) reste visible en bas à droite. */
 #tpSymbolBtn,#tpSymbolPalette{display:none!important}
@@ -1616,7 +1624,7 @@ body.v117-project .wrap{opacity:1!important;filter:none!important;pointer-events
  function nestedMarkup(p,children){return children.map((f,i)=>{const x=getObj(p,f),w=nestedWidth(p,x);return `${i>0&&i%2===0?'<div class="question-line-break" aria-hidden="true"></div>':''}<div class="question-content-item ${x.isSpacer?'question-content-spacer':''}" style="flex-basis:calc(${w}% - ${(1-w/100)*10}px)">${block(p,f)}</div>`}).join('')}
  function orNumber(v,min,max,fallback=min){const n=Number(v);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback}
  function orStyle(f,p){let size=orNumber(f.size,6,48,10);if(f.kind==='label'){try{const c=document.createElement('canvas').getContext('2d');c.font=(f.bold?'bold ':'')+size+'px Arial';const actual=c.measureText(f.label||'').width,available=Number(f.w)/100*p.width-2;if(actual>available&&available>0)size=Math.max(6,size*available/actual)}catch(e){}}const x=orNumber(f.x,0,99),y=orNumber(f.y,0,99);return `left:${x}%;top:${y}%;width:${orNumber(f.w,.5,100-x)}%;height:${orNumber(f.h,.5,100-y)}%;font-size:${100*size/p.width}cqw;color:${/^#[0-9a-f]{6}$/i.test(f.color)?f.color:'#164d78'};background:${/^#[0-9a-f]{6}$/i.test(f.background)?f.background:'#ffffff'};text-align:${validAlign(f.align)||'left'};align-items:${({top:'flex-start',middle:'center',bottom:'flex-end'})[f.vertical]||'center'};font-weight:${f.bold?'700':'400'};`}
- function orBlock(x){const t=x.orTemplate;if(!t||!Array.isArray(t.pages)||!Array.isArray(t.items))return `<section class="table-block"><h3>Ordre de réparation</h3><p>Le modèle OR manque dans ce TP. Demandez au professeur une nouvelle exportation.</p></section>`;const stored=bag()[x.id]||{},locked=workLocked()?'disabled':'';return `<section class="table-block or-block" data-or232="${esc(x.id)}" style="${blockFrameStyle(x)}">${pic(x)}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="or-document">${t.pages.map((page,pi)=>`<div class="or-page" style="aspect-ratio:${orNumber(page.width,1,10000,595)}/${orNumber(page.height,1,10000,842)}"><img class="or-background" src="${/^data:image\//.test(page.image)?esc(page.image):''}" alt="Ordre de réparation, page ${pi+1}">${t.items.filter(f=>f.page===pi).map(f=>{if(f.kind==='label')return f.original?'':`<div class="or-item or-label" style="${orStyle(f,page)}">${esc(f.label)}</div>`;const v=Object.hasOwn(stored,f.id)?stored[f.id]:x.orValues?.[f.id]??(f.kind==='checkbox'?false:''),attr=`data-v217-or="${esc(x.id)}" data-field="${esc(f.id)}" aria-label="${esc(f.label)}" ${locked}`;const field=f.kind==='checkbox'?`<input type="checkbox" ${attr} ${v?'checked':''}>`:f.kind==='select'?`<select ${attr}>${(Array.isArray(f.options)?f.options:['']).map(o=>`<option value="${esc(o)}" ${String(v)===String(o)?'selected':''}>${esc(o)}</option>`).join('')}</select>`:f.kind==='textarea'?`<textarea ${attr} rows="3">${esc(v)}</textarea>`:`<input type="text" ${attr} value="${esc(v)}">`;return `<div class="or-item or-fill" style="${orStyle(f,page)}">${field}<span class="or-print-value">${f.kind==='checkbox'?(v?'✓':''):esc(v)}</span></div>`}).join('')}${pi===t.pages.length-1&&/^data:image\/png;base64,/.test(model.reponses?.signatures232?.[x.id]||'')?`<img class="tp232-signature" src="${esc(model.reponses.signatures232[x.id])}" alt="Signature élève">`:''}</div>`).join('')}</div>${callProf(x)}</section>`}
+ function orBlock(x){const t=x.orTemplate;if(!t||!Array.isArray(t.pages)||!Array.isArray(t.items))return `<section class="table-block"><h3>Ordre de réparation</h3><p>Le modèle OR manque dans ce TP. Demandez au professeur une nouvelle exportation.</p></section>`;const stored=bag()[x.id]||{},locked=workLocked()?'disabled':'';return `<section class="table-block or-block" style="${blockFrameStyle(x)}">${pic(x)}${x.text?`<p>${formattedText(x,'text')}</p>`:''}<div class="or-document">${t.pages.map((page,pi)=>`<div class="or-page" style="aspect-ratio:${orNumber(page.width,1,10000,595)}/${orNumber(page.height,1,10000,842)}"><img class="or-background" src="${/^data:image\//.test(page.image)?esc(page.image):''}" alt="Ordre de réparation, page ${pi+1}">${t.items.filter(f=>f.page===pi).map(f=>{if(f.kind==='label')return f.original?'':`<div class="or-item or-label" style="${orStyle(f,page)}">${esc(f.label)}</div>`;const v=Object.hasOwn(stored,f.id)?stored[f.id]:x.orValues?.[f.id]??(f.kind==='checkbox'?false:''),attr=`data-v217-or="${esc(x.id)}" data-field="${esc(f.id)}" aria-label="${esc(f.label)}" ${locked}`;const field=f.kind==='checkbox'?`<input type="checkbox" ${attr} ${v?'checked':''}>`:f.kind==='select'?`<select ${attr}>${(Array.isArray(f.options)?f.options:['']).map(o=>`<option value="${esc(o)}" ${String(v)===String(o)?'selected':''}>${esc(o)}</option>`).join('')}</select>`:f.kind==='textarea'?`<textarea ${attr} rows="3">${esc(v)}</textarea>`:`<input type="text" ${attr} value="${esc(v)}">`;return `<div class="or-item or-fill" style="${orStyle(f,page)}">${field}<span class="or-print-value">${f.kind==='checkbox'?(v?'✓':''):esc(v)}</span></div>`}).join('')}</div>`).join('')}</div>${callProf(x)}</section>`}
 function orderItems(o){return Array.isArray(o?.items)?o.items:[]}
 function orderIds(o,ids){const valid=orderItems(o).map(x=>x.id),seen=new Set(),out=[];for(const id of Array.isArray(ids)?ids:[]){if(valid.includes(id)&&!seen.has(id)){seen.add(id);out.push(id)}}return out.concat(valid.filter(id=>!seen.has(id)))}
 function mixedOrder(o){const ids=orderItems(o).map(x=>x.id),out=ids.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}if(out.length>1&&out.every((id,i)=>id===ids[i]))[out[0],out[1]]=[out[1],out[0]];return out}
@@ -1913,7 +1921,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
    }catch(e){reject('Impossible de lire ce TP : '+(e?.message||e))}};r.readAsText(file,'utf-8')
  };
  const input=document.getElementById('fileInput');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.loadFile(f);e.target.value=''};
- document.title='Lecteur TP Élève — V228 Cloud';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud';
+ document.title='Lecteur TP Élève — V228 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';
  console.info('Lecteur V157 : verrou RENDU/CORRIGE + anti-réouverture actif.');
 })();
 </script>
@@ -2441,9 +2449,9 @@ if(typeof oldCollect==='function'){
 }
 
 function stamp(){
-  document.title='Lecteur TP Élève — V228 Cloud';
+  document.title='Lecteur TP Élève — V228 Cloud / Local';
   const b=document.querySelector('.brand');
-  if(b)b.textContent='Lecteur TP Élève — V228 Cloud';
+  if(b)b.textContent='Lecteur TP Élève — V228 Cloud / Local';
 }
 stamp();
 setTimeout(stamp,600);
@@ -2678,7 +2686,18 @@ async function submit205(){
 
  try{
    try{window.collect?.()}catch(_){}
-   const cloud=!!model.cloud227,receipt=cloud?await window.tpCloud227.submit(model):null;
+   const cloud=!!model.cloud227;let receipt=null;
+   if(cloud){try{receipt=await window.tpCloud227.submit(model)}catch(err){
+      // L'absence de confirmation serveur ne doit JAMAIS attribuer le statut RENDU.
+      const data=JSON.parse(JSON.stringify(model));data.submission={...(data.submission||{}),final:false,transmissionStatus:'PENDING'};
+      data.transmission={...(data.transmission||{}),etat:'EN_ATTENTE',mode:'cloudflare'};
+      data.statut=data.status='EN_ATTENTE';data.cloud227=model.cloud227;model.transmission={...data.transmission};model.submission={...data.submission};model.statut=model.status='EN_ATTENTE';
+      try{await window.tpV130SaveWork?.()}catch(_){/* Le fichier de secours reste obligatoire */}
+      const text=JSON.stringify(data,null,2);const fileName=(data.code||data.tp?.id||'TP').replace(/[^A-Za-z0-9_-]/g,'_')+'_EN_ATTENTE.json';
+      download(text,fileName);
+      alert('⚠ CONNEXION OU TRANSMISSION INDISPONIBLE\n\nTON TP N’A PAS ÉTÉ RENDU.\n\nUne sauvegarde de secours EN_ATTENTE vient d’être téléchargée. Conserve ce fichier. Dès que tu as Internet, ouvre le lecteur depuis le portail Cloudflare, charge cette sauvegarde, connecte-toi au même compte puis clique sur Rendre mon TP.\n\nDétail : '+(err.message||err));
+      return;
+   }}
    if(receipt?.already){alert('Ce TP est déjà rendu sur Cloudflare. Ouvre-le depuis Mon espace Cloud pour consulter la copie remise.');window.tpCloud227.show();return}
    const now=receipt?.submittedAt||isoNow(),previous=model.submission||{},revision=receipt?.revision||Math.max(1,(Number(previous.revision)||0)+1);
 
@@ -2766,8 +2785,8 @@ function settle(){
 }
 [0,120,500].forEach(ms=>setTimeout(settle,ms));
 
-document.title='Lecteur TP Élève — V228 Cloud';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud';
+document.title='Lecteur TP Élève — V228 Cloud / Local';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';
 
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
 })();
@@ -3134,9 +3153,9 @@ try{
   }
 }catch(_){}
 
-document.title='Lecteur TP Élève — V228 Cloud';
+document.title='Lecteur TP Élève — V228 Cloud / Local';
 const brand206=document.querySelector('.brand');
-if(brand206)brand206.textContent='Lecteur TP Élève — V228 Cloud';
+if(brand206)brand206.textContent='Lecteur TP Élève — V228 Cloud / Local';
 
 console.info('Lecteur TP V206 : verrou strict après rendu, réouverture du fichier DIFFUSION impossible sans code professeur.');
 })();
@@ -3204,9 +3223,9 @@ body.v205-readonly #teacherUnlockBtn{
 
 <script id="reader-v208-stamp">
 (function(){
- document.title='Lecteur TP Élève — V228 Cloud';
+ document.title='Lecteur TP Élève — V228 Cloud / Local';
  const b=document.querySelector('.brand');
- if(b)b.textContent='Lecteur TP Élève — V228 Cloud';
+ if(b)b.textContent='Lecteur TP Élève — V228 Cloud / Local';
  console.info('Lecteur TP V209 : fidélité graphique éditeur V74, verrou strict V206/V207, date JJ-MM-AAAA et nouvelle charte compacte d’auto-évaluation.');
 })();
 </script>
@@ -3673,8 +3692,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V228 Cloud';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud';
+document.title='Lecteur TP Élève — V228 Cloud / Local';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
@@ -3683,34 +3702,54 @@ console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 strict
 </style><style id="reader-v217-checkbox-print">@media print{#v117ProjectHost .or-fill input[type=checkbox]+.or-print-value{border:1px solid currentColor;height:100%;text-align:center;line-height:1}}</style>
 <script id="reader-cloud-v227">(function(){
 'use strict';
-const BASE='https://portail-partage.khmg8np9yj.workers.dev',hosted=location.origin===BASE;
+const BASE='https://portail-partage.khmg8np9yj.workers.dev',hosted=location.protocol==='https:'&&location.pathname.startsWith('/lecteur');
 let user=null,code='',busy=false,folders=[],files=[],tab='diffuses';
 const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
 async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});let d;try{d=await r.json()}catch{throw Error('Réponse du serveur illisible.')}if(!r.ok)throw Error(d.error||'Connexion impossible.');return d}
 const panel=document.createElement('dialog');panel.id='cloud227-panel';panel.innerHTML='<div class="cloud227-head"><h2>Mon espace Cloud</h2><button type="button" id="cloud227-close">Fermer</button></div><form id="cloud227-login"><p>Entre ton code élève pour retrouver tes TP.</p><label for="cloud227-code">Code personnel</label><input id="cloud227-code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" required pattern="[0-9]{4}"><button type="submit">Accéder à mes TP</button></form><div id="cloud227-space" hidden><p id="cloud227-person"></p><nav id="cloud227-tabs"></nav><label for="cloud227-search">Rechercher un TP</label><input id="cloud227-search" type="search" placeholder="Titre du TP…"><div class="cloud227-tools"><button type="button" id="cloud227-refresh">Actualiser</button><button type="button" id="cloud227-logout">Se déconnecter</button></div><div id="cloud227-list"></div></div><p id="cloud227-status" role="status" aria-live="polite"></p>';document.body.append(panel);
-const style=document.createElement('style');style.textContent='#cloud227-panel{box-sizing:border-box;width:min(760px,96vw);max-height:92dvh;border:0;border-radius:18px;padding:22px;color:#17324d;background:#f8fafc;overflow:auto}#cloud227-panel::backdrop{background:#10243d99}#cloud227-panel button,#cloud227-panel input{font:inherit;font-size:16px;min-height:46px;border-radius:10px;padding:10px 14px}#cloud227-panel input{box-sizing:border-box;width:100%;margin:8px 0 14px;border:1px solid #b9c9dc}#cloud227-panel button{border:1px solid #bccbdb;background:white;color:#193b63;cursor:pointer}#cloud227-panel button:disabled{opacity:.5;cursor:wait}.cloud227-head,.cloud227-tools,#cloud227-tabs{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cloud227-head h2{margin:0}#cloud227-tabs button[aria-selected=true]{background:#174d87;color:white}#cloud227-list{display:grid;gap:10px;margin-top:16px}#cloud227-list .cloud227-file{text-align:left;width:100%;padding:16px;overflow-wrap:anywhere}#cloud227-list small{display:block;color:#526b83;margin-top:5px}#cloud227-status{white-space:pre-wrap}#cloud227-launch{min-height:44px;position:fixed;bottom:16px;right:16px;z-index:10001;border:0;border-radius:24px;padding:12px 18px;background:#174d87;color:white;font-weight:bold;box-shadow:0 4px 14px #1234}@media print{#cloud227-launch,#cloud227-panel{display:none!important}}';document.head.append(style);
-const launch=document.createElement('button');launch.id='cloud227-launch';launch.textContent='☁ Mon espace Cloud';launch.type='button';document.body.append(launch);
+const style=document.createElement('style');style.textContent='#cloud227-panel{box-sizing:border-box;width:min(760px,96vw);max-height:92dvh;border:0;border-radius:18px;padding:22px;color:#17324d;background:#f8fafc;overflow:auto}#cloud227-panel::backdrop{background:#10243d99}#cloud227-panel button,#cloud227-panel input{font:inherit;font-size:16px;min-height:46px;border-radius:10px;padding:10px 14px}#cloud227-panel input{box-sizing:border-box;width:100%;margin:8px 0 14px;border:1px solid #b9c9dc}#cloud227-panel button{border:1px solid #bccbdb;background:white;color:#193b63;cursor:pointer}#cloud227-panel button:disabled{opacity:.5;cursor:wait}.cloud227-head,.cloud227-tools,#cloud227-tabs{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cloud227-head h2{margin:0}#cloud227-tabs button[aria-selected=true]{background:#174d87;color:white}#cloud227-list{display:grid;gap:10px;margin-top:16px}#cloud227-list .cloud227-file{text-align:left;width:100%;padding:16px;overflow-wrap:anywhere}#cloud227-list small{display:block;color:#526b83;margin-top:5px}#cloud227-status{white-space:pre-wrap}#v210Sidebar #cloud227-launch{min-height:44px;position:static;bottom:auto;right:auto;z-index:auto;box-shadow:none;border-radius:10px;padding:10px 12px;font-weight:650;text-align:left;width:100%;background:transparent;color:inherit}#v210Sidebar #cloud227-launch:hover{background:#eaf4ff}@media print{#cloud227-launch,#cloud227-panel{display:none!important}}';document.head.append(style);
+const launch=document.createElement('button');launch.id='cloud227-launch';launch.className='v210-nav';launch.textContent='☁ Mon espace Cloud';launch.type='button';const attach4105=()=>{const nav=document.querySelector('#v210Sidebar nav');if(nav&&launch.parentElement!==nav)nav.append(launch)};document.body.append(launch);attach4105();document.addEventListener('DOMContentLoaded',attach4105);setTimeout(attach4105,400);setTimeout(attach4105,1200);
 function status(s){$('cloud227-status').textContent=s}
 function show(){if(!hosted){location.href=BASE+'/lecteur';return}if(!panel.open)panel.showModal()}
 launch.onclick=show;$('cloud227-close').onclick=()=>{if(!busy)panel.close()};panel.addEventListener('cancel',e=>{if(busy)e.preventDefault()});
 function enabled(on){busy=!on;panel.querySelectorAll('button').forEach(b=>b.disabled=!on)}
 function folderFor(f){const m=String(f.chemin||'').match(/^@(\d+)(?:\/|$)/);return m?folders.find(d=>String(d.id)===m[1]):null}
-function category(f){if(f.kind==='commun')return 'diffuses';const d=folderFor(f);if(d)return d.type;const name=(f.chemin||'')+'/'+f.nom_fichier;if(/corrig/i.test(name))return 'corriges';if(/rendu/i.test(name))return 'rendus';return 'diffuses'}
+function category(f){if(f.kind==='commun')return f.categorie_document==='hors_tp'||(f.categorie_document!=='tp'&&!/\.(tp|json)$/i.test(f.nom_fichier||''))?'documents':'diffuses';const d=folderFor(f);if(d)return d.type;const name=(f.chemin||'')+'/'+f.nom_fichier;if(/corrig/i.test(name))return 'corriges';if(/rendu/i.test(name))return 'rendus';return 'diffuses'}
 function draw(){
- const labels={diffuses:'TP remis',rendus:'TP rendus',corriges:'TP corrigés'};$('cloud227-tabs').replaceChildren();
+ const labels={diffuses:'TP diffusés',rendus:'TP rendus',corriges:'TP corrigés',documents:'Dépôts hors TP'};$('cloud227-tabs').replaceChildren();
  for(const [id,label]of Object.entries(labels)){const b=document.createElement('button');b.type='button';b.textContent=label+' ('+files.filter(f=>category(f)===id).length+')';b.setAttribute('aria-selected',String(id===tab));b.onclick=()=>{tab=id;draw()};$('cloud227-tabs').append(b)}
  const q=$('cloud227-search').value.toLocaleLowerCase('fr');const list=$('cloud227-list');list.replaceChildren();
  const matches=files.filter(f=>category(f)===tab&&f.nom_fichier.toLocaleLowerCase('fr').includes(q));
- for(const f of matches){const b=document.createElement('button');b.type='button';b.className='cloud227-file';const title=document.createElement('strong'),hint=document.createElement('small');title.textContent=f.nom_fichier;hint.textContent=/\.(tp|json)$/i.test(f.nom_fichier)?(tab==='diffuses'?'Ouvrir dans le lecteur':'Consulter dans le lecteur'):'Ouvrir le document';b.append(title,hint);b.onclick=()=>open(f);list.append(b)}
+ for(const f of matches){const b=document.createElement('button');b.type='button';b.className='cloud227-file';const title=document.createElement('strong'),hint=document.createElement('small');title.textContent=f.nom_fichier;hint.textContent=/\.(tp|json)$/i.test(f.nom_fichier)?(tab==='diffuses'?'Ouvrir dans le lecteur':'Consulter dans le lecteur'):'Ouvrir le document';b.append(title,hint);b.onclick=()=>open(f);list.append(b);if(category(f)==='diffuses'&&/\.(tp|json)$/i.test(f.nom_fichier||'')){const dl=document.createElement('button');dl.type='button';dl.textContent='⬇ Télécharger pour travailler hors connexion';dl.className='cloud227-download';dl.onclick=()=>downloadOffline4105(f);list.append(dl)}}
  if(!matches.length){const p=document.createElement('p');p.textContent='Aucun document à afficher.';list.append(p)}
 }
-async function refresh(){const [a,b,c]=await Promise.all([api('/api/dossiers'),api('/api/fichiers'),api('/api/communs')]);folders=a.dossiers||[];files=[...(b.fichiers||[]).map(f=>({...f,kind:'personnel'})),...(c.fichiers||[]).map(f=>({...f,kind:'commun'}))];draw();status('Clique sur un TP pour l’ouvrir. Les enregistrements intermédiaires restent sur cet appareil.');}
+async function refresh(){const [a,b,c]=await Promise.all([api('/api/dossiers'),api('/api/fichiers'),api('/api/communs')]);folders=a.dossiers||[];files=[...(b.fichiers||[]).map(f=>({...f,kind:'personnel'})),...(c.fichiers||[]).map(f=>({...f,kind:'commun'}))];draw();updateBell4105();status('Clique sur un TP pour l’ouvrir. Les enregistrements intermédiaires restent sur cet appareil.');}
 $('cloud227-login').onsubmit=async e=>{e.preventDefault();enabled(false);status('Connexion…');try{const pin=$('cloud227-code').value.trim(),result=await api('/api/connexion',{code:pin});if(result.role!=='user'){await api('/api/deconnexion',{});throw Error('Utilise le code élève. Le compte administrateur reste dans le portail.')}const me=await api('/api/moi');user=me.utilisateur;code=pin;$('cloud227-code').value='';$('cloud227-login').hidden=true;$('cloud227-space').hidden=false;$('cloud227-person').textContent=user.nom;await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
+// Sauvegarde autonome JSON : le TP et ses ressources sont conservés dans le fichier.
+async function downloadOffline4105(f){
+ if(busy)return;enabled(false);status('Préparation du TP local…');
+ try{const r=await api('/api/lecteur/ouvrir',{source:{id:f.id,kind:f.kind}});const d=r.data;
+ const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json;charset=utf-8'}),a=document.createElement('a'),url=URL.createObjectURL(blob);
+ a.href=url;a.download=f.nom_fichier.replace(/\.(tp|json)$/i,'')+'_LOCAL.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),25000);
+ status('TP téléchargé. Sur ton ordinateur, ouvre le lecteur local puis choisis ce fichier JSON.');
+ }catch(e){status('Téléchargement impossible : '+e.message)}finally{enabled(true)}
+}
+function updateBell4105(){
+ const bell=document.querySelector('#v210AppHeader .v210-bell');if(!bell)return;
+ const n=files.filter(f=>category(f)==='documents'&&f.kind==='commun'&&Number(f.non_consulte_4105)===1).length;
+ bell.style.display='inline-flex';bell.style.position='relative';bell.style.cursor='pointer';bell.setAttribute('role','button');bell.setAttribute('tabindex','0');
+ bell.title=n?n+' nouveau(x) document(s) à consulter':'Consulter les documents';
+ bell.innerHTML='🔔'+(n?'<span id="cloud4105-badge" style="position:absolute;right:-9px;top:-8px;min-width:18px;height:18px;border-radius:99px;background:#bd263d;color:white;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 4px">'+n+'</span>':'');
+ bell.onclick=()=>{tab='documents';show();draw()};bell.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();bell.click()}};
+}
+// La cloche suit les documents téléchargés/consultés sur le serveur, même après changement d'appareil.
+async function refreshBell4105(){if(!hosted||document.hidden)return;try{const list=await api('/api/communs');const others=files.filter(f=>f.kind!=='commun');files=[...others,...(list.fichiers||[]).map(f=>({...f,kind:'commun'}))];updateBell4105()}catch(_){}}
+if(hosted){setInterval(refreshBell4105,60000);setTimeout(refreshBell4105,1700)}
 $('cloud227-search').oninput=draw;$('cloud227-refresh').onclick=async()=>{enabled(false);try{await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
 $('cloud227-logout').onclick=async()=>{if(!confirm('Te déconnecter ? Pense à enregistrer ton travail sur cet appareil.'))return;enabled(false);try{if(window.model?.cloud227)await window.tpV130SaveWork?.();await api('/api/deconnexion',{});code='';user=null;location.reload()}catch(e){status(e.message);enabled(true)}};
 async function open(source){
  if(busy||window.__tpV226SubmitInProgress)return;
- if(!/\.(tp|json)$/i.test(source.nom_fichier||'')){window.open('/api/'+(source.kind==='commun'?'communs':'fichiers')+'/'+encodeURIComponent(source.id)+'/telecharger','_blank','noopener');return}
+ if(!/\.(tp|json)$/i.test(source.nom_fichier||'')||category(source)==='documents'){window.open('/api/'+(source.kind==='commun'?'communs':'fichiers')+'/'+encodeURIComponent(source.id)+'/telecharger','_blank','noopener');if(source.kind==='commun'){source.non_consulte_4105=0;updateBell4105();}return}
  if(document.body.classList.contains('tp-active-file')&&!window.model?.submission?.final){if(!confirm('Enregistrer le travail actuel sur cet appareil puis ouvrir ce TP ?'))return;try{window.collect?.();await window.tpV130SaveWork?.()}catch(e){status('Enregistrement impossible : '+e.message);return}}
  enabled(false);status('Ouverture du TP…');
  try{
@@ -3726,27 +3765,18 @@ window.tpCloud227={
  async unlock(d,pin){if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Connecte-toi au compte de cet élève dans Mon espace Cloud.');await api('/api/lecteur/deverrouiller',{source:d.cloud227,code:pin});return true},
  show
 };
+// Reprise guidée d'une copie créée sans réseau, sur le même compte élève.
+const pendingButton4105=document.createElement('button');pendingButton4105.type='button';pendingButton4105.id='cloud227-pending-import';pendingButton4105.textContent='↥ Importer une copie EN ATTENTE';
+const pendingInput4105=document.createElement('input');pendingInput4105.type='file';pendingInput4105.id='cloud227-pending-file';pendingInput4105.accept='.json,.tp,application/json';pendingInput4105.hidden=true;
+$('cloud227-space').querySelector('.cloud227-tools').append(pendingButton4105,pendingInput4105);
+pendingButton4105.onclick=()=>pendingInput4105.click();
+pendingInput4105.onchange=async()=>{const f=pendingInput4105.files?.[0];pendingInput4105.value='';if(!f)return;
+ try{const d=JSON.parse(await f.text());if(!d.cloud227||d.submission?.final||!d.code)throw Error('Le fichier doit être une copie TP EN ATTENTE non rendue.');
+  if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Cette copie appartient à un autre compte élève.');
+  window.loadFile(new File([JSON.stringify(d)],f.name,{type:'application/json'}));panel.close();
+  alert('Copie en attente chargée. Vérifie tes réponses puis clique sur Rendre mon TP pour transmettre au professeur. Seule la confirmation du serveur validera le rendu.');
+ }catch(e){status('Reprise impossible : '+(e.message||e))}
+};
 if(hosted)setTimeout(show,250);
-})();
-</script>
-
-<script id="reader-tools-v228">(function(){
-const defaults=['Ω','∞','V','mV','A','mA','°C','%','±','Δ','≤','≥','N·m','bar','kPa','MPa','mm','mm²','Hz','kW','tr/min'];
-const project=()=>{let p=window.model?.tpProject||window.model?.sourceProject||window.model?.project||{};return p.schema==='evaluation.tp.v1'?p.data:p};
-const css=document.createElement('style');css.textContent='#tp232-tools{position:fixed;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:10001;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100vw - 24px)}#tp232-tools button,#tp232-tools #cloud227-launch,#tp232-tools #tp13symbtn{position:static!important;margin:0!important;min-width:44px;width:auto;min-height:44px;height:auto;border-radius:22px;padding:10px 14px;font-size:15px;border:0;background:#174d87;color:white}#tp13sympanel{bottom:calc(var(--tp232-dock-height,44px) + 28px)!important;max-height:50vh;overflow:auto}body{padding-bottom:calc(var(--tp232-dock-height,44px) + 32px)}.tp232-signature{position:absolute;right:3%;bottom:3%;width:22%;max-height:12%;object-fit:contain;pointer-events:none}@media print{#tp232-tools{display:none!important}}';document.head.append(css);
-const dock=document.createElement('div');dock.id='tp232-tools';document.body.append(dock);for(const id of ['cloud227-launch','tp13symbtn']){const el=document.getElementById(id);if(el)dock.append(el)}
-const sign=document.createElement('button');sign.type='button';sign.textContent='✍ Signature';dock.append(sign);if(window.ResizeObserver)new ResizeObserver(()=>document.documentElement.style.setProperty('--tp232-dock-height',dock.getBoundingClientRect().height+'px')).observe(dock);
-const symbol=document.getElementById('tp13symbtn'),palette=document.getElementById('tp13sympanel');if(symbol&&palette){symbol.addEventListener('click',()=>{const list=Array.isArray(project().studentSymbols)?project().studentSymbols:defaults;palette.replaceChildren();if(!list.length){palette.textContent='Aucun symbole prévu pour ce TP.';return}for(const value of list){const b=document.createElement('button');b.type='button';b.dataset.x=value;b.textContent=value;palette.append(b)}})}
-function locked(){return window.tpSubmissionGuard225?.final(window.model)||document.body.classList.contains('v205-readonly')}
-function paint(){document.querySelectorAll('.or-block[data-or232]').forEach(host=>{const id=host.dataset.or232,pages=host.querySelectorAll('.or-page'),last=pages[pages.length-1];if(!last)return;let image=last.querySelector('.tp232-signature');const src=window.model?.reponses?.signatures232?.[id];if(!src){image?.remove();return}if(!/^data:image\/png;base64,/.test(src))return;if(!image){image=document.createElement('img');image.className='tp232-signature';image.alt='Signature élève';last.append(image)}if(image.getAttribute('src')!==src)image.src=src;});if(symbol)symbol.disabled=!!locked();sign.disabled=locked()||!document.querySelector('.or-block[data-or232]')}
-let scheduled=false;const obs=new MutationObserver(()=>{if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;paint()})});const host=document.querySelector('.wrap')||document.body;obs.observe(host,{childList:true,subtree:true});paint();
-sign.onclick=()=>{if(locked())return;const blocks=[...document.querySelectorAll('.or-block[data-or232]')];if(!blocks.length)return alert('Ce TP ne contient pas d’ordre de réparation.');const d=document.createElement('dialog');d.style.cssText='width:min(580px,92vw);border:0;border-radius:16px;padding:18px';d.innerHTML='<h2>Signer l’ordre de réparation</h2><label>Ordre de réparation <select aria-label="Ordre de réparation"></select></label><p>Dessine ta signature au doigt, au stylet ou à la souris.</p><canvas width="900" height="300" style="width:100%;height:auto;touch-action:none;border:1px solid #8097b1;border-radius:8px;background:white"></canvas><p><button type="button" data-clear>Effacer le tracé</button> <button type="button" data-place>Poser la signature</button> <button type="button" data-remove>Retirer la signature</button> <button type="button" data-close>Annuler</button></p>';const select=d.querySelector('select');blocks.forEach((h,i)=>{const o=document.createElement('option');o.value=h.dataset.or232;o.textContent='OR '+(i+1);select.append(o)});const c=d.querySelector('canvas'),ctx=c.getContext('2d');ctx.strokeStyle='#17324d';ctx.lineWidth=4;ctx.lineCap='round';let drawing=false,ink=false;function point(e){const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]}c.onpointerdown=e=>{drawing=true;c.setPointerCapture(e.pointerId);ctx.beginPath();ctx.moveTo(...point(e))};c.onpointermove=e=>{if(!drawing)return;ctx.lineTo(...point(e));ctx.stroke();ink=true};c.onpointerup=c.onpointercancel=()=>drawing=false;d.querySelector('[data-clear]').onclick=()=>{ctx.clearRect(0,0,c.width,c.height);ink=false};
-async function save(src){if(locked())return;window.model.reponses=window.model.reponses||{};window.model.reponses.signatures232=window.model.reponses.signatures232||{};if(src)window.model.reponses.signatures232[select.value]=src;else delete window.model.reponses.signatures232[select.value];paint();try{await window.tpV130SaveWork?.()}catch(e){alert('Signature posée mais sauvegarde locale impossible : '+e.message)}d.close()}
-d.querySelector('[data-place]').onclick=()=>ink?save(c.toDataURL('image/png')):alert('Trace d’abord ta signature.');d.querySelector('[data-remove]').onclick=()=>save(null);d.querySelector('[data-close]').onclick=()=>d.close();d.addEventListener('close',()=>d.remove());document.body.append(d);d.showModal()};
-window.tp232PaintSignature=paint;
-})();
-</script>
-<script id="tp232-zoom">(function(){
-document.addEventListener('click',e=>{const im=e.target.closest('img');if(!im||im.closest('dialog')||!im.closest('#v117ProjectHost,#sheet,.v130-copy,.v206pdf-host,.v117-view'))return;if(im.classList.contains('block-picto'))return;e.preventDefault();const d=document.createElement('dialog');d.style.cssText='border:0;border-radius:14px;padding:12px;max-width:96vw;max-height:94dvh';const b=document.createElement('button');b.textContent='Fermer';b.style.cssText='display:block;min-height:44px;margin-bottom:10px';const img=document.createElement('img');img.src=im.currentSrc||im.src;img.alt=im.alt||'Image agrandie';img.style.cssText='display:block;max-width:90vw;max-height:80dvh;object-fit:contain';d.append(b,img);document.body.append(d);b.onclick=()=>d.close();d.addEventListener('close',()=>d.remove());d.addEventListener('click',ev=>{if(ev.target===d)d.close()});d.showModal();});
 })();
 </script>
