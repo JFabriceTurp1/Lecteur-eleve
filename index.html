@@ -564,7 +564,7 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  window.loadFile=function(file){lock();const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));const p=projectFrom(d);if(!p)throw Error('Ce fichier ne contient pas le projet evaluation.tp.v1 attendu.');model=d;window.model=model;try{localStorage.removeItem('tp_reader_last_submission')}catch(_){}access(file.name)}catch(e){console.error('V127 load',e);alert('Impossible de charger ce TP : '+(e?.message||e));lock()}};r.readAsText(file,'utf-8')};
  const input=document.getElementById('fileInput');if(input){input.onchange=function(e){const f=e.target.files&&e.target.files[0];if(f)window.loadFile(f);e.target.value=''}}
  const btn=document.getElementById('tpAccessBtn'),inp=document.getElementById('tpAccessCode');if(btn)btn.onclick=unlock;if(inp){inp.oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();unlock()}}}
- document.title='Lecteur TP Élève — V230.5 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
+ document.title='Lecteur TP Élève — V234 Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
 })();
 </script>
 
@@ -585,11 +585,11 @@ function $(id){return document.getElementById(id)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()}
 function currentStudent(d=window.model||{}){
-  const e=d.eleve||d.identite||{};
+  const e=d.eleve||{},i=d.identite||{};
   return {
-    id:String(d.studentId||e.id||''),
-    nom:String(e.nom||''),
-    prenom:String(e.prenom||''),
+    id:String(d.studentId||e.id||i.id||d.meta?.studentId||''),
+    nom:String(e.nom||i.nom||''),
+    prenom:String(e.prenom||i.prenom||''),
     classe:String(d.classe||d.identite?.classe||'')
   };
 }
@@ -600,10 +600,11 @@ function identityKey(d){
 function sameStudent(d){
   if(!session)return false;
   const x=currentStudent(d);
-  if(session.student.id&&x.id)return String(session.student.id)===String(x.id);
-  return norm(session.student.nom)===norm(x.nom)
+  if(session.student.id&&x.id&&String(session.student.id)===String(x.id))return true;
+  // Les ID techniques peuvent changer selon les diffusions; l'identité civile reste stable.
+  return !!norm(x.nom)&&!!norm(x.prenom)&&norm(session.student.nom)===norm(x.nom)
     &&norm(session.student.prenom)===norm(x.prenom)
-    &&norm(session.student.classe)===norm(x.classe);
+    &&(!norm(session.student.classe)||!norm(x.classe)||norm(session.student.classe)===norm(x.classe));
 }
 function accessData(){return window.model?.access||{}}
 function canAuthenticate(){
@@ -750,6 +751,7 @@ async function authenticate(){
   try{
     const data=await authenticateData(code);
     session={student:currentStudent(data),identity:identityKey(data),code,access:{required:true,salt:String(data.access.salt),hash:String(data.access.hash)}};
+    registerProfileV233(data);
     if(importedPending){
       const safe=importedPending.rows.map(r=>summaryRow(r));
       const existing=readFollowups();const merged=new Map(existing.map(r=>[r.id,r]));
@@ -933,7 +935,7 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+document.title='Lecteur TP Élève — V234 Local';
 console.info('Lecteur TP V226 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
 /* V226 : accès autonome et suivi transportable sans TP. */
@@ -951,15 +953,54 @@ function readLocalWorks(){
  }}catch(_){}return out;
 }
 function readFollowups(){try{const a=JSON.parse(localStorage.getItem(FOLLOWUP_KEY)||'[]');return Array.isArray(a)?a:[]}catch(_){return[]}}
+// V233 : profils hors ligne identifiés par une empreinte de code et l'identité du TP.
+// Ne jamais conserver le code personnel en clair sur le poste partagé.
+const LOCAL_PROFILES_V233='tp_reader_student_profiles_v233';
+function knownProfilesV233(){try{const a=JSON.parse(localStorage.getItem(LOCAL_PROFILES_V233)||'[]');return Array.isArray(a)?a:[]}catch(_){return[]}}
+function registerProfileV233(d){
+  const a=d?.access||{};
+  if(!a.required||!a.hash||!a.salt||!currentStudent(d).nom)return;
+  try{
+    const item={studentId:currentStudent(d).id,eleve:{nom:currentStudent(d).nom,prenom:currentStudent(d).prenom},classe:currentStudent(d).classe,access:{required:true,salt:String(a.salt),hash:String(a.hash)},savedAt:new Date().toISOString()};
+    const all=knownProfilesV233();const id=identityKey(item);
+    const n=all.filter(x=>identityKey(x)!==id);n.push(item);
+    localStorage.setItem(LOCAL_PROFILES_V233,JSON.stringify(n.slice(-250)));
+  }catch(e){console.warn('V233 profil local non mémorisé',e)}
+}
+window.tpV233RegisterStudentProfile=registerProfileV233;
+
 async function availableRows(){return [...await readIndexedWorks(),...readStrictSnapshots(),...readLocalWorks(),...readFollowups()]}
 async function authenticateData(code){
  if(importedPending){if(!verifyData(importedPending.owner,code))throw Error('Code incorrect pour ce suivi.');return importedPending.owner}
- if(canAuthenticate()){if(!verify(code))throw Error('Code incorrect.');return window.model}
- const matches=(await availableRows()).filter(r=>verifyData(r.data,code));
- const identities=new Map(matches.map(r=>[identityKey(r.data),r.data]));
- if(!identities.size)throw Error('Code non reconnu sur cet appareil. À la maison, importe ton fichier « Mon suivi » exporté en classe.');
- if(identities.size>1)throw Error('Plusieurs élèves utilisent ce code sur cet appareil. Importe ton fichier personnel « Mon suivi » pour identifier ton espace.');
- return [...identities.values()][0];
+ // Le TP actif est prioritaire s'il correspond ; sinon rechercher les autres élèves
+ // sur ce même ordinateur plutôt que de refuser immédiatement le code.
+ const active=window.model;
+ if(active&&verifyData(active,code)){registerProfileV233(active);return active}
+ const pool=[...knownProfilesV233(),...(await availableRows()).map(r=>r.data).filter(Boolean)];
+ const matches=pool.filter(d=>verifyData(d,code));
+ // Même élève : les identifiants peuvent varier d'un TP à l'autre.
+ // Regrouper par identité civile normalisée, et non par studentId de diffusion.
+ const identities=new Map();
+ for(const d of matches){
+   const st=currentStudent(d);
+   const civil=[norm(st.nom),norm(st.prenom)].join('|');
+   const key=civil!=='|'?'personne|'+civil:identityKey(d);
+   const existing=identities.get(key);
+   if(!existing || (!existing.studentId && st.id))identities.set(key,d);
+ }
+ if(!identities.size)throw Error('Code non reconnu parmi les profils de cet ordinateur. Ouvre une première fois un TP personnel avec ton code, ou importe ton suivi.');
+ let d=[...identities.values()][0];
+ if(identities.size>1){
+   const options=[...identities.values()];
+   // En cas de codes identiques, aucun profil n'est choisi automatiquement.
+   const message='Plusieurs élèves utilisent ce code sur cet ordinateur.\nChoisis TON profil :\n'+options.map((x,i)=>{const st=currentStudent(x);return (i+1)+'. '+st.prenom+' '+st.nom+(st.classe?' — '+st.classe:'')}).join('\n')+'\n\nNuméro du profil :';
+   const selection=window.prompt(message,'');
+   if(selection===null)throw Error('Identification annulée.');
+   const index=Number(selection);
+   if(!Number.isInteger(index)||index<1||index>options.length)throw Error('Choix non valide. Réessaie en sélectionnant le numéro de ton profil.');
+   d=options[index-1];
+ }
+ registerProfileV233(d);return d;
 }
 function summaryRow(r){
  const d=r.data,s=currentStudent(d);
@@ -1512,7 +1553,43 @@ function nav(){const menu=document.querySelector('#v210Sidebar nav'),bar=documen
  if(display){for(const [id,tab] of [['v211NavRecords','records'],['v211NavHistory','history']]){const el=document.getElementById(id);if(!el||el.dataset.cloudNav2307)return;el.dataset.cloudNav2307='1';el.classList.remove('v211-nav-locked');el.querySelector('.v211-lock')?.remove();el.addEventListener('click',e=>{if(!window.tpCloudConnected4107g?.())return;e.preventDefault();e.stopImmediatePropagation();window.tpCloudOpenHistory4107g?.(tab)},true)}}
 }
 window.tpV2307Nav=nav;document.addEventListener('DOMContentLoaded',nav);setTimeout(nav,600);setTimeout(nav,1800);
-})();</script></body></html><style id="v8-symbols-always-visible">
+})();</script>
+<!-- V234 — commande explicite de fermeture du lecteur local -->
+<script id="tp-v234-close-reader">
+(function(){
+'use strict';
+function install(){
+ if(document.getElementById('tpV234CloseReader'))return;
+ const nav=document.querySelector('#v210Sidebar nav');
+ if(!nav)return;
+ const b=document.createElement('button');
+ b.type='button';b.id='tpV234CloseReader';b.className='v210-nav';
+ b.textContent='⏻ Quitter le lecteur';
+ b.title='Enregistrer le TP en attente puis fermer le lecteur';
+ b.addEventListener('click',async()=>{
+   if(b.disabled)return;
+   const active=document.body.classList.contains('tp-active-file')&&!document.body.classList.contains('submitted');
+   if(active){
+     if(typeof window.tpV130SaveWork!=='function'){alert('Sauvegarde locale indisponible : fermeture annulée.');return;}
+     b.disabled=true;
+     try{await window.tpV130SaveWork();}
+     catch(e){alert('Sauvegarde échouée : fermeture annulée. '+(e?.message||e));b.disabled=false;return;}
+     b.disabled=false;
+     if(!confirm('TP enregistré localement. Quitter maintenant ?'))return;
+     try{window.close()}catch(_){}
+     setTimeout(()=>{if(!window.closed)alert('TP enregistré. Le navigateur ne permet pas de fermer cet onglet automatiquement : ferme-le manuellement.');},100);
+     return;
+   }
+   if(!confirm('Quitter le lecteur TP local ?'))return;
+   try{window.close()}catch(_){}
+   setTimeout(()=>{if(!window.closed)alert('Le navigateur empêche la fermeture automatique. Tu peux maintenant fermer cet onglet.');},100);
+ });
+ nav.appendChild(b);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+})();
+</script>
+</body></html><style id="v8-symbols-always-visible">
 /* V214 — le panneau historique permanent est désactivé.
    Seule la pastille Ω (#tp13symbtn) reste visible en bas à droite. */
 #tpSymbolBtn,#tpSymbolPalette{display:none!important}
@@ -2176,7 +2253,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
    }catch(e){reject('Impossible de lire ce TP : '+(e?.message||e))}};r.readAsText(file,'utf-8')
  };
  const input=document.getElementById('fileInput');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.loadFile(f);e.target.value=''};
- document.title='Lecteur TP Élève — V230.5 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+ document.title='Lecteur TP Élève — V234 Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
  console.info('Lecteur V157 : verrou RENDU/CORRIGE + anti-réouverture actif.');
 })();
 </script>
@@ -2704,7 +2781,7 @@ if(typeof oldCollect==='function'){
 }
 
 function stamp(){
-  document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+  document.title='Lecteur TP Élève — V234 Local';
   const b=document.querySelector('.brand');
   if(b)b.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 }
@@ -2872,6 +2949,7 @@ function unlockAccess(){
  const h=window.tpReaderHash?window.tpReaderHash(String(a.salt||'')+'|'+c):'';
  if(h!==String(a.hash||'')){if(err)err.textContent='Code incorrect. Vérifie le code remis par ton professeur.';inp?.select();return}
  if(err)err.textContent='';
+ try{window.tpV233RegisterStudentProfile?.(model)}catch(e){console.warn('Profil V233',e)}
  const ov=document.getElementById('tpAccessOverlay');
  openFile(ov?.dataset.fileName||'',ov?.dataset.v205Readonly==='1');
 }
@@ -3017,7 +3095,7 @@ function settle(){
 }
 [0,120,500].forEach(ms=>setTimeout(settle,ms));
 
-document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+document.title='Lecteur TP Élève — V234 Local';
 const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
@@ -3388,7 +3466,7 @@ try{
   }
 }catch(_){}
 
-document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+document.title='Lecteur TP Élève — V234 Local';
 const brand206=document.querySelector('.brand');
 if(brand206)brand206.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 
@@ -3458,7 +3536,7 @@ body.v205-readonly #teacherUnlockBtn{
 
 <script id="reader-v208-stamp">
 (function(){
- document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+ document.title='Lecteur TP Élève — V234 Local';
  const b=document.querySelector('.brand');
  if(b)b.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
  console.info('Lecteur TP V209 : fidélité graphique éditeur V74, verrou strict V206/V207, date JJ-MM-AAAA et nouvelle charte compacte d’auto-évaluation.');
@@ -3843,7 +3921,7 @@ function installShell(){
       <button class="v210-nav v211-nav-locked" type="button" id="v211NavRecords">${svg('clock')}<span>Mes enregistrements</span><span class="v211-lock">🔒</span></button>
       <button class="v210-nav v211-nav-locked" type="button" id="v211NavHistory">${svg('folder')}<span>Historique</span><span class="v211-lock">🔒</span></button>
     </nav>
-    <div class="v210-side-bottom">Lecteur local V230.7 · Travail élève<br>Compatible éditeur V103</div>`;
+    <div class="v210-side-bottom">Lecteur local V233 · Travail élève<br>Compatible éditeur V103</div>`;
   document.body.insertBefore(side,document.body.firstChild);
 
   const head=document.createElement('header');
@@ -3941,7 +4019,7 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+document.title='Lecteur TP Élève — V234 Local';
 const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
