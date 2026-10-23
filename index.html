@@ -1363,7 +1363,8 @@ async function archive(why){
  const folder=state.includes('ATTENTE')?'03_TP_EN_ATTENTE':state==='RENDU'?'04_TP_RENDUS':state==='CORRIGE'?'05_TP_CORRIGES':'02_TP_EN_COURS';
  const dir=await directory(home,folder);
  const source=safe(data.cloud227?.id||data.code||data.tp?.id||'TP');
- const name=(folder==='03_TP_EN_ATTENTE'?[safe(data.eleve?.nom||data.identite?.nom||'ELEVE'),safe(data.eleve?.prenom||data.identite?.prenom||'INCONNU'),safe(data.code||data.tp?.id||'TP'),'EN_ATTENTE'].join('_'):[safe(data.code||data.tp?.id||'TP'),source].join('_'))+'.json';
+ const attempt=safe(data.submission?.attempt||data.submission?.round||data.revisionRendu||data.renduNumero||'R1');
+ const name=(folder==='03_TP_EN_ATTENTE'?[safe(data.eleve?.nom||data.identite?.nom||'ELEVE'),safe(data.eleve?.prenom||data.identite?.prenom||'INCONNU'),safe(data.code||data.tp?.id||'TP'),'EN_ATTENTE'].join('_'):[safe(data.code||data.tp?.id||'TP'),source,attempt,folder==='04_TP_RENDUS'?'RENDU':'EN_COURS'].join('_'))+'.json';
  const dataText=JSON.stringify(data,null,2);if(dataText===lastWritten&&Date.now()-lastAt<15000)return;
  const fh=await dir.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(dataText);await w.close();
  const check=await(await fh.getFile()).text();if(check!==dataText)throw Error('Vérification du fichier échouée.');
@@ -4182,3 +4183,13 @@ new MutationObserver(clean).observe(document.documentElement,{subtree:true,child
 
 <!-- TFAB lecteur autonome : les transferts sont exclusivement réalisés par clé USB. -->
 <style>#cloud227-launch,#cloud227-panel,#v211CloudLaunch,.cloud227-launch{display:none!important}</style>
+
+<style id="tfab-v232-clean">body #local230-nav,body #cloud227-launch,body #cloud227-panel,body #v211CloudLaunch,body #v2307Back,body #v2307Disconnect,body #v2306Disconnect{display:none!important}</style>
+<script id="tfab-v232-safe-save">(function(){
+'use strict';if(location.protocol!=='file:')return;
+// IndexedDB saving is mandatory; file-system export remains subject to granted browser folder permission.
+function save(){if(typeof window.tpV130SaveWork!=='function')throw Error('Sauvegarde locale indisponible');return window.tpV130SaveWork()}
+function bind(){const b=document.getElementById('pauseBtn');if(b&&!b.dataset.tfab232){b.dataset.tfab232='1';b.addEventListener('click',async e=>{try{await save()}catch(err){e.preventDefault();e.stopImmediatePropagation();alert('Sauvegarde NON confirmée : '+err.message)}},true)}
+const q=document.getElementById('quitBtn');if(q&&!q.dataset.tfab232){q.dataset.tfab232='1';q.addEventListener('click',async e=>{try{await save()}catch(err){e.preventDefault();e.stopImmediatePropagation();alert('Impossible de quitter : le travail n’a pas été sauvegardé. '+err.message)}},true)}}
+setTimeout(bind,100);setTimeout(bind,600);document.addEventListener('DOMContentLoaded',bind);
+})();</script>
