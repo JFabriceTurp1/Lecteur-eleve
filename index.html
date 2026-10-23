@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V228 Cloud / Local</title>
+<title>Lecteur TP Élève — V230.5 Cloud / Local</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -41,7 +41,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 <style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
 <style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style><style id="observation-style">.observation-answer{display:block;width:100%;box-sizing:border-box;min-height:80px;resize:vertical;padding:10px;border:1px solid #a9c8d8;border-radius:7px;line-height:1.5;font:inherit;white-space:pre-wrap}@media print{.observation-answer{resize:none;overflow:visible}}</style></head>
 <body>
-<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V228 Cloud / Local</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
+<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V230.5 Cloud / Local</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
 <div class="wrap">
 <div class="helper"><strong>Ouvrez votre fichier TP personnel pour commencer.</strong> Le TP reste verrouillé tant que le fichier et le code élève ne sont pas validés.</div>
 <div class="fileName" id="loadedName" style="display:none"></div>
@@ -73,6 +73,20 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 </section>
 </div>
 <div class="toast" id="toast"></div>
+<script id="tp-v230-11-quota-protection">
+/* Quota protection: no deletion, no silent false claim of a successful persistent save.
+   IndexedDB V130 remains the primary full-size store; localStorage is best effort only. */
+window.tpV230QuotaSafeSet=function(key,value){
+ try{localStorage.setItem(key,value);return true}
+ catch(e){
+   if(e?.name==='QuotaExceededError'||e?.name==='NS_ERROR_DOM_QUOTA_REACHED'||e?.code===22){
+     console.warn('[TP] localStorage plein; écriture volumineuse ignorée, IndexedDB conservé.',key);
+     return false;
+   }
+   throw e;
+ }
+};
+</script>
 <script>
 const DEMO={"schemaVersion": "1.0", "type": "tp-eleve", "code": "BACPRO-FREIN-010", "titre": "Remplacer plaquettes et contrôler les disques", "diplome": "BAC PRO", "specialite": "Maintenance des véhicules", "anneeScolaire": "2026-2027", "classe": "2MAC1", "professeur": "", "contexte": {"ressentiClient": "J'entends un bruit lorsque je freine et je voudrais faire contrôler les freins avant.", "mission": "Contrôler l'état du freinage, confirmer la nécessité d'intervention, remplacer les plaquettes si nécessaire et contrôler les disques."}, "ressources": ["[OBLIGATOIRE] OR ; RTA freinage ; valeurs d'usure.", "[PROPOSÉ] Procédure repousse-piston.", "[OPTIONNEL] Outil diagnostic pour frein électrique si concerné."], "competences": [{"code": "C2.1", "libelle": "Préparer une intervention corrective"}, {"code": "C2.2", "libelle": "Réaliser le remplacement ou la réparation des composants"}, {"code": "C2.4", "libelle": "Réaliser le contrôle qualité d'une intervention corrective"}], "objectifs": ["Diagnostiquer correctement l'usure", "Choisir les pièces adaptées", "Respecter le montage et les couples de serrage", "Remettre le système de freinage en état", "Réaliser le contrôle final"], "donneesTechniquesAttendus": "Épaisseur mini disque ; épaisseur garniture ; couples ; procédure ; type de pièces.", "risquesAttendus": "Véhicule levé ; poussières ; pincement ; liquide de frein ; frein de stationnement.", "dechetsAttendus": "Plaquettes usagées ; emballages ; produits de nettoyage selon filière.", "vehicule": {"marque": "", "modele": "", "immatriculation": "", "annee": "", "motorisation": "", "kilometrage": ""}, "eleve": {"nom": "", "prenom": "", "date": ""}, "reponses": {"travailDemande": "", "donneesTechniques": "", "preparationRisques": "", "controles": [{"controle": "", "valeur": "", "reference": "", "conclusion": ""}, {"controle": "", "valeur": "", "reference": "", "conclusion": ""}, {"controle": "", "valeur": "", "reference": "", "conclusion": ""}, {"controle": "", "valeur": "", "reference": "", "conclusion": ""}], "dechets": [{"type": "", "filiere": ""}, {"type": "", "filiere": ""}, {"type": "", "filiere": ""}], "bilanEleve": ""}, "professeurZone": {"appreciation": "", "evaluation": []}};
 let model=structuredClone(DEMO);
@@ -84,12 +98,12 @@ function renderControls(){let arr=model.reponses?.controles||[];const tpl=model.
 function renderWastes(){let arr=model.reponses?.dechets||[];while(arr.length<3)arr.push({type:'',filiere:''});$('wastes').innerHTML=arr.slice(0,3).map((r,i)=>`<tr><td><input data-waste="${i}" data-key="type" value="${escapeAttr(r.type||'')}"></td><td><input data-waste="${i}" data-key="filiere" value="${escapeAttr(r.filiere||'')}"></td></tr>`).join('')}
 function renderEval(){$('evalRows').innerHTML=(model.competences||[]).map(c=>`<tr><td><b>${escapeHtml(c.code)}</b> — ${escapeHtml(c.libelle)}</td><td class="center"></td><td class="center"></td><td class="center"></td><td class="center"></td><td></td></tr>`).join('')}
 function collect(){model.eleve={nom:$('nom').value.trim(),prenom:$('prenom').value.trim(),date:$('date').value};model.classe=$('classe').value.trim();model.vehicule={marque:$('veh_marque').value.trim(),modele:$('veh_modele').value.trim(),immatriculation:$('veh_immat').value.trim(),annee:$('veh_annee').value.trim(),motorisation:$('veh_mot').value.trim(),kilometrage:$('veh_km').value.trim()};model.reponses=model.reponses||{};model.reponses.travailDemande=$('travail').value;model.reponses.donneesTechniques=$('tech').value;model.reponses.preparationRisques=$('risks').value;model.reponses.bilanEleve=$('bilan').value;document.querySelectorAll('[data-control]').forEach(el=>{const i=+el.dataset.control;model.reponses.controles[i]=model.reponses.controles[i]||{};model.reponses.controles[i][el.dataset.key]=el.value});document.querySelectorAll('[data-waste]').forEach(el=>{const i=+el.dataset.waste;model.reponses.dechets[i]=model.reponses.dechets[i]||{};model.reponses.dechets[i][el.dataset.key]=el.value});model.lastSavedAt=new Date().toISOString();return model}
-function saveWork(){collect();const safe=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').replace(/^_+|_+$/g,'');const name=[model.code,safe(model.classe),safe(model.eleve.nom||'ELEVE'),safe(model.eleve.prenom||'')].filter(Boolean).join('_')+'_TRAVAIL.tp';const blob=new Blob([JSON.stringify(model,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),500);localStorage.setItem('tp_eleve_autosave',JSON.stringify(model));toast('Travail enregistré dans un fichier .tp')}
+function saveWork(){collect();const safe=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').replace(/^_+|_+$/g,'');const name=[model.code,safe(model.classe),safe(model.eleve.nom||'ELEVE'),safe(model.eleve.prenom||'')].filter(Boolean).join('_')+'_TRAVAIL.tp';const blob=new Blob([JSON.stringify(model,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),500);window.tpV230QuotaSafeSet('tp_eleve_autosave',JSON.stringify(model));toast('Travail enregistré dans un fichier .tp')}
 function loadFile(file){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.code||!d.titre)throw new Error('Format TP invalide');model=d;model.eleve=model.eleve||{};model.vehicule=model.vehicule||{};model.reponses=model.reponses||{};model.reponses.controles=model.reponses.controles||[];model.reponses.dechets=model.reponses.dechets||[];render();$('loadedName').textContent='Fichier chargé : '+file.name;toast('TP chargé')}catch(e){alert('Impossible de charger ce fichier : '+e.message)}};r.readAsText(file,'utf-8')}
 function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function escapeAttr(s){return escapeHtml(s).replace(/'/g,'&#39;')}
 $('loadBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{if(e.target.files[0])loadFile(e.target.files[0]);e.target.value=''};$('saveBtn').onclick=saveWork;$('printBtn').onclick=()=>{collect();window.print()};
-setInterval(()=>{try{collect();localStorage.setItem('tp_eleve_autosave',JSON.stringify(model))}catch(e){}},15000);
+setInterval(()=>{try{collect();window.tpV230QuotaSafeSet('tp_eleve_autosave',JSON.stringify(model))}catch(e){}},15000);
 render();
 </script>
 <!-- V23 — commandes PDF et dossier rendues volontairement discrètes -->
@@ -375,7 +389,7 @@ textarea.tp-auto,input.tp-auto{overflow:hidden;resize:none;min-height:42px}.tp-s
   function isSubmitted(){return localStorage.getItem(submittedKey())==='1'||model?.submission?.final===true}
   function applySubmitted(){const yes=isSubmitted();document.body.classList.toggle('submitted',yes);document.querySelectorAll('.wrap input,.wrap textarea,.wrap select').forEach(el=>{if(el.id!=='tpAccessCode')el.disabled=yes||el.disabled});updateIdentity()}
   const oldRender=window.render||render;window.render=function(){oldRender();updateIdentity();applySubmitted()};
-  function pauseSave(){if(isSubmitted())return alert('Cette copie a déjà été rendue.');collect();localStorage.setItem(workKey(),JSON.stringify(model));toast('Pause enregistrée sur cet ordinateur. Tu pourras reprendre ce TP plus tard.')}
+  async function pauseSave(){if(isSubmitted())return alert('Cette copie a déjà été rendue.');collect();try{await window.tpV130SaveWork?.();window.tpV230QuotaSafeSet(workKey(),JSON.stringify(model));toast('Pause enregistrée sur cet ordinateur. Tu pourras reprendre ce TP plus tard.')}catch(e){alert('Sauvegarde non confirmée : '+e.message)}}
   pause.onclick=pauseSave;
   // IndexedDB : mémorise le dossier de remise choisi par le professeur/utilisateur du poste.
   function db(){return new Promise((res,rej)=>{const q=indexedDB.open('tp_reader_v17',1);q.onupgradeneeded=()=>q.result.createObjectStore('settings');q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
@@ -393,7 +407,7 @@ textarea.tp-auto,input.tp-auto{overflow:hidden;resize:none;min-height:42px}.tp-s
     try{const h=await writableHandle();if(h){const fh=await h.getFileHandle(filename,{create:true}),w=await fh.createWritable();await w.write(new Blob([text],{type:'application/json;charset=utf-8'}));await w.close();written=true}}
     catch(e){console.warn('Dossier de remise indisponible',e)}
     if(!written){const blob=new Blob([text],{type:'application/json;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),600)}
-    localStorage.setItem(workKey(),text);localStorage.setItem(submittedKey(),'1');applySubmitted();toast(written?'Copie rendue dans le dossier prévu.':'Copie rendue et fichier JSON téléchargé.');
+    window.tpV230QuotaSafeSet(workKey(),text);localStorage.setItem(submittedKey(),'1');applySubmitted();toast(written?'Copie rendue dans le dossier prévu.':'Copie rendue et fichier JSON téléchargé.');
   }
   save.onclick=submit;
   // À l'ouverture : restaure une pause existante pour ce TP, après déverrouillage.
@@ -429,7 +443,7 @@ textarea.tp-auto,input.tp-auto{overflow:hidden;resize:none;min-height:42px}.tp-s
   }
   const observer=new MutationObserver(()=>{if(document.getElementById('tpAccessOverlay')?.style.display==='none')setTimeout(tryRestore,80)});observer.observe(document.body,{attributes:true,subtree:true,attributeFilter:['style']});
   // Autosave silencieux par TP (sans fichier JSON) ; ne modifie jamais une copie rendue.
-  setInterval(()=>{try{if(!isSubmitted()){collect();localStorage.setItem(workKey(),JSON.stringify(model))}}catch(e){}},15000);
+  setInterval(()=>{try{if(!isSubmitted()){collect();window.tpV230QuotaSafeSet(workKey(),JSON.stringify(model))}}catch(e){}},15000);
   setTimeout(async()=>{try{const h=await getHandle();if(h)folder.textContent='📁 '+h.name}catch(e){}updateIdentity()},250);
 })();
 </script>
@@ -457,7 +471,7 @@ textarea.tp-auto,input.tp-auto{overflow:hidden;resize:none;min-height:42px}.tp-s
     model.submission=model.submission||{};model.submission.unlockedAt=new Date().toISOString();model.submission.unlockedByTeacher=true;
     localStorage.removeItem(submittedKey18());
     document.body.classList.remove('submitted');unlockInputs();
-    try{localStorage.setItem(workKey18(),JSON.stringify(model))}catch(e){}
+    try{window.tpV230QuotaSafeSet(workKey18(),JSON.stringify(model))}catch(e){}
     if(typeof render==='function')render();document.body.classList.remove('submitted');unlockInputs();
     if(typeof toast==='function')toast('Copie déverrouillée par le professeur. L’élève peut reprendre son travail.');
   };
@@ -550,7 +564,7 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  window.loadFile=function(file){lock();const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));const p=projectFrom(d);if(!p)throw Error('Ce fichier ne contient pas le projet evaluation.tp.v1 attendu.');model=d;window.model=model;try{localStorage.removeItem('tp_reader_last_submission')}catch(_){}access(file.name)}catch(e){console.error('V127 load',e);alert('Impossible de charger ce TP : '+(e?.message||e));lock()}};r.readAsText(file,'utf-8')};
  const input=document.getElementById('fileInput');if(input){input.onchange=function(e){const f=e.target.files&&e.target.files[0];if(f)window.loadFile(f);e.target.value=''}}
  const btn=document.getElementById('tpAccessBtn'),inp=document.getElementById('tpAccessCode');if(btn)btn.onclick=unlock;if(inp){inp.oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();unlock()}}}
- document.title='Lecteur TP Élève — V228 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
+ document.title='Lecteur TP Élève — V230.5 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
 })();
 </script>
 
@@ -919,7 +933,7 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V228 Cloud / Local';
+document.title='Lecteur TP Élève — V230.5 Cloud / Local';
 console.info('Lecteur TP V226 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
 /* V226 : accès autonome et suivi transportable sans TP. */
@@ -1257,6 +1271,246 @@ console.info('Lecteur TP V226 : ouverture automatique compatible utilitaire doub
   if(!waiting&&el)el.remove();
  }
  setInterval(check,1500);document.addEventListener('tp-reader-rendered',check);
+})();</script><style id="local230-style">
+/* V230.1 : une fenêtre centrée dans la couche supérieure remplace la pastille flottante masquée. */
+#local230-modal{width:min(580px,calc(100vw - 24px));max-width:580px;max-height:calc(100dvh - 24px);overflow-y:auto;overflow-x:hidden;box-sizing:border-box;border:2px solid #206e9e;border-radius:18px;padding:0;box-shadow:0 22px 72px #081e4073;background:#fff;color:#173b55;font:14px/1.5 system-ui,Arial,sans-serif;overscroll-behavior:contain;z-index:2147483647}
+#local230-modal::backdrop{background:rgba(15,35,55,.68);backdrop-filter:blur(2px)}
+#local230-modal:not([open]){display:none!important}
+#local230-modal .local230-head{background:#eaf5fd;border-bottom:1px solid #c1d9e9;padding:19px 22px 14px}
+#local230-modal h2{font-size:21px;line-height:1.25;margin:0 0 6px;color:#124b74;font-weight:850}
+#local230-modal .local230-body{padding:16px 22px 20px}
+#local230-modal p{margin:0 0 11px}
+#local230-modal .local230-folder{background:#f1f6fa;border:1px solid #bfd4e3;border-radius:9px;padding:10px 12px;margin:11px 0;font-weight:800;overflow-wrap:anywhere}
+#local230-modal .local230-buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+#local230-modal button{border:1px solid #b4cbd9;border-radius:9px;background:white;color:#185478;font:700 14px system-ui,Arial,sans-serif;padding:11px 13px;cursor:pointer;min-height:44px;max-width:100%;white-space:normal}
+#local230-modal #local230-choose{background:#156caa;border-color:#156caa;color:white;flex:1 1 235px}
+#local230-modal #local230-later{background:#f2f5f8;color:#405c6d}
+#local230-modal button:disabled{opacity:.5;cursor:not-allowed}#local230-modal button:focus-visible,#local230-nav:focus-visible{outline:3px solid #eda521;outline-offset:2px}
+#local230-status{font-weight:700;color:#205c7f;padding-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+#local230-status[data-state="error"]{color:#a43f20}
+#local230-status[data-state="success"]{color:#167345}
+#local230-nav{display:flex!important;width:100%;align-items:center;gap:7px;text-align:left;min-height:42px;white-space:normal}
+#local230-nav.local230-attention{color:#9a4c11!important;font-weight:800}
+#local230-nav.local230-ready{color:#176b47!important}
+@media(max-width:520px){#local230-modal{width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}#local230-modal .local230-head{padding:15px 14px 12px}#local230-modal .local230-body{padding:14px}#local230-modal h2{font-size:19px}#local230-modal .local230-buttons{flex-direction:column}#local230-modal .local230-buttons button{width:100%;flex:0 0 auto;min-height:44px}#local230-modal #local230-choose{flex:0 0 auto}}
+@media print{#local230-modal,#local230-nav{display:none!important}}
+</style>
+<script id="local-v230-folders">(function(){'use strict';
+// V230.2 — choix volontaire une seule fois ; si permission expire, rappel discret dans le menu gauche.
+if(location.protocol!=='file:')return;
+const canPick=typeof window.showDirectoryPicker==='function';
+const modal=document.createElement('dialog');modal.id='local230-modal';modal.setAttribute('aria-labelledby','local230-title');
+modal.innerHTML='<div class="local230-head"><h2 id="local230-title">💾 Activation de la sauvegarde locale</h2><p>Une seule autorisation est nécessaire pour ranger automatiquement tes TP dans les dossiers prévus.</p></div><div class="local230-body"><p><b>Choisis le dossier parent créé par l’installation :</b></p><div class="local230-folder">Documents ⟶ ATELIER_TP</div><p>Le lecteur enregistrera ensuite tes TP dans les dossiers <b>EN COURS</b>, <b>EN ATTENTE</b> et <b>RENDUS</b>, afin de faciliter la récupération de ton travail.</p><p id="local230-status" role="status" aria-live="polite">Vérification de l’autorisation…</p><div class="local230-buttons"><button id="local230-choose" type="button">📁 Activer la sauvegarde</button><button id="local230-check" type="button">Vérifier</button><button id="local230-later" type="button">Plus tard</button></div><p style="font-size:12px;color:#516b7f;margin:12px 0 0">Si tu choisis « Plus tard », le travail reste possible, mais la sauvegarde automatique dans les dossiers Windows n’est pas activée. Tu pourras revenir ici depuis le menu gauche.</p></div>';
+document.body.append(modal);
+const nav=document.createElement('button');nav.id='local230-nav';nav.type='button';nav.className='v210-nav local230-attention';nav.textContent='💾 Activer la sauvegarde';nav.title='Ouvrir le réglage de sauvegarde locale';
+const statusEl=modal.querySelector('#local230-status');
+let rootHandle=null,lastWritten='',lastAt=0,hasMounted=false;
+function msg(s,state='info'){
+ statusEl.textContent=s;statusEl.dataset.state=state;
+ nav.title=s;
+ if(state==='error'){nav.textContent='⚠ Sauvegarde locale';nav.classList.add('local230-attention');nav.classList.remove('local230-ready')}
+}
+function navState(ok){nav.textContent=ok?'✓ Sauvegarde locale':'💾 Activer la sauvegarde';nav.classList.toggle('local230-ready',ok);nav.classList.toggle('local230-attention',!ok)}
+function mountNav(){const area=document.querySelector('#v210Sidebar nav');if(!area)return false;if(nav.parentElement!==area)area.appendChild(nav);hasMounted=true;return true}
+if(!mountNav()){
+ const obs=new MutationObserver(()=>{if(mountNav())obs.disconnect()});obs.observe(document.body,{childList:true,subtree:true});
+ document.addEventListener('DOMContentLoaded',mountNav,{once:true});setTimeout(mountNav,800);
+}
+function openModal(){if(!modal.open){try{modal.showModal()}catch(e){msg('Impossible d’ouvrir la fenêtre : '+e.message,'error')}}}
+function closeModal(){if(modal.open)modal.close()}
+nav.addEventListener('click',openModal);
+modal.querySelector('#local230-later').addEventListener('click',()=>{try{localStorage.setItem('atelierv230_storage_dialog_seen','1')}catch(_){};closeModal();if(!rootHandle)navState(false)});
+modal.addEventListener('cancel',()=>{if(!rootHandle)navState(false)});
+const DB='atelierv230',STORE='settings';
+function db(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE)};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function setting(load,value){const d=await db();return new Promise((resolve,reject)=>{const t=d.transaction(STORE,load?'readonly':'readwrite'),s=t.objectStore(STORE),r=load?s.get('handle'):s.put(value,'handle');r.onsuccess=()=>resolve(load?r.result:true);r.onerror=()=>reject(r.error);t.oncomplete=()=>d.close()})}
+async function permission(h,request=false){if(!h)return false;let p=await h.queryPermission({mode:'readwrite'});if(p!=='granted'&&request)p=await h.requestPermission({mode:'readwrite'});return p==='granted'}
+async function pick(){
+ if(!canPick){msg('Ce navigateur ne permet pas la sauvegarde directe. Utilise Chrome ou Edge récent, puis relance le lecteur local.','error');return}
+ try{
+  const h=await window.showDirectoryPicker({mode:'readwrite',id:'atelier-tp'});
+  if(h.name.toUpperCase()!=='ATELIER_TP'){msg('Mauvais dossier : sélectionne précisément Documents ⟶ ATELIER_TP, sans ouvrir le sous-dossier de l’élève.','error');return}
+  if(!await permission(h,true))throw Error('Autorisation refusée par le navigateur.');
+  rootHandle=h;try{localStorage.setItem('atelierv230_storage_dialog_seen','1')}catch(_){};try{await setting(false,h)}catch(e){msg('Dossier autorisé pour cette session, mais l’autorisation ne pourra peut-être pas être retrouvée au prochain lancement : '+e.message,'error')}
+  if(statusEl.dataset.state!=='error')msg('✓ Dossier ATELIER_TP activé : sauvegarde locale automatique prête.','success');
+  navState(true);
+  try{await archive('selected')}catch(e){msg('Dossier activé, mais l’enregistrement du TP courant a échoué : '+e.message,'error')}
+  if(statusEl.dataset.state!=='error')closeModal();
+ }catch(e){msg(e?.name==='AbortError'?'Sélection annulée : la sauvegarde locale n’est pas encore activée.':'Impossible d’activer le dossier : '+(e?.message||e),'error')}
+}
+modal.querySelector('#local230-choose').addEventListener('click',pick);
+modal.querySelector('#local230-check').addEventListener('click',async()=>{
+ try{
+  if(!rootHandle)rootHandle=await setting(true);
+  if(!await permission(rootHandle,true)){msg('Dossier non autorisé. Clique sur Activer la sauvegarde.','error');navState(false);return}
+  const id=window.model?.cloud227?.userId||window.model?.studentId;
+  if(!id){msg('✓ Dossier autorisé. Ouvre un TP pour contrôler les fichiers.','success');navState(true);return}
+  const home=await rootHandle.getDirectoryHandle('Eleve_'+String(id));let count=0;
+  for await(const [name,entry] of(await home.getDirectoryHandle('03_TP_EN_ATTENTE')).entries())if(entry.kind==='file'&&name.endsWith('.json'))count++;
+  try{const fh=await home.getFileHandle('statut_synchronisation.json'),state=JSON.parse(await(await fh.getFile()).text());msg('Copies en attente : '+count+' · '+(state.message||state.etat||'Synchronisation à vérifier'),'success')}
+  catch{msg('Copies en attente : '+count+' · utilise le raccourci « Synchroniser mes TP » si besoin.','success')}
+  navState(true);
+ }catch(e){msg('Contrôle impossible : '+e.message,'error')}
+});
+async function directory(root,name){return await root.getDirectoryHandle(name,{create:true})}
+function safe(s){return String(s||'TP').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9_-]/g,'_').slice(0,60)}
+async function archive(why){
+ const data=window.model;if(!data||(!data.code&&!data.tp?.id))return;
+ if(!rootHandle||!await permission(rootHandle))return;
+ const id=data.cloud227?.userId||data.studentId||'LOCAL';
+ const home=await directory(rootHandle,'Eleve_'+safe(id));
+ const state=String(data.submission?.final?'RENDU':data.transmission?.etat||data.status||'').toUpperCase();
+ const folder=state.includes('ATTENTE')?'03_TP_EN_ATTENTE':state==='RENDU'?'04_TP_RENDUS':state==='CORRIGE'?'05_TP_CORRIGES':'02_TP_EN_COURS';
+ const dir=await directory(home,folder);
+ const source=safe(data.cloud227?.id||data.code||data.tp?.id||'TP');
+ const name=(folder==='03_TP_EN_ATTENTE'?[safe(data.eleve?.nom||data.identite?.nom||'ELEVE'),safe(data.eleve?.prenom||data.identite?.prenom||'INCONNU'),safe(data.code||data.tp?.id||'TP'),'EN_ATTENTE'].join('_'):[safe(data.code||data.tp?.id||'TP'),source].join('_'))+'.json';
+ const dataText=JSON.stringify(data,null,2);if(dataText===lastWritten&&Date.now()-lastAt<15000)return;
+ const fh=await dir.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(dataText);await w.close();
+ const check=await(await fh.getFile()).text();if(check!==dataText)throw Error('Vérification du fichier échouée.');
+ lastWritten=dataText;lastAt=Date.now();
+ msg(folder==='03_TP_EN_ATTENTE'?'⚠ Copie non rendue : fichier conservé dans 03_TP_EN_ATTENTE. Internet requis pour l’envoi.':'✓ Travail sauvegardé : '+folder+' / '+name,folder==='03_TP_EN_ATTENTE'?'error':'success');
+}
+function hookSave(){if(typeof window.tpV130SaveWork!=='function'||window.tpV130SaveWork.__local230)return;
+ const old=window.tpV130SaveWork;const wrapped=async function(...args){const result=await old.apply(this,args);try{await archive('save')}catch(e){msg('⚠ Échec de sauvegarde dans le dossier : '+e.message,'error')}return result};wrapped.__local230=true;window.tpV130SaveWork=wrapped}
+setInterval(hookSave,12000);setTimeout(hookSave,500);
+(async()=>{
+ if(!canPick){modal.querySelector('#local230-choose').disabled=true;msg('Sauvegarde directe non disponible. Le module Windows conserve sa propre synchronisation ; export JSON manuel possible.','error');if(!localStorage.getItem('atelierv230_storage_dialog_seen'))openModal();return}
+ try{
+  rootHandle=await setting(true);
+  if(rootHandle&&await permission(rootHandle)){
+   msg('✓ Dossier local prêt : '+rootHandle.name,'success');navState(true);return;
+  }
+  rootHandle=null;msg('Permission Windows non active. Clique dans le menu gauche pour la renouveler si tu souhaites sauvegarder depuis le navigateur.');navState(false);if(!localStorage.getItem('atelierv230_storage_dialog_seen'))openModal();
+ }catch(e){rootHandle=null;msg('Sauvegarde navigateur non disponible. Clique dans le menu gauche pour configurer si nécessaire.');navState(false);if(!localStorage.getItem('atelierv230_storage_dialog_seen'))openModal()}
+})();
+})();</script>
+<style id="reader-v2305-signature-style">
+body.reader-theme-v210 #signBtn{display:none}
+body.reader-theme-v210.v230-signature-available #signBtn{display:inline-flex!important}
+body.reader-theme-v210 #signBtn{background:#eef7ff!important;color:#0a65b8!important;border-color:#bcd8f6!important}
+#v230SignatureModal{width:min(620px,calc(100vw - 24px));max-width:620px;border:1px solid #cddceb;border-radius:18px;padding:0;box-shadow:0 24px 70px rgba(15,36,67,.25)}
+#v230SignatureModal::backdrop{background:rgba(15,36,67,.48)}
+#v230SignatureModal .v230-sign-head{padding:18px 20px 10px;border-bottom:1px solid #dfebf5;background:#f8fbff}
+#v230SignatureModal h2{margin:0;color:#0b2d56;font-size:22px}
+#v230SignatureModal p{margin:6px 0 0;color:#647b95;font-size:13px;line-height:1.45}
+#v230SignatureModal .v230-sign-body{padding:16px 20px 18px}
+#v230SignatureCanvas{display:block;width:100%;height:220px;border:2px dashed #9fc0df;border-radius:12px;background:#fff;touch-action:none;cursor:crosshair}
+#v230SignatureInfo{margin-top:10px;font-size:12px;color:#627889}
+#v230SignatureModal .v230-sign-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:9px;margin-top:14px}
+#v230SignatureModal button{border:1px solid #c4d6e6;border-radius:9px;background:#fff;color:#183b63;padding:10px 14px;font-weight:800;cursor:pointer;min-height:42px}
+#v230SignatureSave{background:linear-gradient(180deg,#1685ff,#0672f2);border-color:#0672f2!important;color:#fff!important}
+#v117ProjectHost .or-fill.v230-signature-target{position:relative;overflow:hidden}
+#v117ProjectHost .or-fill.v230-signature-target.has-signature>input,
+#v117ProjectHost .or-fill.v230-signature-target.has-signature>textarea{opacity:0!important;pointer-events:none!important}
+#v117ProjectHost .v230-sign-preview-wrap{position:absolute;inset:0;background:#fff;display:flex;align-items:center;justify-content:center;padding:2px}
+#v117ProjectHost .v230-sign-preview{max-width:100%;max-height:100%;object-fit:contain;display:block}
+#v117ProjectHost .v230-sign-clear{position:absolute;right:4px;bottom:4px;border:1px solid #c4d6e6;border-radius:8px;background:rgba(255,255,255,.96);color:#174677;padding:3px 8px;font-size:10px;font-weight:800;cursor:pointer}
+#v117ProjectHost .or-print-value img.v230-sign-print{width:100%;height:100%;object-fit:contain;display:block}
+@media(max-width:700px){
+  #v230SignatureCanvas{height:180px}
+  #v230SignatureModal .v230-sign-body{padding:12px 14px 14px}
+}
+</style>
+<script id="reader-v2307-signature-runtime">
+(function(){
+'use strict';
+const FIELD_RE=/signatur/i;
+const KEY='__signature_OR_bas_droite__';
+let active=null, dialog=null, drawn=false;
+function project(){let p=window.model?.tpProject||window.model?.sourceProject||window.model?.project||window.model?.projet;return p?.schema==='evaluation.tp.v1'&&p.data?p.data:p}
+function bags(){const d=window.model;if(!d)return null;return (d.reponses??={}).v117??={}}
+function orBlocks(){return (project()?.tableBlocks||[]).filter(b=>b.orTemplate?.pages?.length&&b.orTemplate?.items)}
+function placements(){return [...document.querySelectorAll('#v117ProjectHost .or-block')].map((section,i)=>({section,block:orBlocks()[i]})).filter(x=>x.block&&x.section.querySelector('.or-page'))}
+function findTargets(){
+ return placements().map(({section,block})=>{
+  const pages=[...section.querySelectorAll('.or-page')];const fields=[...section.querySelectorAll('[data-v217-or]')];
+  // Prendre uniquement la zone en bas à droite de la DERNIÈRE page de l'OR.
+  const page=pages.at(-1);let match=null;
+  for(const el of fields){if(!page.contains(el)||!FIELD_RE.test(el.getAttribute('aria-label')||''))continue;
+    const box=el.closest('.or-fill'),x=parseFloat(box?.style.left||0),y=parseFloat(box?.style.top||0);
+    if(x>=50&&y>=55){match=el;break}
+  }
+  return {section,block,page,field:match};
+ });
+}
+function getVal(target){const b=bags();if(!b)return '';if(target.field)return target.field.value||b[target.block.id]?.[target.field.dataset.field]||'';return b[target.block.id]?.[KEY]||''}
+function setVal(target,val){const b=bags();if(!b)return;const rec=b[target.block.id]&&typeof b[target.block.id]==='object'&&!Array.isArray(b[target.block.id])?b[target.block.id]:(b[target.block.id]={});
+ if(target.field){target.field.value=val;rec[target.field.dataset.field]=val;target.field.dispatchEvent(new Event('input',{bubbles:true}));}
+ else rec[KEY]=val;
+}
+function updateView(){
+ const targets=findTargets();
+ for(const t of targets){
+  t.page.querySelectorAll('.v2307-signature-on-or').forEach(x=>x.remove());
+  const val=getVal(t);if(!/^data:image\/png;base64,/.test(val))continue;
+  const overlay=document.createElement('div');overlay.className='v2307-signature-on-or';
+  if(t.field){const box=t.field.closest('.or-fill');const pageRect=t.page.getBoundingClientRect(),r=box.getBoundingClientRect();
+   overlay.style.left=(r.left-pageRect.left)/pageRect.width*100+'%';overlay.style.top=(r.top-pageRect.top)/pageRect.height*100+'%';overlay.style.width=r.width/pageRect.width*100+'%';overlay.style.height=r.height/pageRect.height*100+'%';}
+  else{overlay.style.cssText='right:3%;bottom:2.5%;width:30%;height:10%'}
+  const img=document.createElement('img');img.alt='Signature de l’ordre de réparation';img.src=val;overlay.append(img);
+  if(!document.body.classList.contains('v205-readonly')&&!window.model?.submission?.final){const clear=document.createElement('button');clear.type='button';clear.textContent='Effacer';clear.className='v2307-signature-erase';clear.onclick=e=>{e.preventDefault();setVal(t,'');updateView()};overlay.append(clear)}
+  t.page.append(overlay);
+  if(t.field){t.field.classList.toggle('v2307-hidden-field',true);}
+ }
+ const allowed=targets.length>0&&!document.body.classList.contains('v205-readonly')&&!window.model?.submission?.final;
+ const b=document.getElementById('signBtn');if(b){b.disabled=!allowed;b.title=allowed?'Signer en bas à droite de l’OR':'Signature disponible uniquement sur un OR modifiable';b.style.display=allowed?'inline-flex':'none'}
+ document.body.classList.toggle('v230-signature-available',allowed);
+}
+function modal(){if(dialog)return dialog;dialog=document.createElement('dialog');dialog.id='v230SignatureModal';
+ dialog.innerHTML=`<div class="v230-sign-head"><h2>Signature de l’OR</h2><p>La signature sera placée exclusivement en bas à droite de l’ordre de réparation.</p></div><div class="v230-sign-body"><canvas id="v230SignatureCanvas" width="1100" height="420"></canvas><div class="v230-sign-actions"><button type="button" id="v230SignatureClear">Effacer</button><button type="button" id="v230SignatureCancel">Annuler</button><button type="button" id="v230SignatureSave">Valider et apposer la signature</button></div></div>`;
+ document.body.append(dialog);const canvas=dialog.querySelector('canvas'),ctx=canvas.getContext('2d');ctx.lineWidth=3.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#15384a';let drawing=false;
+ function pos(e){const r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height]}
+ canvas.addEventListener('pointerdown',e=>{e.preventDefault();canvas.setPointerCapture(e.pointerId);const [x,y]=pos(e);drawing=true;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+.1,y+.1);ctx.stroke();drawn=true});
+ canvas.addEventListener('pointermove',e=>{if(!drawing)return;e.preventDefault();const [x,y]=pos(e);ctx.lineTo(x,y);ctx.stroke();drawn=true});
+ for(const evt of ['pointerup','pointercancel'])canvas.addEventListener(evt,()=>drawing=false);
+ function erase(){ctx.clearRect(0,0,canvas.width,canvas.height);drawn=false}
+ dialog.querySelector('#v230SignatureClear').onclick=erase;dialog.querySelector('#v230SignatureCancel').onclick=()=>dialog.close();
+ dialog.querySelector('#v230SignatureSave').onclick=()=>{if(!drawn){alert('Signe d’abord dans la zone blanche.');return}if(!active){dialog.close();return}setVal(active,canvas.toDataURL('image/png'));dialog.close();updateView();};
+ dialog.addEventListener('close',erase);dialog.__erase=erase;return dialog;
+}
+window.tpV230OpenSignature=()=>{active=findTargets()[0];if(!active)return;const d=modal();d.__erase();d.showModal()};
+window.tpV230RefreshSignatureUi=updateView;
+// Une mise à jour par rendu, aucune reconstitution d'images pendant la frappe.
+const prior=window.tpV117RenderProject;
+if(typeof prior==='function'&&!prior.__v2307){const wrapped=function(...args){const ret=prior.apply(this,args);setTimeout(updateView,30);return ret};wrapped.__v2307=true;window.tpV117RenderProject=wrapped}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(updateView,350));else setTimeout(updateView,350);
+})();
+</script><style id="reader-v2306-fixes">
+#v230SignatureSave{background:#0875ec!important;color:#fff!important;border-color:#0875ec!important;opacity:1!important;min-width:175px}
+#v230SignatureSave::after{content:""}
+#v230SignatureModal .v230-sign-actions button{color:#173b55!important;background:#fff!important}
+#v230SignatureModal .v230-sign-actions #v230SignatureSave{color:#fff!important;background:#0875ec!important}
+#tpV2306ImageView{width:min(98vw,1250px);max-height:96dvh;border:none;border-radius:12px;padding:12px;background:#fff}
+#tpV2306ImageView::backdrop{background:rgba(0,0,0,.8)}
+#tpV2306ImageView img{display:block;max-width:100%;max-height:84dvh;margin:auto;object-fit:contain}
+#tpV2306ImageView button{display:block;margin:0 0 8px auto;background:#193c65;color:#fff;padding:9px 14px;border:none;border-radius:9px;cursor:pointer}
+#v117ProjectHost img:not(.block-picto):not(.v230-sign-preview):not(.v230-sign-print){cursor:zoom-in}
+#v210Sidebar #v2306Disconnect{border:1px solid #e0c5c5;color:#973c3c;margin-top:12px}
+</style><style id="reader-v2307-css">
+#v117ProjectHost .v2307-signature-on-or{position:absolute;z-index:15;background:transparent;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
+#v117ProjectHost .v2307-signature-on-or img{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;pointer-events:none}
+#v117ProjectHost .v2307-signature-on-or .v2307-signature-erase{pointer-events:auto;position:absolute;right:0;bottom:0;font-size:10px;background:white;color:#16446e;border:1px solid #bdd0e0;border-radius:4px;padding:2px}
+#v117ProjectHost .or-fill>.v2307-hidden-field{opacity:0!important}
+#v117ProjectHost .placement-block img,#v117ProjectHost .placement-stage img,#v117ProjectHost .match-block img{cursor:default!important}
+body.reader-theme-v210 .topbar .v2307-cloud-btn{font-size:11px!important;min-width:0!important;padding:0 10px!important}
+body.reader-theme-v210 .v2307-cloud-btn[hidden]{display:none!important}
+#v230SignatureModal #v230SignatureSave{background:#0875ec!important;color:#fff!important;border:2px solid #0875ec!important;opacity:1!important}
+@media(max-width:920px){body.reader-theme-v210 .topbar-inner{overflow-x:auto;max-width:100%}}
+@media print{#v117ProjectHost .v2307-signature-erase{display:none!important}body.reader-theme-v210 .v2307-cloud-btn{display:none!important}}
+</style><script id="reader-v2307-ui">(function(){
+'use strict';let dlg=null;
+function forbidden(img){return !!img.closest('.placement-block,.placement-stage,[data-v117-placement-block],.match-block,.v115-placement,.or-page,.v2307-signature-on-or,.block-picto,.call-prof-icon,[draggable],[data-v117-placement],[data-v117-pin],[data-v117-token],.gommette-stage,.gommette-block,.placement-zone,[data-placement]')}
+document.addEventListener('click',e=>{if(e.defaultPrevented||e.button!==0||e.target.closest('button,[draggable],[data-v117-pin],[data-v117-placement-token],[data-v117-token]'))return;
+ const img=e.target.closest('#v117ProjectHost img');if(!img||forbidden(img))return;
+ if(!dlg){dlg=document.createElement('dialog');dlg.id='tpV2306ImageView';dlg.innerHTML='<button type="button">Fermer ✕</button><img alt="Image du TP agrandie">';document.body.append(dlg);dlg.querySelector('button').onclick=()=>dlg.close()}
+ dlg.querySelector('img').src=img.currentSrc||img.src;dlg.showModal();},false);
+function nav(){const menu=document.querySelector('#v210Sidebar nav'),bar=document.querySelector('body.reader-theme-v210 .topbar-inner');
+ const defs=[['v2307Back','↩ Espace Cloud',()=>window.tpCloudBack4107g?.()],['v2307Disconnect','⏻ Déconnexion',()=>window.tpCloudDisconnect4107g?.()]];
+ for(const [id,label,fn] of defs){for(const host of [menu,bar]){if(!host||host.querySelector('[data-cloud-action="'+id+'"]'))continue;const b=document.createElement('button');b.type='button';b.dataset.cloudAction=id;b.textContent=label;b.className=host===bar?'btn v2307-cloud-btn':'v210-nav v2307-cloud-btn';b.onclick=fn;host.append(b)}}
+ const display=!!window.tpCloudConnected4107g?.();document.querySelectorAll('.v2307-cloud-btn').forEach(b=>b.hidden=!display);
+ if(display){for(const [id,tab] of [['v211NavRecords','records'],['v211NavHistory','history']]){const el=document.getElementById(id);if(!el||el.dataset.cloudNav2307)return;el.dataset.cloudNav2307='1';el.classList.remove('v211-nav-locked');el.querySelector('.v211-lock')?.remove();el.addEventListener('click',e=>{if(!window.tpCloudConnected4107g?.())return;e.preventDefault();e.stopImmediatePropagation();window.tpCloudOpenHistory4107g?.(tab)},true)}}
+}
+window.tpV2307Nav=nav;document.addEventListener('DOMContentLoaded',nav);setTimeout(nav,600);setTimeout(nav,1800);
 })();</script></body></html><style id="v8-symbols-always-visible">
 /* V214 — le panneau historique permanent est désactivé.
    Seule la pastille Ω (#tp13symbtn) reste visible en bas à droite. */
@@ -1305,14 +1559,14 @@ body{padding-right:0!important}
     b.onclick=function(){
       const submitted=localStorage.getItem(workKey21()+'|submitted')==='1'||model?.submission?.final===true;
       if(submitted){alert('Cette copie a déjà été rendue.');return}
-      localStorage.setItem(workKey21(),JSON.stringify(compactPause()));
+      window.tpV230QuotaSafeSet(workKey21(),JSON.stringify(compactPause()));
       if(typeof toast==='function')toast('Pause enregistrée sur cet ordinateur. Tu pourras reprendre ce TP plus tard.');
     };
   }
   /* V226 : pause gérée par le stockage IndexedDB V130. */
   // Nettoyage visuel après chaque reprise/rendu.
   const mo=new MutationObserver(()=>{document.querySelectorAll('#supportBox .fieldRow').forEach(row=>{const vals=[...row.querySelectorAll('.tp-display-value')];vals.slice(0,-1).forEach(x=>x.remove())})});
-  mo.observe(document.body,{childList:true,subtree:true});
+  mo.observe(document.getElementById("supportBox")||document.body,{childList:true,subtree:false});
 })();
 </script>
 <!-- V24 — interface élève épurée : trois actions principales seulement -->
@@ -1428,7 +1682,7 @@ body.tp-active-file #supportBox.tp-v27-locked input{pointer-events:none!importan
  const prior=window.render;window.render=function(){const out=prior.apply(this,arguments);[0,40,180,450].forEach(ms=>setTimeout(enforce,ms));return out};
  new MutationObserver(()=>setTimeout(enforce,0)).observe(document.body,{attributes:true,attributeFilter:['class']});
  document.addEventListener('focusin',enforce,true);document.addEventListener('pointerdown',e=>{if(e.target?.closest?.('#supportBox'))enforce()},true);
- setInterval(()=>{if(document.body.classList.contains('tp-active-file'))enforce()},1000);
+ setInterval(()=>{if(document.body.classList.contains('tp-active-file'))enforce()},5000);
  enforce();
 })();
 </script>
@@ -1921,7 +2175,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
    }catch(e){reject('Impossible de lire ce TP : '+(e?.message||e))}};r.readAsText(file,'utf-8')
  };
  const input=document.getElementById('fileInput');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.loadFile(f);e.target.value=''};
- document.title='Lecteur TP Élève — V228 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';
+ document.title='Lecteur TP Élève — V230.5 Cloud / Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
  console.info('Lecteur V157 : verrou RENDU/CORRIGE + anti-réouverture actif.');
 })();
 </script>
@@ -2449,9 +2703,9 @@ if(typeof oldCollect==='function'){
 }
 
 function stamp(){
-  document.title='Lecteur TP Élève — V228 Cloud / Local';
+  document.title='Lecteur TP Élève — V230.5 Cloud / Local';
   const b=document.querySelector('.brand');
-  if(b)b.textContent='Lecteur TP Élève — V228 Cloud / Local';
+  if(b)b.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 }
 stamp();
 setTimeout(stamp,600);
@@ -2589,6 +2843,9 @@ function access(fileName,readonly){
  const a=model?.access||{};
  const ov=document.getElementById('tpAccessOverlay'),student=document.getElementById('tpAccessStudent'),inp=document.getElementById('tpAccessCode'),err=document.getElementById('tpAccessError');
  if(!ov||!inp){openFile(fileName,readonly);return}
+ // V229 : l'ouverture Cloud a été autorisée via la session HttpOnly du portail.
+ // Un TP importé en local continue de demander son code élève.
+ if(window.tpCloud229?.consumeAuthorizedTp?.(model)){openFile(fileName,readonly);return}
  if(!(a.required&&a.hash&&a.salt)){
    if(readonly){openFile(fileName,true);return}
    alert('Ce TP ne contient pas de code élève valide. Il doit être rediffusé depuis le logiciel professeur.');
@@ -2672,71 +2929,45 @@ async function writeVerified(h,name,text){
  throw new Error('Impossible de créer une nouvelle copie sans remplacer un fichier existant.');
 }
 
+function pendingNameV411(d){const safe=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]/g,'_').replace(/^_+|_+$/g,'');return [safe(d?.eleve?.nom||d?.identite?.nom),safe(d?.eleve?.prenom||d?.identite?.prenom),safe(d?.code||d?.tp?.id||'TP'),'EN_ATTENTE'].filter(Boolean).join('_')+'.json'}
 function localKey(){return ['tp_work_v17',model?.studentId||model?.eleve?.id||'',model?.code||model?.tp?.id||'',model?.classe||'',model?.eleve?.nom||'',model?.eleve?.prenom||''].join('|')}
 
 async function submit205(){
  if(window.__tpV226SubmitInProgress)return;
- if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('Cette copie a déjà été rendue et reste verrouillée en lecture seule.');return}
+ if(model?.submission?.final||document.body.classList.contains('v205-readonly')){alert('TP déjà rendu : lecture seule.');return}
  if(!window.tpV205AutoEvaluationComplete?.()){window.tpV205OpenAutoEvaluation?.();return}
- if(!confirm('Rendre ce TP verrouillera cette nouvelle copie.\n\nContinuer ?'))return;
-
+ if(!confirm('Valider le rendu local définitif ? Cette copie sera verrouillée.'))return;
  window.__tpV226SubmitInProgress=true;
- const submitButton=document.getElementById('saveBtn');
- if(submitButton)submitButton.disabled=true;
-
+ const btn=document.getElementById('saveBtn');if(btn)btn.disabled=true;
  try{
-   try{window.collect?.()}catch(_){}
-   const cloud=!!model.cloud227;let receipt=null;
-   if(cloud){try{receipt=await window.tpCloud227.submit(model)}catch(err){
-      // L'absence de confirmation serveur ne doit JAMAIS attribuer le statut RENDU.
-      const data=JSON.parse(JSON.stringify(model));data.submission={...(data.submission||{}),final:false,transmissionStatus:'PENDING'};
-      data.transmission={...(data.transmission||{}),etat:'EN_ATTENTE',mode:'cloudflare'};
-      data.statut=data.status='EN_ATTENTE';data.cloud227=model.cloud227;model.transmission={...data.transmission};model.submission={...data.submission};model.statut=model.status='EN_ATTENTE';
-      try{await window.tpV130SaveWork?.()}catch(_){/* Le fichier de secours reste obligatoire */}
-      const text=JSON.stringify(data,null,2);const fileName=(data.code||data.tp?.id||'TP').replace(/[^A-Za-z0-9_-]/g,'_')+'_EN_ATTENTE.json';
-      download(text,fileName);
-      alert('⚠ CONNEXION OU TRANSMISSION INDISPONIBLE\n\nTON TP N’A PAS ÉTÉ RENDU.\n\nUne sauvegarde de secours EN_ATTENTE vient d’être téléchargée. Conserve ce fichier. Dès que tu as Internet, ouvre le lecteur depuis le portail Cloudflare, charge cette sauvegarde, connecte-toi au même compte puis clique sur Rendre mon TP.\n\nDétail : '+(err.message||err));
-      return;
-   }}
-   if(receipt?.already){alert('Ce TP est déjà rendu sur Cloudflare. Ouvre-le depuis Mon espace Cloud pour consulter la copie remise.');window.tpCloud227.show();return}
-   const now=receipt?.submittedAt||isoNow(),previous=model.submission||{},revision=receipt?.revision||Math.max(1,(Number(previous.revision)||0)+1);
-
-   /* Le statut final est posé AVANT toute écriture asynchrone :
-      un second clic ne peut donc jamais produire une deuxième remise. */
-   model.submission={...previous,final:true,submittedAt:now,transmissionStatus:'SENT',readerVersion:'V226',revision};
-   model.statut='RENDU';model.status='RENDU';
-   model.dates={...(model.dates||{}),rendu:now,derniereModification:now};
-   model.transmission={...(model.transmission||{}),etat:'RENDU',mode:cloud?'cloudflare':'fichier'};if(cloud)model.cloud227.revision=revision;
-   model.meta={...(model.meta||{}),readerVersion:'V226',suiteVersion:'V226'};
-
-   const text=JSON.stringify(model,null,2);let name=stampFile();
-   let h=cloud?null:await writable(),saved=false;
-   if(h){
-     try{name=await writeVerified(h,name,text);saved=true}
-     catch(e){alert('Écriture directe impossible : '+(e?.message||e))}
-   }
-   if(!saved&&!cloud)download(text,name);
-
-   await window.tpSubmissionGuard225?.recordFinal(model);
-   try{localStorage.setItem(localKey()+'|submitted','1')}catch(_){}
-   try{localStorage.setItem(localKey(),text)}catch(_){}
-
-   /* La même ligne IndexedDB devient RENDU : elle sort donc immédiatement
-      de Mes enregistrements et reste disponible dans Historique. */
-   try{await window.tpV130SaveWork?.()}catch(e){console.warn('V226 sauvegarde finale IndexedDB',e)}
-   try{await window.tpV226FinalizeRendered?.(model)}catch(e){console.warn('V226 finalisation rendu',e)}
-
-   setReadOnly(true,false);
-   document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision}}));
-
-   alert(cloud?'TP rendu sur Cloudflare. Ta copie est maintenant verrouillée.':saved?`TP rendu enregistré avec succès.\n\nFichier : ${name}`:`TP rendu téléchargé avec succès.\n\nFichier : ${name}`);
- }catch(e){alert('Rendu non confirmé : '+(e?.message||e)+'\nTon travail reste disponible.')}finally{
-   window.__tpV226SubmitInProgress=false;
-   /* En cas de rendu final, setReadOnly maintient le bouton verrouillé/caché.
-      En cas d'erreur avant le statut final, on le rend à nouveau disponible. */
-   if(submitButton&&model?.submission?.final!==true&&!document.body.classList.contains('v205-readonly')){
-     submitButton.disabled=false;
-   }
+  try{window.collect?.()}catch(e){console.warn(e)}
+  const at=new Date().toISOString(),old=model.submission||{};
+  const rev=Math.max(1,Number(old.revision||model?.cloud227?.revision||1));
+  const data=JSON.parse(JSON.stringify(model));
+  data.submission={...old,final:true,submittedAt:at,revision:rev,transmissionStatus:'LOCAL_USB',readerVersion:'V231_OFFLINE'};
+  data.status=data.statut='RENDU';
+  data.transmission={...(data.transmission||{}),etat:'RENDU',mode:'usb_hors_ligne'};
+  data.dates={...(data.dates||{}),rendu:at,derniereModification:at};
+  data.meta={...(data.meta||{}),readerVersion:'V231_OFFLINE'};
+  const json=JSON.stringify(data,null,2),name=stampFile();
+  let saved=false,actual=name;
+  // Ne confirmer le rendu qu'après écriture vérifiée ou déclenchement du téléchargement.
+  const h=await writable();
+  if(h){actual=await writeVerified(h,name,json);saved=true}
+  else{download(json,name);saved=true}
+  if(!saved)throw Error('Fichier non créé');
+  Object.assign(model,data);
+  await window.tpSubmissionGuard225?.recordFinal(model);
+  try{localStorage.setItem(localKey()+'|submitted','1')}catch(_){ }
+  try{window.tpV230QuotaSafeSet(localKey(),json)}catch(_){ }
+  try{await window.tpV130SaveWork?.()}catch(e){console.warn('Historique local',e)}
+  try{await window.tpV226FinalizeRendered?.(model)}catch(e){console.warn('Finalisation',e)}
+  setReadOnly(true,false);
+  document.dispatchEvent(new CustomEvent('tp-reader-rendered',{detail:{status:'RENDU',revision:rev}}));
+  alert('TP RENDU localement et verrouillé.\nFichier : '+actual+'\nLe professeur récupérera ce fichier par clé USB.');
+ }catch(e){alert('Rendu non confirmé : '+String(e?.message||e)+'\nConserve ton travail.')}finally{
+  window.__tpV226SubmitInProgress=false;
+  if(btn&&!model?.submission?.final)btn.disabled=false;
  }
 }
 const saveBtn=document.getElementById('saveBtn');
@@ -2785,8 +3016,8 @@ function settle(){
 }
 [0,120,500].forEach(ms=>setTimeout(settle,ms));
 
-document.title='Lecteur TP Élève — V228 Cloud / Local';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';
+document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
 })();
@@ -2977,7 +3208,7 @@ function readLock(d){
         createdBy:'migration-v205',
         identity:identityV206(d)
       };
-      localStorage.setItem(lockKeyV206(d),JSON.stringify(migrated));
+      window.tpV230QuotaSafeSet(lockKeyV206(d),JSON.stringify(migrated));
       return migrated;
     }
   }catch(_){}
@@ -3011,7 +3242,7 @@ function saveLock(d){
     localStorage.removeItem(unlockKeyV206(d));
     localStorage.setItem(wk+'|submitted','1');
     // La copie locale contient les réponses réellement rendues.
-    localStorage.setItem(wk,JSON.stringify(d));
+    window.tpV230QuotaSafeSet(wk,JSON.stringify(d));
     return rec;
   }catch(e){
     console.warn('V206 verrou local non enregistré',e);
@@ -3021,7 +3252,7 @@ function saveLock(d){
 function saveUnlockedSnapshot(d){
   try{
     const wk=legacyWorkKeyV206(d);
-    localStorage.setItem(wk,JSON.stringify(d));
+    window.tpV230QuotaSafeSet(wk,JSON.stringify(d));
     localStorage.removeItem(wk+'|submitted');
     localStorage.removeItem(lockKeyV206(d));
     localStorage.setItem(unlockKeyV206(d),JSON.stringify({
@@ -3072,6 +3303,9 @@ if(typeof oldLoad==='function'&&!oldLoad.__v206){
         const incoming=JSON.parse(r.result);
         const result=incoming.cloud227&&incoming.submission?.final?{locked:true,data:incoming}:await window.tpSubmissionGuard225.resolve(incoming);if(incoming.cloud227)result.data.cloud227=incoming.cloud227;
         if(epoch!==loadEpoch||submitChecking||window.__tpV226SubmitInProgress)return;
+        if(location.protocol==='file:'&&!result.data?.cloud227){
+          setTimeout(()=>alert('TP LOCAL SANS ATTRIBUTION CLOUDFLARE\n\nCe TP peut être travaillé et enregistré sur cet ordinateur, mais son rendu ne pourra pas être synchronisé automatiquement.\n\nPour une copie synchronisable, télécharge à nouveau le TP depuis le dossier TP diffusés du portail élève.'),100);
+        }
         if(result.locked)await window.tpSubmissionGuard225.recordFinal(result.data);
         if(epoch!==loadEpoch)return;
         oldLoad.call(window,makeJsonFile(result.data,file?.name));
@@ -3153,9 +3387,9 @@ try{
   }
 }catch(_){}
 
-document.title='Lecteur TP Élève — V228 Cloud / Local';
+document.title='Lecteur TP Élève — V230.5 Cloud / Local';
 const brand206=document.querySelector('.brand');
-if(brand206)brand206.textContent='Lecteur TP Élève — V228 Cloud / Local';
+if(brand206)brand206.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 
 console.info('Lecteur TP V206 : verrou strict après rendu, réouverture du fichier DIFFUSION impossible sans code professeur.');
 })();
@@ -3223,9 +3457,9 @@ body.v205-readonly #teacherUnlockBtn{
 
 <script id="reader-v208-stamp">
 (function(){
- document.title='Lecteur TP Élève — V228 Cloud / Local';
+ document.title='Lecteur TP Élève — V230.5 Cloud / Local';
  const b=document.querySelector('.brand');
- if(b)b.textContent='Lecteur TP Élève — V228 Cloud / Local';
+ if(b)b.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
  console.info('Lecteur TP V209 : fidélité graphique éditeur V74, verrou strict V206/V207, date JJ-MM-AAAA et nouvelle charte compacte d’auto-évaluation.');
 })();
 </script>
@@ -3315,33 +3549,33 @@ body.reader-theme-v210{
 #v210AppHeader .v210-avatar.authenticated{background:#dcfce7;color:#166534}
 
 body.reader-theme-v210 .topbar{
-  position:sticky;top:74px;z-index:10000;
+  position:sticky;top:56px;z-index:10000;
   background:transparent;border:0;box-shadow:none;
-  padding:11px 20px 5px;
+  padding:4px 16px 2px;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 body.reader-theme-v210 .topbar-inner{
   width:max-content;max-width:calc(100vw - 270px);
-  margin:0 auto;padding:9px 11px!important;
-  border:1px solid #e4edf6;border-radius:12px;
-  background:rgba(255,255,255,.96);
+  margin:0 auto;padding:6px 8px!important;
+  border:1px solid #e4edf6;border-radius:11px;
+  background:rgba(255,255,255,.97);
   box-shadow:var(--v211-shadow);
-  display:flex;justify-content:center;gap:9px;flex-wrap:nowrap
+  display:flex;justify-content:center;gap:7px;flex-wrap:nowrap
 }
 body.reader-theme-v210 .topbar-inner>div:first-child,
 body.reader-theme-v210 .topbar-inner>.status,
 body.reader-theme-v210 #tpV22State{display:none!important}
 body.reader-theme-v210 .topbar .btn{
-  min-height:42px!important;height:42px;
-  border-radius:8px!important;padding:0 17px!important;
-  display:inline-flex!important;align-items:center;justify-content:center;gap:8px;
-  font-size:12px!important;font-weight:850!important;
+  min-height:36px!important;height:36px;
+  border-radius:8px!important;padding:0 13px!important;
+  display:inline-flex!important;align-items:center;justify-content:center;gap:7px;
+  font-size:11px!important;font-weight:850!important;
   border:1px solid #d2e1ef!important;
   background:#fff!important;color:#0b2d56!important;
   box-shadow:none!important;white-space:nowrap;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
 }
-body.reader-theme-v210 .topbar .btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.reader-theme-v210 .topbar .btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 body.reader-theme-v210 #pauseBtn{color:#0671ed!important;background:#f5faff!important}
 body.reader-theme-v210 #saveBtn{
   background:linear-gradient(180deg,#1685ff,#0672f2)!important;
@@ -3351,7 +3585,7 @@ body.reader-theme-v210 #saveBtn{
 body.reader-theme-v210 #quitBtn{background:#fff!important;color:#183b63!important}
 body.reader-theme-v210 .topbar .btn:disabled{opacity:.42!important;box-shadow:none!important}
 
-body.reader-theme-v210 .wrap{max-width:1130px;margin:12px auto 0;padding:0 18px 42px}
+body.reader-theme-v210 .wrap{max-width:1130px;margin:8px auto 0;padding:0 18px 42px}
 body.reader-theme-v210 .helper,
 body.reader-theme-v210 .tp-wait-message{
   max-width:1080px;margin:18px auto;
@@ -3505,13 +3739,13 @@ body.reader-theme-v210 #readerSecondaryTools summary{color:#9aacc0}
   #v210AppHeader{padding:10px 15px}
   #v210AppHeader h1{font-size:20px}
   #v210AppHeader .v210-head-right{gap:8px}
-  body.reader-theme-v210 .topbar{top:66px;padding-left:8px;padding-right:8px}
-  body.reader-theme-v210 .topbar-inner{max-width:100%;width:100%;overflow:auto;justify-content:flex-start}
+  body.reader-theme-v210 .topbar{top:54px;padding-left:6px;padding-right:6px;padding-top:3px}
+  body.reader-theme-v210 .topbar-inner{max-width:100%;width:100%;overflow:auto;justify-content:flex-start;padding:5px 6px!important}
   body.reader-theme-v210 .wrap{padding-left:10px;padding-right:10px}
 }
 @media(max-width:700px){
   #v210AppHeader .v210-date,#v210AppHeader .v210-bell{display:none}
-  body.reader-theme-v210 .topbar .btn{padding:0 12px!important;font-size:11px!important}
+  body.reader-theme-v210 .topbar .btn{padding:0 10px!important;font-size:10px!important;min-height:34px!important;height:34px!important}
   body.reader-theme-v210 #v205-ae{justify-content:center!important;padding:8px!important}
   body.reader-theme-v210 #v205-ae .ae-box{width:100%!important;max-height:96vh!important}
   body.reader-theme-v210 #v205-ae .v208-ae-row{grid-template-columns:40px 1fr!important}
@@ -3554,6 +3788,7 @@ function svg(name){
     save:`<svg viewBox="0 0 24 24"><path d="M5 4h12l2 2v14H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>`,
     send:`<svg viewBox="0 0 24 24"><path d="m21 3-8 18-2-8-8-2z"/><path d="M11 13 21 3"/></svg>`,
     quit:`<svg viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M9 12h9"/></svg>`,
+    pen:`<svg viewBox="0 0 24 24"><path d="M4 20h4l10.2-10.2a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16v4z"/><path d="m12.5 6.5 5 5"/></svg>`,
     bell:`<svg viewBox="0 0 24 24"><path d="M6 17h12l-1.5-2.2V10a4.5 4.5 0 0 0-9 0v4.8z"/><path d="M10 20h4"/></svg>`,
     user:`<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 21v-2A6.5 6.5 0 0 1 12 12.5 6.5 6.5 0 0 1 18.5 19v2"/></svg>`,
     users:`<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5a3 3 0 0 1 0 5.5M16.5 14a5 5 0 0 1 4 5"/></svg>`,
@@ -3607,7 +3842,7 @@ function installShell(){
       <button class="v210-nav v211-nav-locked" type="button" id="v211NavRecords">${svg('clock')}<span>Mes enregistrements</span><span class="v211-lock">🔒</span></button>
       <button class="v210-nav v211-nav-locked" type="button" id="v211NavHistory">${svg('folder')}<span>Historique</span><span class="v211-lock">🔒</span></button>
     </nav>
-    <div class="v210-side-bottom">Lecteur local · Travail élève<br>Compatible éditeur V103</div>`;
+    <div class="v210-side-bottom">Lecteur local V230.7 · Travail élève<br>Compatible éditeur V103</div>`;
   document.body.insertBefore(side,document.body.firstChild);
 
   const head=document.createElement('header');
@@ -3627,11 +3862,23 @@ function installShell(){
   // Réordonner les quatre actions principales sans changer leurs identifiants ni leurs événements.
   const inner=document.querySelector('.topbar-inner');
   const load=document.getElementById('loadBtn'),save=document.getElementById('pauseBtn'),send=document.getElementById('saveBtn'),quit=document.getElementById('quitBtn');
+  let sign=document.getElementById('signBtn');
+  if(!sign){
+    sign=document.createElement('button');
+    sign.type='button';
+    sign.id='signBtn';
+    sign.className='btn secondary';
+    sign.title='Signer l’ordre de réparation';
+    sign.innerHTML=svg('pen')+'<span>Signature</span>';
+    sign.style.display='none';
+    sign.onclick=()=>window.tpV230OpenSignature?.();
+  }
   if(inner){
-    [load,save,send,quit].filter(Boolean).forEach(b=>inner.appendChild(b));
+    [load,save,send,sign,quit].filter(Boolean).forEach(b=>inner.appendChild(b));
     if(load)load.innerHTML=svg('open')+'<span>Ouvrir un TP</span>';
     if(save)save.innerHTML=svg('save')+'<span>Enregistrer</span>';
     if(send)send.innerHTML=svg('send')+'<span>Rendre mon TP</span>';
+    if(sign)sign.innerHTML=svg('pen')+'<span>Signature</span>';
     if(quit)quit.innerHTML=svg('quit')+'<span>Quitter</span>';
   }
 
@@ -3663,6 +3910,7 @@ function refresh(){
 
   // Les légendes/noms d'images restent toujours masqués.
   document.querySelectorAll('#v117ProjectHost figcaption,#v117ProjectHost .caption,.v115-block figcaption,.v115-block .caption').forEach(x=>x.style.display='none');
+  window.tpV230RefreshSignatureUi?.();
 }
 
 const old117=window.tpV117RenderProject;
@@ -3692,8 +3940,8 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V228 Cloud / Local';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V228 Cloud / Local';
+document.title='Lecteur TP Élève — V230.5 Cloud / Local';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
@@ -3703,7 +3951,7 @@ console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 strict
 <script id="reader-cloud-v227">(function(){
 'use strict';
 const BASE='https://portail-partage.khmg8np9yj.workers.dev',hosted=location.protocol==='https:'&&location.pathname.startsWith('/lecteur');
-let user=null,code='',busy=false,folders=[],files=[],tab='diffuses';
+let user=null,busy=false,folders=[],files=[],tab='diffuses',authorizedOnce=null;
 const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
 async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});let d;try{d=await r.json()}catch{throw Error('Réponse du serveur illisible.')}if(!r.ok)throw Error(d.error||'Connexion impossible.');return d}
 const panel=document.createElement('dialog');panel.id='cloud227-panel';panel.innerHTML='<div class="cloud227-head"><h2>Mon espace Cloud</h2><button type="button" id="cloud227-close">Fermer</button></div><form id="cloud227-login"><p>Entre ton code élève pour retrouver tes TP.</p><label for="cloud227-code">Code personnel</label><input id="cloud227-code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" required pattern="[0-9]{4}"><button type="submit">Accéder à mes TP</button></form><div id="cloud227-space" hidden><p id="cloud227-person"></p><nav id="cloud227-tabs"></nav><label for="cloud227-search">Rechercher un TP</label><input id="cloud227-search" type="search" placeholder="Titre du TP…"><div class="cloud227-tools"><button type="button" id="cloud227-refresh">Actualiser</button><button type="button" id="cloud227-logout">Se déconnecter</button></div><div id="cloud227-list"></div></div><p id="cloud227-status" role="status" aria-live="polite"></p>';document.body.append(panel);
@@ -3724,7 +3972,50 @@ function draw(){
  if(!matches.length){const p=document.createElement('p');p.textContent='Aucun document à afficher.';list.append(p)}
 }
 async function refresh(){const [a,b,c]=await Promise.all([api('/api/dossiers'),api('/api/fichiers'),api('/api/communs')]);folders=a.dossiers||[];files=[...(b.fichiers||[]).map(f=>({...f,kind:'personnel'})),...(c.fichiers||[]).map(f=>({...f,kind:'commun'}))];draw();updateBell4105();status('Clique sur un TP pour l’ouvrir. Les enregistrements intermédiaires restent sur cet appareil.');}
-$('cloud227-login').onsubmit=async e=>{e.preventDefault();enabled(false);status('Connexion…');try{const pin=$('cloud227-code').value.trim(),result=await api('/api/connexion',{code:pin});if(result.role!=='user'){await api('/api/deconnexion',{});throw Error('Utilise le code élève. Le compte administrateur reste dans le portail.')}const me=await api('/api/moi');user=me.utilisateur;code=pin;$('cloud227-code').value='';$('cloud227-login').hidden=true;$('cloud227-space').hidden=false;$('cloud227-person').textContent=user.nom;await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
+// V229 : identification unique. Le navigateur présente automatiquement la session
+// sécurisée créée par le portail, sans recopier ni conserver le code personnel.
+async function activateSession229(me){
+ if(me?.role!=='user'||!me.utilisateur?.id)throw Error('Un compte élève est nécessaire.');
+ user=me.utilisateur;setTimeout(()=>window.tpV2307Nav?.(),0);
+ $('cloud227-login').hidden=true;
+ $('cloud227-space').hidden=false;
+ $('cloud227-person').textContent='Connecté : '+user.nom+' · session du portail reconnue';
+ await refresh();
+}
+async function restoreSession229(){
+ if(!hosted)return;
+ status('Vérification de la session élève…');
+ try{
+  const me=await api('/api/moi');
+  if(me.role==='admin'){
+   $('cloud227-login').hidden=true;
+   status('Une session administrateur est ouverte. Pour utiliser le lecteur élève, déconnecte-toi du portail puis connecte-toi avec le compte élève.');
+   return;
+  }
+  await activateSession229(me);
+ }catch(e){
+  user=null;
+  $('cloud227-space').hidden=true;
+  $('cloud227-login').hidden=false;
+  status('Première connexion ou session expirée : saisis ton code personnel une seule fois.');
+ }
+}
+$('cloud227-login').onsubmit=async e=>{
+ e.preventDefault();enabled(false);status('Connexion…');
+ try{
+  const pin=$('cloud227-code').value.trim();
+  const result=await api('/api/connexion',{code:pin});
+  if(result.role!=='user')throw Error('Le lecteur est réservé aux élèves. Déconnecte-toi du portail avant de changer de compte.');
+  $('cloud227-code').value='';
+  await activateSession229(await api('/api/moi'));
+ }catch(e){status(e.message)}finally{enabled(true)}
+};
+function authorizeOneCloudTp229(data){
+ // Appelé uniquement après la réponse positive de /api/lecteur/ouvrir.
+ if(!hosted||!user||!data?.cloud227||String(data.cloud227.userId)!==String(user.id))throw Error('Compte élève ou attribution TP non vérifié.');
+ authorizedOnce={id:String(data.cloud227.id),kind:String(data.cloud227.kind),userId:String(user.id),code:String(data.code||''),until:Date.now()+30000};
+}
+
 // Sauvegarde autonome JSON : le TP et ses ressources sont conservés dans le fichier.
 async function downloadOffline4105(f){
  if(busy)return;enabled(false);status('Préparation du TP local…');
@@ -3746,7 +4037,7 @@ function updateBell4105(){
 async function refreshBell4105(){if(!hosted||document.hidden)return;try{const list=await api('/api/communs');const others=files.filter(f=>f.kind!=='commun');files=[...others,...(list.fichiers||[]).map(f=>({...f,kind:'commun'}))];updateBell4105()}catch(_){}}
 if(hosted){setInterval(refreshBell4105,60000);setTimeout(refreshBell4105,1700)}
 $('cloud227-search').oninput=draw;$('cloud227-refresh').onclick=async()=>{enabled(false);try{await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
-$('cloud227-logout').onclick=async()=>{if(!confirm('Te déconnecter ? Pense à enregistrer ton travail sur cet appareil.'))return;enabled(false);try{if(window.model?.cloud227)await window.tpV130SaveWork?.();await api('/api/deconnexion',{});code='';user=null;location.reload()}catch(e){status(e.message);enabled(true)}};
+$('cloud227-logout').onclick=async()=>{if(!confirm('Se déconnecter du portail ?'))return;await window.tpCloudDisconnect4107g?.()};
 async function open(source){
  if(busy||window.__tpV226SubmitInProgress)return;
  if(!/\.(tp|json)$/i.test(source.nom_fichier||'')||category(source)==='documents'){window.open('/api/'+(source.kind==='commun'?'communs':'fichiers')+'/'+encodeURIComponent(source.id)+'/telecharger','_blank','noopener');if(source.kind==='commun'){source.non_consulte_4105=0;updateBell4105();}return}
@@ -3754,13 +4045,28 @@ async function open(source){
  enabled(false);status('Ouverture du TP…');
  try{
   const result=await api('/api/lecteur/ouvrir',{source:{id:source.id,kind:source.kind}}),d=result.data;
-  if(d.access?.hash&&window.tpReaderHash(String(d.access.salt)+'|'+code)!==String(d.access.hash))throw Error('Le code de ce TP ne correspond pas à ton code Cloud. Demande au professeur de vérifier sa diffusion.');
   if(result.state==='open'){await window.tpSubmissionGuard225.recordOpen(d)}
+  if(!d.submission?.final&&result.state!=='final'&&result.state!=='pending'){
+    try{const saved=await api('/api/lecteur/brouillon',{source:d.cloud227,action:'lire'});
+      if(saved.found&&saved.data?.cloud227&&String(saved.data.cloud227.userId)===String(user.id)){
+        Object.assign(d,saved.data);d.cloud227={...saved.data.cloud227};
+        status('Travail en cours retrouve dans Cloudflare ('+new Date(saved.savedAt).toLocaleString('fr-FR')+').');
+      }
+    }catch(error){alert('Impossible de récupérer le brouillon Cloud : '+error.message+'\nNe recommence pas ce TP avant vérification.');throw error}
+  }
+  authorizeOneCloudTp229(d);
   window.loadFile(new File([JSON.stringify(d)],result.name,{type:'application/json'}));panel.close();
  }catch(e){status(e.message)}finally{enabled(true)}
 }
+window.tpCloud229={
+ consumeAuthorizedTp(data){
+  const proof=authorizedOnce;authorizedOnce=null; // utilisation unique ; jamais valable pour un fichier local quelconque
+  if(!hosted||!user||!proof||Date.now()>proof.until||!data?.cloud227)return false;
+  return String(data.cloud227.userId)===proof.userId&&String(user.id)===proof.userId&&String(data.cloud227.id)===proof.id&&String(data.cloud227.kind)===proof.kind&&String(data.code||'')===proof.code;
+ }
+};
 window.tpCloud227={
- tryUnlock(){const d=window.model;if(!user||!code||String(d?.cloud227?.userId)!==String(user.id))return;const input=$('tpAccessCode');if(input){input.value=code;$('tpAccessBtn')?.click()}},
+ tryUnlock(){/* Le TP Cloud authentifié s'ouvre via tpCloud229 ; code exigé uniquement en local. */},
  async submit(d){if(!hosted||!user||String(d.cloud227.userId)!==String(user.id)){show();throw Error('Connecte-toi à ton espace Cloud puis clique à nouveau sur Rendre.')}return api('/api/lecteur/rendre',{source:{id:d.cloud227.id,kind:d.cloud227.kind},revision:d.cloud227.revision||0,data:clone(d)})},
  async unlock(d,pin){if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Connecte-toi au compte de cet élève dans Mon espace Cloud.');await api('/api/lecteur/deverrouiller',{source:d.cloud227,code:pin});return true},
  show
@@ -3773,10 +4079,106 @@ pendingButton4105.onclick=()=>pendingInput4105.click();
 pendingInput4105.onchange=async()=>{const f=pendingInput4105.files?.[0];pendingInput4105.value='';if(!f)return;
  try{const d=JSON.parse(await f.text());if(!d.cloud227||d.submission?.final||!d.code)throw Error('Le fichier doit être une copie TP EN ATTENTE non rendue.');
   if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Cette copie appartient à un autre compte élève.');
+  const check=await api('/api/lecteur/ouvrir',{source:{id:d.cloud227.id,kind:d.cloud227.kind}});
+  if(check.state==='final'||check.state==='pending')throw Error('Ce TP est déjà rendu ou sa remise est en cours. Aucune deuxième copie ne sera créée.');
+  if(String(check.data?.code||'')!==String(d.code||''))throw Error('La sauvegarde ne correspond pas au TP attribué à ce compte.');
+  authorizeOneCloudTp229(check.data);
   window.loadFile(new File([JSON.stringify(d)],f.name,{type:'application/json'}));panel.close();
   alert('Copie en attente chargée. Vérifie tes réponses puis clique sur Rendre mon TP pour transmettre au professeur. Seule la confirmation du serveur validera le rendu.');
  }catch(e){status('Reprise impossible : '+(e.message||e))}
 };
-if(hosted)setTimeout(show,250);
+
+// V230.6 — une seule session Cloud, brouillons verifies cote Cloudflare.
+let saveBusy4107g=null;
+function cloudCurrent4107g(){const d=window.model;return hosted&&user&&d?.cloud227&&String(d.cloud227.userId)===String(user.id)&&!d.submission?.final&&!document.body.classList.contains('v205-readonly')?d:null}
+async function saveCurrent4107g({notify=true}={}){
+ const d=cloudCurrent4107g();
+ if(!d){if(window.tpV130SaveWork)await window.tpV130SaveWork();return true}
+ if(saveBusy4107g)return saveBusy4107g;
+ saveBusy4107g=(async()=>{
+   window.collect?.();
+   if(window.tpV130SaveWork)await window.tpV130SaveWork();
+   const snapshot=clone(window.model);
+   const res=await api('/api/lecteur/brouillon',{source:d.cloud227,revision:d.cloud227.revision||0,data:snapshot});
+   if(!res.ok)throw Error('Le serveur n’a pas confirmé l’écriture.');
+   const verify=await api('/api/lecteur/brouillon',{source:d.cloud227,action:'lire'});
+   if(!verify.found||!verify.data)throw Error('Le brouillon est introuvable après écriture dans R2.');
+   if(JSON.stringify(verify.data.reponses||{})!==JSON.stringify(snapshot.reponses||{}))throw Error('Les réponses relues ne correspondent pas aux réponses sauvegardées.');
+   const stamp=new Date(verify.savedAt||res.savedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+   status('Travail en cours sauvegarde dans Cloudflare a '+stamp+'.');
+   if(notify)alert('Travail enregistre dans Cloudflare a '+stamp+'. Tu pourras le reprendre plus tard.');
+   return true;
+ })().catch(e=>{status('Sauvegarde Cloud impossible : '+e.message+' — garde une copie locale.');if(notify)alert('Sauvegarde Cloud NON confirmee. Ne quitte pas sans sauvegarde de secours.\n'+e.message);throw e}).finally(()=>{saveBusy4107g=null});
+ return saveBusy4107g;
+}
+window.tpCloudSave4107g=saveCurrent4107g;
+window.tpCloudConnected4107g=()=>!!(hosted&&user); window.tpV2307Nav?.();
+window.tpCloudBack4107g=async()=>{
+ try{if(cloudCurrent4107g())await saveCurrent4107g({notify:false})}
+ catch(e){alert('Quitter annulé : sauvegarde Cloud non confirmée. Le TP reste ouvert.');return}
+ document.body.classList.remove('tp-active-file','v117-project','v205-project-only','v205-readonly');
+ document.getElementById('v117ProjectHost')?.replaceChildren();
+ show();tab='diffuses';await refresh();
+};
+window.tpCloudDisconnect4107g=async()=>{
+ try{if(cloudCurrent4107g())await saveCurrent4107g({notify:false})}
+ catch(e){alert('Deconnexion annulee : travail non confirme par Cloudflare.');return}
+ try{await api('/api/deconnexion',{});user=null;authorizedOnce=null;location.href='/'}
+ catch(e){alert('Deconnexion impossible : '+e.message)}
+};
+window.tpCloudOpenHistory4107g=async(tabName)=>{
+ if(!hosted||!user)return false;
+ tab=tabName==='history'?'corriges':'diffuses';
+ await refresh();show();return true;
+};
+// La consultation locale est une action volontaire via Ouvrir un TP.
+// Les vues Cloud ne declenchent jamais la demande de code local.
+setInterval(()=>{if(cloudCurrent4107g()&&document.visibilityState==='visible'&&!saveBusy4107g)saveCurrent4107g({notify:false}).catch(()=>{});},180000);
+
+document.addEventListener('click',async function(e){
+ const b=e.target.closest('button');if(!b||!window.tpCloudConnected4107g?.())return;
+ if(b.id==='pauseBtn'||b.id==='quitBtn'){
+   e.preventDefault();e.stopImmediatePropagation();
+   if(b.id==='pauseBtn')await saveCurrent4107g().catch(()=>{});
+   else await window.tpCloudBack4107g();
+ }
+},true);
+if(hosted){setTimeout(show,250);restoreSession229();}
 })();
 </script>
+<style id="reader-v2308-controls">
+body.v2308-cloud-connected #loadBtn{display:none!important}
+#v117ProjectHost .or-page .v2308-sign-launch{position:absolute;bottom:2%;right:2%;z-index:25;background:#0875ec;color:white;border:1px solid #0875ec;border-radius:7px;padding:7px 9px;font-weight:750;font-size:11px;cursor:pointer}
+@media print{#v117ProjectHost .or-page .v2308-sign-launch{display:none!important}}
+body.reader-theme-v210 #signBtn{display:none!important}
+#v117ProjectHost .placement-block img,#v117ProjectHost .placement-stage img,#v117ProjectHost [data-v117-placement-block] img,#v117ProjectHost .match-block img{cursor:default!important}
+</style><script id="reader-v2308-controls-runtime">(function(){
+function status(){document.body.classList.toggle('v2308-cloud-connected',!!window.tpCloudConnected4107g?.());}
+function signatureButtons(){
+ document.querySelectorAll('#v117ProjectHost .v2308-sign-launch').forEach(e=>e.remove());
+ if(document.body.classList.contains('v205-readonly')||window.model?.submission?.final)return;
+ document.querySelectorAll('#v117ProjectHost .or-block').forEach(section=>{
+   const pages=[...section.querySelectorAll('.or-page')];const last=pages.at(-1);if(!last)return;
+   const b=document.createElement('button');b.type='button';b.className='v2308-sign-launch';b.textContent='✍ Signer l’OR';
+   b.onclick=e=>{e.preventDefault();window.tpV230OpenSignature?.()};last.appendChild(b);
+ });
+}
+const observer=new MutationObserver(()=>{if(observer.__pending)return;observer.__pending=true;requestAnimationFrame(()=>{observer.__pending=false;status();signatureButtons()})});
+// Limiter l'observation à la présence des pages OR, pas aux réponses saisies.
+function bind(){status();signatureButtons();const host=document.getElementById('v117ProjectHost');if(host)observer.observe(host,{childList:true,subtree:false});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+const render=window.tpV117RenderProject;if(typeof render==='function'){window.tpV117RenderProject=function(...args){const x=render.apply(this,args);setTimeout(signatureButtons,70);return x}}
+setTimeout(bind,1000);
+})();</script>
+<style id="tp-local-transition-v2309">#v210AppHeader .v210-head-right{min-width:0}</style>
+<script id="tp-local-transition-v2309">(function(){
+'use strict'; const isLocal=location.protocol==='file:';
+function clean(){const sign=document.getElementById('signBtn');if(sign)sign.style.display='none';
+if(isLocal){for(const id of ['cloud227-launch','v2307Back','v2307Disconnect','v2306Disconnect']){const b=document.getElementById(id);if(b)b.style.display='none'};
+for(const b of document.querySelectorAll('#v210Sidebar button,#v210AppHeader button,.topbar button')){if(/(?:Espace Cloud|Mon espace Cloud)/i.test(b.textContent||''))b.style.display='none'}}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean);else clean();
+new MutationObserver(clean).observe(document.documentElement,{subtree:true,childList:true});
+})();</script>
+
+<!-- TFAB lecteur autonome : les transferts sont exclusivement réalisés par clé USB. -->
+<style>#cloud227-launch,#cloud227-panel,#v211CloudLaunch,.cloud227-launch{display:none!important}</style>
