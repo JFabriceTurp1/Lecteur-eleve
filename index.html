@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lecteur TP Élève — V230.5 Cloud / Local</title>
+<title>Lecteur TP Élève — V235 LOCAL HORS LIGNE</title>
 <style>
 :root{--blue:#0d6596;--blue2:#0f6da3;--line:#9ec5d8;--pale:#eef7fb;--ink:#15384a;--muted:#6b7f89;--ok:#198754;--danger:#c63e3e;--shadow:0 10px 30px rgba(15,61,85,.12)}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#eaf1f5;color:var(--ink)}
@@ -41,7 +41,7 @@ body.v211-personal-view .wrap{filter:none!important;opacity:1!important;pointer-
 <style id="ordering-v221">.ordering-list{list-style:none;margin:8px 0;padding:0;display:flex;flex-direction:column;gap:9px}.ordering-pill{display:flex;align-items:center;gap:10px;border:1px solid #a9c7df;border-radius:18px;padding:10px 12px;background:#edf5fc;color:#163b59;cursor:grab;break-inside:avoid}.ordering-pill[draggable=false]{cursor:default}.ordering-number{flex:0 0 24px;height:24px;border-radius:50%;background:#175b97;color:white;display:flex;align-items:center;justify-content:center;font-size:12px}.ordering-text{flex:1;min-width:0;overflow-wrap:anywhere;white-space:normal}.ordering-controls{display:flex;gap:5px}.ordering-controls button,.ordering-reset{border:1px solid #abc3d7;border-radius:8px;background:white;color:#174677;padding:5px 9px;cursor:pointer}.ordering-controls button:disabled{opacity:.35;cursor:default}.ordering-hint{font-size:12px;color:#5c7389}.ordering-pill:focus-within{outline:2px solid #175b97;outline-offset:2px}.tp-navigation-focus{outline:3px solid #edaf3b!important;outline-offset:4px;scroll-margin-top:25px}#sheet .qmeta,#sheet .cover-evaluation{cursor:pointer}@media print{.ordering-controls,.ordering-reset,.ordering-hint{display:none!important}.ordering-pill{border:1px solid #8daac0;background:white;color:#000}.ordering-number{color:#000;background:white;border:1px solid #8daac0}.tp-navigation-focus{outline:none!important}}</style>
 <style id="fin-tp-style">.fin-tp-label{font-weight:800;font-size:12px;letter-spacing:.06em;color:#175b97;margin-bottom:5px}.true-false-block .tf-grid{margin-top:8px}</style><style id="observation-style">.observation-answer{display:block;width:100%;box-sizing:border-box;min-height:80px;resize:vertical;padding:10px;border:1px solid #a9c8d8;border-radius:7px;line-height:1.5;font:inherit;white-space:pre-wrap}@media print{.observation-answer{resize:none;overflow:visible}}</style></head>
 <body>
-<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V230.5 Cloud / Local</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
+<div class="topbar"><div class="topbar-inner"><div><div class="brand">Lecteur TP Élève — V235 LOCAL HORS LIGNE</div><div class="sub">Fonctionne hors ligne • Aucun Firebase • Aucun compte requis</div></div><span class="status">Mode élève</span><button class="btn secondary" id="loadBtn">Charger un TP</button><button class="btn soft" id="saveBtn">Enregistrer mon travail</button><button class="btn" id="printBtn">Générer PDF</button><input id="fileInput" type="file" accept=".tp,.tpjson,.json" hidden></div></div>
 <div class="wrap">
 <div class="helper"><strong>Ouvrez votre fichier TP personnel pour commencer.</strong> Le TP reste verrouillé tant que le fichier et le code élève ne sont pas validés.</div>
 <div class="fileName" id="loadedName" style="display:none"></div>
@@ -564,7 +564,7 @@ body.v126-awaiting #v115ProjectHost,body.v126-awaiting #v117ProjectHost{display:
  window.loadFile=function(file){lock();const r=new FileReader();r.onload=()=>{try{const d=normalize(JSON.parse(r.result));const p=projectFrom(d);if(!p)throw Error('Ce fichier ne contient pas le projet evaluation.tp.v1 attendu.');model=d;window.model=model;try{localStorage.removeItem('tp_reader_last_submission')}catch(_){}access(file.name)}catch(e){console.error('V127 load',e);alert('Impossible de charger ce TP : '+(e?.message||e));lock()}};r.readAsText(file,'utf-8')};
  const input=document.getElementById('fileInput');if(input){input.onchange=function(e){const f=e.target.files&&e.target.files[0];if(f)window.loadFile(f);e.target.value=''}}
  const btn=document.getElementById('tpAccessBtn'),inp=document.getElementById('tpAccessCode');if(btn)btn.onclick=unlock;if(inp){inp.oninput=e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,4);inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();unlock()}}}
- document.title='Lecteur TP Élève — V234 Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
+ document.title='Lecteur TP Élève — V235 Local · Hors ligne';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';lock();console.info('Lecteur TP V128 : chargeur unique sécurisé installé');
 })();
 </script>
 
@@ -704,6 +704,9 @@ function delegatedClick(e){
   const avatar=e.target?.closest?.('#v210Avatar');
   if(avatar){
     e.preventDefault();
+    // V235 : toucher la pastille permet de changer de profil,
+    // sans bouton Déconnexion visible. Le code élève reste exigé.
+    if(session)logout(false);
     requestAccess('history');
     return;
   }
@@ -836,15 +839,19 @@ async function show(kind){
     <div><h2>${kind==='records'?'Mes enregistrements':'Mon historique'}</h2>
     <div class="v211-page-sub">${kind==='records'?'Mes TP enregistrés sur cet appareil et encore modifiables.':'Mes TP enregistrés, rendus ou corrigés présents sur cet appareil.'}</div></div>
     <span class="v211-session">🔓 ${esc(studentLabel())}</span>
-  </div><div class="v218-tools"><button type="button" id="v218Export">Exporter mon suivi</button><button type="button" id="v218Import">Importer mon suivi</button><button type="button" id="v218Logout">Se déconnecter</button><p>Pour consulter ton avancement à la maison : exporte ton suivi, puis importe ce fichier sur ton ordinateur. Les statuts correspondent au dernier export ; aucune synchronisation automatique.</p></div><div class="v211-list"><div class="v211-empty">Chargement…</div></div>`;
-  $('v218Export').onclick=exportFollowup;$('v218Import').onclick=()=>$('v218FollowupFile').click();$('v218Logout').onclick=()=>logout();
+  </div><div class="v218-tools"><button type="button" id="v218Export">Exporter mon suivi</button><button type="button" id="v218Import">Importer mon suivi</button><p>Pour consulter ton avancement à la maison : exporte ton suivi, puis importe ce fichier sur ton ordinateur. Les statuts correspondent au dernier export ; aucune synchronisation automatique.</p></div><div class="v211-list"><div class="v211-empty">Chargement…</div></div>`;
+  $('v218Export').onclick=exportFollowup;$('v218Import').onclick=()=>$('v218FollowupFile').click();
   const activeSession=session;const all=await rowsForStudent();if(session!==activeSession)return;
   const rows=kind==='records'
     ?all.filter(r=>{
         const st=statusOf(r.data);
         return !r.summaryOnly && !r.data?.submission?.final && (st==='EN COURS'||st==='RÉOUVERT');
       })
-    :all;
+    :[...all].sort((a,b)=>{
+       const finished=d=>{const st=statusOf(d);return st==='RENDU'||st==='CORRIGÉ'};
+       const rank=Number(finished(a.data))-Number(finished(b.data));
+       return rank || String(dateOf(b)).localeCompare(String(dateOf(a)));
+     });
   renderRows(rows,kind);
 }
 function renderRows(rows,kind){
@@ -856,7 +863,7 @@ function renderRows(rows,kind){
   }
   list.innerHTML=rows.map((r,i)=>{
     const d=r.data,st=statusOf(d),cls=st==='RENDU'?'rendu':st==='CORRIGÉ'?'corrige':'';
-    return `<article class="v211-record">
+    return `<article class="v211-record${st==='RENDU'||st==='CORRIGÉ'?' v235-finished':''}">
       <div class="v211-record-icon">${svg(st==='EN COURS'?'file':'clock')}</div>
       <div>
         <div class="v211-record-title">${esc(titleOf(d))}</div>
@@ -908,7 +915,7 @@ if(fi)fi.addEventListener('change',()=>{
       const av=$('v210Avatar');if(av)av.classList.remove('authenticated');
       for(const id of ['v211NavRecords','v211NavHistory']){
         const b=$(id);if(!b)continue;b.classList.add('v211-nav-locked');
-        if(!b.querySelector('.v211-lock'))b.insertAdjacentHTML('beforeend','<span class="v211-lock">🔒</span>');
+        b.querySelector('.v211-lock')?.remove();
       }
       showTp();
     }
@@ -935,7 +942,7 @@ document.addEventListener('tp-reader-rendered',()=>{
 window.tpV211StudentSpace={requestAccess,show,showTp,logout,isAuthenticated:()=>!!session};
 window.tpV213StudentSpace=window.tpV211StudentSpace;
 
-document.title='Lecteur TP Élève — V234 Local';
+document.title='Lecteur TP Élève — V235 Local · Hors ligne';
 console.info('Lecteur TP V226 : espace élève synchronisé avec le statut rendu, historique local cohérent.');
 
 /* V226 : accès autonome et suivi transportable sans TP. */
@@ -1029,7 +1036,7 @@ async function importFollowup(file){
 function logout(home=true){
  session=null;importedPending=null;closeAuth();
  const av=$('v210Avatar');if(av){av.classList.remove('authenticated');av.textContent='EL';av.title='Accéder à mon espace élève'}
- for(const id of ['v211NavRecords','v211NavHistory']){const b=$(id);if(b){b.classList.add('v211-nav-locked');if(!b.querySelector('.v211-lock'))b.insertAdjacentHTML('beforeend','<span class="v211-lock">🔒</span>')}}
+ for(const id of ['v211NavRecords','v211NavHistory']){const b=$(id);if(b){b.classList.add('v211-nav-locked');b.querySelector('.v211-lock')?.remove()}}
  if($('v211PersonalPage'))$('v211PersonalPage').innerHTML='';if(home)showTp();
 }
 function mountFollowup(){
@@ -1547,7 +1554,7 @@ document.addEventListener('click',e=>{if(e.defaultPrevented||e.button!==0||e.tar
  if(!dlg){dlg=document.createElement('dialog');dlg.id='tpV2306ImageView';dlg.innerHTML='<button type="button">Fermer ✕</button><img alt="Image du TP agrandie">';document.body.append(dlg);dlg.querySelector('button').onclick=()=>dlg.close()}
  dlg.querySelector('img').src=img.currentSrc||img.src;dlg.showModal();},false);
 function nav(){const menu=document.querySelector('#v210Sidebar nav'),bar=document.querySelector('body.reader-theme-v210 .topbar-inner');
- const defs=[['v2307Back','↩ Espace Cloud',()=>window.tpCloudBack4107g?.()],['v2307Disconnect','⏻ Déconnexion',()=>window.tpCloudDisconnect4107g?.()]];
+ const defs=[]; // V235 : aucune commande Cloud ni déconnexion dans le lecteur local
  for(const [id,label,fn] of defs){for(const host of [menu,bar]){if(!host||host.querySelector('[data-cloud-action="'+id+'"]'))continue;const b=document.createElement('button');b.type='button';b.dataset.cloudAction=id;b.textContent=label;b.className=host===bar?'btn v2307-cloud-btn':'v210-nav v2307-cloud-btn';b.onclick=fn;host.append(b)}}
  const display=!!window.tpCloudConnected4107g?.();document.querySelectorAll('.v2307-cloud-btn').forEach(b=>b.hidden=!display);
  if(display){for(const [id,tab] of [['v211NavRecords','records'],['v211NavHistory','history']]){const el=document.getElementById(id);if(!el||el.dataset.cloudNav2307)return;el.dataset.cloudNav2307='1';el.classList.remove('v211-nav-locked');el.querySelector('.v211-lock')?.remove();el.addEventListener('click',e=>{if(!window.tpCloudConnected4107g?.())return;e.preventDefault();e.stopImmediatePropagation();window.tpCloudOpenHistory4107g?.(tab)},true)}}
@@ -1587,6 +1594,7 @@ function install(){
  nav.appendChild(b);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+setTimeout(install,400);setTimeout(install,1250); // V235: sidebar mounted asynchronously
 })();
 </script>
 </body></html><style id="v8-symbols-always-visible">
@@ -2253,7 +2261,7 @@ function binaryTableLabels(a){return a.blockKind==='endTp'?{first:'Actions',yes:
    }catch(e){reject('Impossible de lire ce TP : '+(e?.message||e))}};r.readAsText(file,'utf-8')
  };
  const input=document.getElementById('fileInput');if(input)input.onchange=e=>{const f=e.target.files?.[0];if(f)window.loadFile(f);e.target.value=''};
- document.title='Lecteur TP Élève — V234 Local';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+ document.title='Lecteur TP Élève — V235 Local · Hors ligne';const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';
  console.info('Lecteur V157 : verrou RENDU/CORRIGE + anti-réouverture actif.');
 })();
 </script>
@@ -2781,9 +2789,9 @@ if(typeof oldCollect==='function'){
 }
 
 function stamp(){
-  document.title='Lecteur TP Élève — V234 Local';
+  document.title='Lecteur TP Élève — V235 Local · Hors ligne';
   const b=document.querySelector('.brand');
-  if(b)b.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+  if(b)b.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';
 }
 stamp();
 setTimeout(stamp,600);
@@ -3095,8 +3103,8 @@ function settle(){
 }
 [0,120,500].forEach(ms=>setTimeout(settle,ms));
 
-document.title='Lecteur TP Élève — V234 Local';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+document.title='Lecteur TP Élève — V235 Local · Hors ligne';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';
 
 console.info('Lecteur TP V205 : rendu projet unique, date JJ-MM-AAAA, RENDU en lecture seule, déverrouillage professeur et nouvelles copies horodatées.');
 })();
@@ -3466,9 +3474,9 @@ try{
   }
 }catch(_){}
 
-document.title='Lecteur TP Élève — V234 Local';
+document.title='Lecteur TP Élève — V235 Local · Hors ligne';
 const brand206=document.querySelector('.brand');
-if(brand206)brand206.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+if(brand206)brand206.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';
 
 console.info('Lecteur TP V206 : verrou strict après rendu, réouverture du fichier DIFFUSION impossible sans code professeur.');
 })();
@@ -3536,9 +3544,9 @@ body.v205-readonly #teacherUnlockBtn{
 
 <script id="reader-v208-stamp">
 (function(){
- document.title='Lecteur TP Élève — V234 Local';
+ document.title='Lecteur TP Élève — V235 Local · Hors ligne';
  const b=document.querySelector('.brand');
- if(b)b.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+ if(b)b.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';
  console.info('Lecteur TP V209 : fidélité graphique éditeur V74, verrou strict V206/V207, date JJ-MM-AAAA et nouvelle charte compacte d’auto-évaluation.');
 })();
 </script>
@@ -3915,19 +3923,19 @@ function installShell(){
   const side=document.createElement('aside');
   side.id='v210Sidebar';
   side.innerHTML=`
-    <div class="v210-brand"><span class="v210-brand-icon">${svg('book')}</span><span>Lecteur TP élève</span></div>
+    <div class="v210-brand"><span class="v210-brand-icon">${svg('book')}</span><span>Lecteur TP élève</span><span class="v235-side-label">LOCAL</span></div>
     <nav>
       <button class="v210-nav active" type="button" id="v210NavTp">${svg('file')}<span>Mon TP</span></button>
-      <button class="v210-nav v211-nav-locked" type="button" id="v211NavRecords">${svg('clock')}<span>Mes enregistrements</span><span class="v211-lock">🔒</span></button>
-      <button class="v210-nav v211-nav-locked" type="button" id="v211NavHistory">${svg('folder')}<span>Historique</span><span class="v211-lock">🔒</span></button>
+      <button class="v210-nav v211-nav-locked" type="button" id="v211NavRecords">${svg('clock')}<span>Mes enregistrements</span></button>
+      <button class="v210-nav v211-nav-locked" type="button" id="v211NavHistory">${svg('folder')}<span>Historique</span></button>
     </nav>
-    <div class="v210-side-bottom">Lecteur local V233 · Travail élève<br>Compatible éditeur V103</div>`;
+    <div class="v210-side-bottom">Lecteur local V235 · Travail hors ligne<br>Compatible éditeur V103</div>`;
   document.body.insertBefore(side,document.body.firstChild);
 
   const head=document.createElement('header');
   head.id='v210AppHeader';
   head.innerHTML=`
-    <div><h1>Lecteur TP élève</h1><p>Mon espace de travail pour réaliser et compléter mes TP.</p></div>
+    <div><h1>Lecteur TP élève <span class="v235-header-chip">MODE LOCAL · HORS LIGNE</span></h1><p>Mes TP sur cet appareil · Transfert des copies par clé USB, sans Cloudflare.</p></div>
     <div class="v210-head-right">
       <span class="v210-date" id="v210HeaderDate">Date : ${fr('')}</span>
       <span class="v210-bell">${svg('bell')}</span>
@@ -4019,212 +4027,15 @@ else installShell();
 const file=document.getElementById('fileInput');
 if(file)file.addEventListener('change',()=>setTimeout(refresh,350),true);
 
-document.title='Lecteur TP Élève — V234 Local';
-const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V230.5 Cloud / Local';
+document.title='Lecteur TP Élève — V235 Local · Hors ligne';
+const brand=document.querySelector('.brand');if(brand)brand.textContent='Lecteur TP Élève — V235 LOCAL HORS LIGNE';
 console.info('Lecteur TP V214 : coque graphique maquette + fidélité V74 stricte du contenu TP.');
 })();
 </script>
 
 <style id="reader-v217-editor-v103">#v117ProjectHost .question-contents{grid-template-columns:repeat(auto-fit,minmax(min(100%,max(290px,calc((100% - 10px)/2))),1fr))}#v117ProjectHost .question-contents.question-contents-sized{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}#v117ProjectHost .question-content-item{min-width:0;flex-grow:0;flex-shrink:0;box-sizing:border-box}#v117ProjectHost .question-content-item>*{width:100%;max-width:100%;box-sizing:border-box;min-width:0;margin:0!important}#v117ProjectHost .question-content-spacer{grid-column:1/-1}#v117ProjectHost .question-line-break{display:none}#v117ProjectHost .question-contents-sized>.question-line-break{display:block;flex:0 0 100%;height:0;min-height:0;margin:-5px 0!important;padding:0;border:0}#v117ProjectHost .placement-fixed{pointer-events:none;cursor:default}#v117ProjectHost .response-list-line{display:flex;align-items:center;gap:8px;border-bottom:1px solid #b9cddd;padding:5px 8px;background:white}#v117ProjectHost .response-list-dash{font-weight:700;flex:0 0 auto;user-select:none}#v117ProjectHost .response-list-answer{flex:1;width:100%;min-width:0;border:0;background:transparent}#v117ProjectHost .or-page{position:relative;width:100%;container-type:inline-size;background:white;overflow:hidden;break-inside:avoid;margin-bottom:12px}#v117ProjectHost .or-background{display:block!important;width:100%!important;height:100%!important;max-height:none!important;object-fit:fill!important;pointer-events:none}#v117ProjectHost .or-item{position:absolute;display:flex;box-sizing:border-box;overflow:hidden;font-family:Arial,sans-serif;line-height:1.1;padding:1px;border:0;white-space:pre-wrap}#v117ProjectHost .or-label{pointer-events:none}#v117ProjectHost .or-fill input,#v117ProjectHost .or-fill textarea,#v117ProjectHost .or-fill select{display:block;width:100%;max-width:100%;box-sizing:border-box;border:1px solid #bad5e5;background:transparent;font:inherit;color:inherit;text-align:inherit;padding:0 2px;min-height:0;outline-offset:-1px}#v117ProjectHost .or-fill input[type=checkbox]{width:100%;height:100%;margin:0;accent-color:#175b97}#v117ProjectHost .or-fill textarea{height:100%!important;resize:none}#v117ProjectHost .or-print-value{display:none}#v117ProjectHost .or-label[style*="text-align:center"]{justify-content:center}#v117ProjectHost .or-label[style*="text-align:right"]{justify-content:flex-end}#v117ProjectHost .call-prof{display:flex;align-items:center;gap:7px}#v117ProjectHost .call-prof-icon{display:flex}#v117ProjectHost .call-prof-icon svg{width:42px;height:34px}#v117ProjectHost .cover-illustration{margin:14px 0;min-height:var(--cover-illustration-height,85mm);border:1px solid #c2d2df;background:white;display:flex;align-items:center;justify-content:center}#v117ProjectHost .cover-illustration img{display:block;width:100%;height:var(--cover-illustration-height,85mm);max-height:none!important;object-fit:contain}#v117ProjectHost .cover-evaluation{margin:12px 0 18px}#v117ProjectHost .cover-evaluation h2{font-size:14px}#v117ProjectHost .cover-evaluation-table{width:100%;border-collapse:collapse;font-size:11px}#v117ProjectHost .cover-evaluation-table td,#v117ProjectHost .cover-evaluation-table th{padding:6px 8px;border:1px solid #aebfd0;vertical-align:top;text-align:left}#v117ProjectHost .cover-evaluation-table thead th{background:#eaf3f9}#v117ProjectHost .cover-evaluation-table ul{margin:0;padding-left:16px}#v117ProjectHost .qmeta{font-size:10px;line-height:1.4;margin-top:6px}#v117ProjectHost .qmeta-role{font-style:italic;color:#627889}@media print{#v117ProjectHost .or-fill input,#v117ProjectHost .or-fill textarea,#v117ProjectHost .or-fill select{display:none!important}#v117ProjectHost .or-print-value{display:block;width:100%;overflow-wrap:anywhere;white-space:pre-wrap}#v117ProjectHost .or-block{break-inside:auto!important}#v117ProjectHost .or-page{break-inside:avoid}}
 </style><style id="reader-v217-checkbox-print">@media print{#v117ProjectHost .or-fill input[type=checkbox]+.or-print-value{border:1px solid currentColor;height:100%;text-align:center;line-height:1}}</style>
-<script id="reader-cloud-v227">(function(){
-'use strict';
-const BASE='https://portail-partage.khmg8np9yj.workers.dev',hosted=location.protocol==='https:'&&location.pathname.startsWith('/lecteur');
-let user=null,busy=false,folders=[],files=[],tab='diffuses',authorizedOnce=null;
-const $=id=>document.getElementById(id),clone=x=>JSON.parse(JSON.stringify(x));
-async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});let d;try{d=await r.json()}catch{throw Error('Réponse du serveur illisible.')}if(!r.ok)throw Error(d.error||'Connexion impossible.');return d}
-const panel=document.createElement('dialog');panel.id='cloud227-panel';panel.innerHTML='<div class="cloud227-head"><h2>Mon espace Cloud</h2><button type="button" id="cloud227-close">Fermer</button></div><form id="cloud227-login"><p>Entre ton code élève pour retrouver tes TP.</p><label for="cloud227-code">Code personnel</label><input id="cloud227-code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" required pattern="[0-9]{4}"><button type="submit">Accéder à mes TP</button></form><div id="cloud227-space" hidden><p id="cloud227-person"></p><nav id="cloud227-tabs"></nav><label for="cloud227-search">Rechercher un TP</label><input id="cloud227-search" type="search" placeholder="Titre du TP…"><div class="cloud227-tools"><button type="button" id="cloud227-refresh">Actualiser</button><button type="button" id="cloud227-logout">Se déconnecter</button></div><div id="cloud227-list"></div></div><p id="cloud227-status" role="status" aria-live="polite"></p>';document.body.append(panel);
-const style=document.createElement('style');style.textContent='#cloud227-panel{box-sizing:border-box;width:min(760px,96vw);max-height:92dvh;border:0;border-radius:18px;padding:22px;color:#17324d;background:#f8fafc;overflow:auto}#cloud227-panel::backdrop{background:#10243d99}#cloud227-panel button,#cloud227-panel input{font:inherit;font-size:16px;min-height:46px;border-radius:10px;padding:10px 14px}#cloud227-panel input{box-sizing:border-box;width:100%;margin:8px 0 14px;border:1px solid #b9c9dc}#cloud227-panel button{border:1px solid #bccbdb;background:white;color:#193b63;cursor:pointer}#cloud227-panel button:disabled{opacity:.5;cursor:wait}.cloud227-head,.cloud227-tools,#cloud227-tabs{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cloud227-head h2{margin:0}#cloud227-tabs button[aria-selected=true]{background:#174d87;color:white}#cloud227-list{display:grid;gap:10px;margin-top:16px}#cloud227-list .cloud227-file{text-align:left;width:100%;padding:16px;overflow-wrap:anywhere}#cloud227-list small{display:block;color:#526b83;margin-top:5px}#cloud227-status{white-space:pre-wrap}#v210Sidebar #cloud227-launch{min-height:44px;position:static;bottom:auto;right:auto;z-index:auto;box-shadow:none;border-radius:10px;padding:10px 12px;font-weight:650;text-align:left;width:100%;background:transparent;color:inherit}#v210Sidebar #cloud227-launch:hover{background:#eaf4ff}@media print{#cloud227-launch,#cloud227-panel{display:none!important}}';document.head.append(style);
-const launch=document.createElement('button');launch.id='cloud227-launch';launch.className='v210-nav';launch.textContent='☁ Mon espace Cloud';launch.type='button';const attach4105=()=>{const nav=document.querySelector('#v210Sidebar nav');if(nav&&launch.parentElement!==nav)nav.append(launch)};document.body.append(launch);attach4105();document.addEventListener('DOMContentLoaded',attach4105);setTimeout(attach4105,400);setTimeout(attach4105,1200);
-function status(s){$('cloud227-status').textContent=s}
-function show(){if(!hosted){location.href=BASE+'/lecteur';return}if(!panel.open)panel.showModal()}
-launch.onclick=show;$('cloud227-close').onclick=()=>{if(!busy)panel.close()};panel.addEventListener('cancel',e=>{if(busy)e.preventDefault()});
-function enabled(on){busy=!on;panel.querySelectorAll('button').forEach(b=>b.disabled=!on)}
-function folderFor(f){const m=String(f.chemin||'').match(/^@(\d+)(?:\/|$)/);return m?folders.find(d=>String(d.id)===m[1]):null}
-function category(f){if(f.kind==='commun')return f.categorie_document==='hors_tp'||(f.categorie_document!=='tp'&&!/\.(tp|json)$/i.test(f.nom_fichier||''))?'documents':'diffuses';const d=folderFor(f);if(d)return d.type;const name=(f.chemin||'')+'/'+f.nom_fichier;if(/corrig/i.test(name))return 'corriges';if(/rendu/i.test(name))return 'rendus';return 'diffuses'}
-function draw(){
- const labels={diffuses:'TP diffusés',rendus:'TP rendus',corriges:'TP corrigés',documents:'Dépôts hors TP'};$('cloud227-tabs').replaceChildren();
- for(const [id,label]of Object.entries(labels)){const b=document.createElement('button');b.type='button';b.textContent=label+' ('+files.filter(f=>category(f)===id).length+')';b.setAttribute('aria-selected',String(id===tab));b.onclick=()=>{tab=id;draw()};$('cloud227-tabs').append(b)}
- const q=$('cloud227-search').value.toLocaleLowerCase('fr');const list=$('cloud227-list');list.replaceChildren();
- const matches=files.filter(f=>category(f)===tab&&f.nom_fichier.toLocaleLowerCase('fr').includes(q));
- for(const f of matches){const b=document.createElement('button');b.type='button';b.className='cloud227-file';const title=document.createElement('strong'),hint=document.createElement('small');title.textContent=f.nom_fichier;hint.textContent=/\.(tp|json)$/i.test(f.nom_fichier)?(tab==='diffuses'?'Ouvrir dans le lecteur':'Consulter dans le lecteur'):'Ouvrir le document';b.append(title,hint);b.onclick=()=>open(f);list.append(b);if(category(f)==='diffuses'&&/\.(tp|json)$/i.test(f.nom_fichier||'')){const dl=document.createElement('button');dl.type='button';dl.textContent='⬇ Télécharger pour travailler hors connexion';dl.className='cloud227-download';dl.onclick=()=>downloadOffline4105(f);list.append(dl)}}
- if(!matches.length){const p=document.createElement('p');p.textContent='Aucun document à afficher.';list.append(p)}
-}
-async function refresh(){const [a,b,c]=await Promise.all([api('/api/dossiers'),api('/api/fichiers'),api('/api/communs')]);folders=a.dossiers||[];files=[...(b.fichiers||[]).map(f=>({...f,kind:'personnel'})),...(c.fichiers||[]).map(f=>({...f,kind:'commun'}))];draw();updateBell4105();status('Clique sur un TP pour l’ouvrir. Les enregistrements intermédiaires restent sur cet appareil.');}
-// V229 : identification unique. Le navigateur présente automatiquement la session
-// sécurisée créée par le portail, sans recopier ni conserver le code personnel.
-async function activateSession229(me){
- if(me?.role!=='user'||!me.utilisateur?.id)throw Error('Un compte élève est nécessaire.');
- user=me.utilisateur;setTimeout(()=>window.tpV2307Nav?.(),0);
- $('cloud227-login').hidden=true;
- $('cloud227-space').hidden=false;
- $('cloud227-person').textContent='Connecté : '+user.nom+' · session du portail reconnue';
- await refresh();
-}
-async function restoreSession229(){
- if(!hosted)return;
- status('Vérification de la session élève…');
- try{
-  const me=await api('/api/moi');
-  if(me.role==='admin'){
-   $('cloud227-login').hidden=true;
-   status('Une session administrateur est ouverte. Pour utiliser le lecteur élève, déconnecte-toi du portail puis connecte-toi avec le compte élève.');
-   return;
-  }
-  await activateSession229(me);
- }catch(e){
-  user=null;
-  $('cloud227-space').hidden=true;
-  $('cloud227-login').hidden=false;
-  status('Première connexion ou session expirée : saisis ton code personnel une seule fois.');
- }
-}
-$('cloud227-login').onsubmit=async e=>{
- e.preventDefault();enabled(false);status('Connexion…');
- try{
-  const pin=$('cloud227-code').value.trim();
-  const result=await api('/api/connexion',{code:pin});
-  if(result.role!=='user')throw Error('Le lecteur est réservé aux élèves. Déconnecte-toi du portail avant de changer de compte.');
-  $('cloud227-code').value='';
-  await activateSession229(await api('/api/moi'));
- }catch(e){status(e.message)}finally{enabled(true)}
-};
-function authorizeOneCloudTp229(data){
- // Appelé uniquement après la réponse positive de /api/lecteur/ouvrir.
- if(!hosted||!user||!data?.cloud227||String(data.cloud227.userId)!==String(user.id))throw Error('Compte élève ou attribution TP non vérifié.');
- authorizedOnce={id:String(data.cloud227.id),kind:String(data.cloud227.kind),userId:String(user.id),code:String(data.code||''),until:Date.now()+30000};
-}
-
-// Sauvegarde autonome JSON : le TP et ses ressources sont conservés dans le fichier.
-async function downloadOffline4105(f){
- if(busy)return;enabled(false);status('Préparation du TP local…');
- try{const r=await api('/api/lecteur/ouvrir',{source:{id:f.id,kind:f.kind}});const d=r.data;
- const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json;charset=utf-8'}),a=document.createElement('a'),url=URL.createObjectURL(blob);
- a.href=url;a.download=f.nom_fichier.replace(/\.(tp|json)$/i,'')+'_LOCAL.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),25000);
- status('TP téléchargé. Sur ton ordinateur, ouvre le lecteur local puis choisis ce fichier JSON.');
- }catch(e){status('Téléchargement impossible : '+e.message)}finally{enabled(true)}
-}
-function updateBell4105(){
- const bell=document.querySelector('#v210AppHeader .v210-bell');if(!bell)return;
- const n=files.filter(f=>category(f)==='documents'&&f.kind==='commun'&&Number(f.non_consulte_4105)===1).length;
- bell.style.display='inline-flex';bell.style.position='relative';bell.style.cursor='pointer';bell.setAttribute('role','button');bell.setAttribute('tabindex','0');
- bell.title=n?n+' nouveau(x) document(s) à consulter':'Consulter les documents';
- bell.innerHTML='🔔'+(n?'<span id="cloud4105-badge" style="position:absolute;right:-9px;top:-8px;min-width:18px;height:18px;border-radius:99px;background:#bd263d;color:white;font-size:11px;font-weight:800;display:grid;place-items:center;padding:0 4px">'+n+'</span>':'');
- bell.onclick=()=>{tab='documents';show();draw()};bell.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();bell.click()}};
-}
-// La cloche suit les documents téléchargés/consultés sur le serveur, même après changement d'appareil.
-async function refreshBell4105(){if(!hosted||document.hidden)return;try{const list=await api('/api/communs');const others=files.filter(f=>f.kind!=='commun');files=[...others,...(list.fichiers||[]).map(f=>({...f,kind:'commun'}))];updateBell4105()}catch(_){}}
-if(hosted){setInterval(refreshBell4105,60000);setTimeout(refreshBell4105,1700)}
-$('cloud227-search').oninput=draw;$('cloud227-refresh').onclick=async()=>{enabled(false);try{await refresh()}catch(e){status(e.message)}finally{enabled(true)}};
-$('cloud227-logout').onclick=async()=>{if(!confirm('Se déconnecter du portail ?'))return;await window.tpCloudDisconnect4107g?.()};
-async function open(source){
- if(busy||window.__tpV226SubmitInProgress)return;
- if(!/\.(tp|json)$/i.test(source.nom_fichier||'')||category(source)==='documents'){window.open('/api/'+(source.kind==='commun'?'communs':'fichiers')+'/'+encodeURIComponent(source.id)+'/telecharger','_blank','noopener');if(source.kind==='commun'){source.non_consulte_4105=0;updateBell4105();}return}
- if(document.body.classList.contains('tp-active-file')&&!window.model?.submission?.final){if(!confirm('Enregistrer le travail actuel sur cet appareil puis ouvrir ce TP ?'))return;try{window.collect?.();await window.tpV130SaveWork?.()}catch(e){status('Enregistrement impossible : '+e.message);return}}
- enabled(false);status('Ouverture du TP…');
- try{
-  const result=await api('/api/lecteur/ouvrir',{source:{id:source.id,kind:source.kind}}),d=result.data;
-  if(result.state==='open'){await window.tpSubmissionGuard225.recordOpen(d)}
-  if(!d.submission?.final&&result.state!=='final'&&result.state!=='pending'){
-    try{const saved=await api('/api/lecteur/brouillon',{source:d.cloud227,action:'lire'});
-      if(saved.found&&saved.data?.cloud227&&String(saved.data.cloud227.userId)===String(user.id)){
-        Object.assign(d,saved.data);d.cloud227={...saved.data.cloud227};
-        status('Travail en cours retrouve dans Cloudflare ('+new Date(saved.savedAt).toLocaleString('fr-FR')+').');
-      }
-    }catch(error){alert('Impossible de récupérer le brouillon Cloud : '+error.message+'\nNe recommence pas ce TP avant vérification.');throw error}
-  }
-  authorizeOneCloudTp229(d);
-  window.loadFile(new File([JSON.stringify(d)],result.name,{type:'application/json'}));panel.close();
- }catch(e){status(e.message)}finally{enabled(true)}
-}
-window.tpCloud229={
- consumeAuthorizedTp(data){
-  const proof=authorizedOnce;authorizedOnce=null; // utilisation unique ; jamais valable pour un fichier local quelconque
-  if(!hosted||!user||!proof||Date.now()>proof.until||!data?.cloud227)return false;
-  return String(data.cloud227.userId)===proof.userId&&String(user.id)===proof.userId&&String(data.cloud227.id)===proof.id&&String(data.cloud227.kind)===proof.kind&&String(data.code||'')===proof.code;
- }
-};
-window.tpCloud227={
- tryUnlock(){/* Le TP Cloud authentifié s'ouvre via tpCloud229 ; code exigé uniquement en local. */},
- async submit(d){if(!hosted||!user||String(d.cloud227.userId)!==String(user.id)){show();throw Error('Connecte-toi à ton espace Cloud puis clique à nouveau sur Rendre.')}return api('/api/lecteur/rendre',{source:{id:d.cloud227.id,kind:d.cloud227.kind},revision:d.cloud227.revision||0,data:clone(d)})},
- async unlock(d,pin){if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Connecte-toi au compte de cet élève dans Mon espace Cloud.');await api('/api/lecteur/deverrouiller',{source:d.cloud227,code:pin});return true},
- show
-};
-// Reprise guidée d'une copie créée sans réseau, sur le même compte élève.
-const pendingButton4105=document.createElement('button');pendingButton4105.type='button';pendingButton4105.id='cloud227-pending-import';pendingButton4105.textContent='↥ Importer une copie EN ATTENTE';
-const pendingInput4105=document.createElement('input');pendingInput4105.type='file';pendingInput4105.id='cloud227-pending-file';pendingInput4105.accept='.json,.tp,application/json';pendingInput4105.hidden=true;
-$('cloud227-space').querySelector('.cloud227-tools').append(pendingButton4105,pendingInput4105);
-pendingButton4105.onclick=()=>pendingInput4105.click();
-pendingInput4105.onchange=async()=>{const f=pendingInput4105.files?.[0];pendingInput4105.value='';if(!f)return;
- try{const d=JSON.parse(await f.text());if(!d.cloud227||d.submission?.final||!d.code)throw Error('Le fichier doit être une copie TP EN ATTENTE non rendue.');
-  if(!user||String(d.cloud227.userId)!==String(user.id))throw Error('Cette copie appartient à un autre compte élève.');
-  const check=await api('/api/lecteur/ouvrir',{source:{id:d.cloud227.id,kind:d.cloud227.kind}});
-  if(check.state==='final'||check.state==='pending')throw Error('Ce TP est déjà rendu ou sa remise est en cours. Aucune deuxième copie ne sera créée.');
-  if(String(check.data?.code||'')!==String(d.code||''))throw Error('La sauvegarde ne correspond pas au TP attribué à ce compte.');
-  authorizeOneCloudTp229(check.data);
-  window.loadFile(new File([JSON.stringify(d)],f.name,{type:'application/json'}));panel.close();
-  alert('Copie en attente chargée. Vérifie tes réponses puis clique sur Rendre mon TP pour transmettre au professeur. Seule la confirmation du serveur validera le rendu.');
- }catch(e){status('Reprise impossible : '+(e.message||e))}
-};
-
-// V230.6 — une seule session Cloud, brouillons verifies cote Cloudflare.
-let saveBusy4107g=null;
-function cloudCurrent4107g(){const d=window.model;return hosted&&user&&d?.cloud227&&String(d.cloud227.userId)===String(user.id)&&!d.submission?.final&&!document.body.classList.contains('v205-readonly')?d:null}
-async function saveCurrent4107g({notify=true}={}){
- const d=cloudCurrent4107g();
- if(!d){if(window.tpV130SaveWork)await window.tpV130SaveWork();return true}
- if(saveBusy4107g)return saveBusy4107g;
- saveBusy4107g=(async()=>{
-   window.collect?.();
-   if(window.tpV130SaveWork)await window.tpV130SaveWork();
-   const snapshot=clone(window.model);
-   const res=await api('/api/lecteur/brouillon',{source:d.cloud227,revision:d.cloud227.revision||0,data:snapshot});
-   if(!res.ok)throw Error('Le serveur n’a pas confirmé l’écriture.');
-   const verify=await api('/api/lecteur/brouillon',{source:d.cloud227,action:'lire'});
-   if(!verify.found||!verify.data)throw Error('Le brouillon est introuvable après écriture dans R2.');
-   if(JSON.stringify(verify.data.reponses||{})!==JSON.stringify(snapshot.reponses||{}))throw Error('Les réponses relues ne correspondent pas aux réponses sauvegardées.');
-   const stamp=new Date(verify.savedAt||res.savedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-   status('Travail en cours sauvegarde dans Cloudflare a '+stamp+'.');
-   if(notify)alert('Travail enregistre dans Cloudflare a '+stamp+'. Tu pourras le reprendre plus tard.');
-   return true;
- })().catch(e=>{status('Sauvegarde Cloud impossible : '+e.message+' — garde une copie locale.');if(notify)alert('Sauvegarde Cloud NON confirmee. Ne quitte pas sans sauvegarde de secours.\n'+e.message);throw e}).finally(()=>{saveBusy4107g=null});
- return saveBusy4107g;
-}
-window.tpCloudSave4107g=saveCurrent4107g;
-window.tpCloudConnected4107g=()=>!!(hosted&&user); window.tpV2307Nav?.();
-window.tpCloudBack4107g=async()=>{
- try{if(cloudCurrent4107g())await saveCurrent4107g({notify:false})}
- catch(e){alert('Quitter annulé : sauvegarde Cloud non confirmée. Le TP reste ouvert.');return}
- document.body.classList.remove('tp-active-file','v117-project','v205-project-only','v205-readonly');
- document.getElementById('v117ProjectHost')?.replaceChildren();
- show();tab='diffuses';await refresh();
-};
-window.tpCloudDisconnect4107g=async()=>{
- try{if(cloudCurrent4107g())await saveCurrent4107g({notify:false})}
- catch(e){alert('Deconnexion annulee : travail non confirme par Cloudflare.');return}
- try{await api('/api/deconnexion',{});user=null;authorizedOnce=null;location.href='/'}
- catch(e){alert('Deconnexion impossible : '+e.message)}
-};
-window.tpCloudOpenHistory4107g=async(tabName)=>{
- if(!hosted||!user)return false;
- tab=tabName==='history'?'corriges':'diffuses';
- await refresh();show();return true;
-};
-// La consultation locale est une action volontaire via Ouvrir un TP.
-// Les vues Cloud ne declenchent jamais la demande de code local.
-setInterval(()=>{if(cloudCurrent4107g()&&document.visibilityState==='visible'&&!saveBusy4107g)saveCurrent4107g({notify:false}).catch(()=>{});},180000);
-
-document.addEventListener('click',async function(e){
- const b=e.target.closest('button');if(!b||!window.tpCloudConnected4107g?.())return;
- if(b.id==='pauseBtn'||b.id==='quitBtn'){
-   e.preventDefault();e.stopImmediatePropagation();
-   if(b.id==='pauseBtn')await saveCurrent4107g().catch(()=>{});
-   else await window.tpCloudBack4107g();
- }
-},true);
-if(hosted){setTimeout(show,250);restoreSession229();}
-})();
-</script>
+<!-- V235 lecteur local : module de connexion Cloud volontairement absent. Aucun transfert réseau. -->
 <style id="reader-v2308-controls">
 body.v2308-cloud-connected #loadBtn{display:none!important}
 #v117ProjectHost .or-page .v2308-sign-launch{position:absolute;bottom:2%;right:2%;z-index:25;background:#0875ec;color:white;border:1px solid #0875ec;border-radius:7px;padding:7px 9px;font-weight:750;font-size:11px;cursor:pointer}
@@ -4271,3 +4082,41 @@ function bind(){const b=document.getElementById('pauseBtn');if(b&&!b.dataset.tfa
 const q=document.getElementById('quitBtn');if(q&&!q.dataset.tfab232){q.dataset.tfab232='1';q.addEventListener('click',async e=>{try{await save()}catch(err){e.preventDefault();e.stopImmediatePropagation();alert('Impossible de quitter : le travail n’a pas été sauvegardé. '+err.message)}},true)}}
 setTimeout(bind,100);setTimeout(bind,600);document.addEventListener('DOMContentLoaded',bind);
 })();</script>
+
+
+<style id="tfab-v235-local-identity">
+/* V235 : identité visuelle du lecteur autonome. Ne recolore pas les TP. */
+body.reader-theme-v210{
+  --v211-blue:#bc6613;--v211-navy:#71370a;--v211-line:#edcfae;
+  --v211-soft:#fff4e5;--v211-bg:#fffaf4;
+  background:radial-gradient(circle at 78% 7%,rgba(240,155,45,.13),transparent 29%),linear-gradient(180deg,#fffcf8,#fff5ea);
+}
+#v210Sidebar{background:#fff8ed;border-right:2px solid #e3ab6a;box-shadow:6px 0 24px rgba(130,75,12,.055)}
+#v210Sidebar .v210-brand{color:#7f420d;border-bottom-color:#f1dbc4;gap:7px;font-size:13px;flex-wrap:wrap;height:auto;min-height:55px}
+#v210Sidebar .v210-brand-icon{background:linear-gradient(155deg,#ef9d30,#c56d12);box-shadow:0 4px 12px rgba(192,108,20,.23)}
+#v210Sidebar .v235-side-label{font-size:9px;letter-spacing:.07em;background:#9b520f;color:white;border-radius:4px;padding:3px 5px;font-weight:950}
+#v210Sidebar .v210-nav.active{background:#ffead0;color:#8c490c}
+#v210Sidebar .v210-nav:hover{background:#fff0dd}
+#v210Sidebar .v211-nav-locked{opacity:1}
+#v210Sidebar .v211-lock{display:none!important}
+#v210Sidebar .v210-side-bottom{color:#965a28;border-top:1px solid #f2dcc7}
+#v210AppHeader{background:#fff7eb;border-bottom:2px solid #dda46a}
+#v210AppHeader h1{color:#733907;display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+#v210AppHeader .v235-header-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:950;letter-spacing:.06em;color:#fff;background:#955010;border:1px solid #955010;border-radius:7px;padding:8px 10px;line-height:1}
+#v210AppHeader p{color:#965e29}
+#v210AppHeader .v210-avatar{background:#ffdfb4;color:#713905}
+#v210AppHeader .v210-avatar.authenticated{background:#dbf3dc;color:#166534}
+body.reader-theme-v210 .topbar-inner{border-color:#edc99d}
+body.reader-theme-v210 #pauseBtn{background:#fff1dc!important;color:#8f4d0b!important;border-color:#e7b779!important}
+body.reader-theme-v210 .helper{border-color:#e9c8a1}
+/* TP rendus ou corrigés = verts, clairement distincts des brouillons. */
+#v211PersonalPage .v211-record.v235-finished{background:#e9f9ef!important;border:1px solid #6dbb86!important;box-shadow:0 4px 13px rgba(25,125,69,.09)!important}
+#v211PersonalPage .v211-record.v235-finished .v211-record-icon{background:#c9efd7!important;color:#176638!important}
+#v211PersonalPage .v211-record.v235-finished .v211-record-title{color:#175d31!important}
+#v211PersonalPage .v211-record.v235-finished .v211-status{background:#c6efd2!important;color:#14532d!important}
+#v211PersonalPage .v211-record.v235-finished .v211-open{border-color:#76ba8a!important;color:#14532d!important;background:#fff!important}
+#v211PersonalPage .v211-record.v235-finished .v211-record-meta{color:#447455!important}
+#cloud227-launch,#cloud227-panel,#v2307Back,#v2307Disconnect,#v2306Disconnect,#v211CloudLaunch,[data-cloud-action]{display:none!important}
+@media(max-width:700px){#v210AppHeader h1{font-size:18px}#v210AppHeader .v235-header-chip{font-size:9px;padding:6px 7px}#v210AppHeader p{font-size:10px}}
+@media print{#v210Sidebar,#v210AppHeader{display:none!important}body.reader-theme-v210{background:white!important;padding-left:0!important}}
+</style>
